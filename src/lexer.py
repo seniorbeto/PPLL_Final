@@ -39,7 +39,7 @@ class ViperLexer:
                  'LPAREN', 'RPAREN',
                  'LBRACKET', 'RBRACKET',
                  'LBRACE', 'RBRACE',
-                 'COMMA', 'COLON', 'SEMICOLON',
+                 'COMMA', 'COLON', 'SEMICOLON', 'DOT',
                 'COMMENT', 'MLCOMMENT',
                 'NEWLINE'
              ] + list(reserved.values())
@@ -63,9 +63,10 @@ class ViperLexer:
     t_RBRACE     = r'\}'
     t_COMMA      = r','
     t_COLON      = r':'
-    t_SEMICOLON  = r';'
+    t_SEMICOLON  = r';' # ¿Necesario?
+    t_DOT        = r'\.'
 
-    # Ignorar espacios y tabulaciones
+    # Ignorar espacios y tabulaciones (de momento)
     t_ignore = ' \t'
 
     # Definición para números en coma flotante (incluye notación científica)
@@ -98,6 +99,16 @@ class ViperLexer:
         t.value = int(t.value)
         return t
 
+    # Comentarios de una línea
+    def t_COMMENT(self, t):
+        r'\#.*'
+        pass
+
+    def t_MULTICOMMENT(self, token):
+        r'\'\'\'(.|\n)*\'\'\''
+        token.lexer.lineno += token.value.count('\n')
+        pass
+
     # Carácter: cualquier símbolo ASCII-extendido delimitado por comillas simples
     def t_CHAR_CONST(self, t):
         r'\'([^\\\n]|(\\.))?\''
@@ -110,16 +121,6 @@ class ViperLexer:
         r'[A-Za-z_][A-Za-z0-9_]*'
         t.type = self.reserved.get(t.value, 'ID')
         return t
-
-    # Comentarios de una línea
-    def t_COMMENT(self, t):
-        r'\#.*'
-        pass
-
-    def t_MULTICOMMENT(self, token):
-        r'\'\'\'(.|\n)*\'\'\''
-        token.lexer.lineno += token.value.count('\n')
-        pass
 
     # Manejo de saltos de línea para llevar la cuenta
     def t_NEWLINE(self, token):
