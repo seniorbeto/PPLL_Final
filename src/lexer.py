@@ -2,9 +2,9 @@ import ply.lex as lex
 
 class ViperLexer:
     def __init__(self, route: str):
-        self.__lexer = None
-        self.__input_file = route
-        self.__output_file = route.replace(".vip", ".token")
+        self.lexer = None
+        self.input_file = route
+        self.output_file = route.replace(".vip", ".token")
     # Palabras reservadas
     reserved = {
         'true': 'TRUE',
@@ -39,7 +39,7 @@ class ViperLexer:
                  'LPAREN', 'RPAREN',
                  'LBRACKET', 'RBRACKET',
                  'LBRACE', 'RBRACE',
-                 'COMMA', 'COLON', 'SEMICOLON', 'DOT',
+                 'COMMA', 'COLON', 'DOT',
                 'COMMENT', 'MLCOMMENT',
                 'NEWLINE'
              ] + list(reserved.values())
@@ -63,7 +63,6 @@ class ViperLexer:
     t_RBRACE     = r'\}'
     t_COMMA      = r','
     t_COLON      = r':'
-    t_SEMICOLON  = r';' # ¿Necesario?
     t_DOT        = r'\.'
 
     # Ignorar espacios y tabulaciones (de momento)
@@ -139,20 +138,20 @@ class ViperLexer:
         """
         Construye el lexer con la configuración de PLY.
         """
-        self.__lexer = lex.lex(module=self, **kwargs)
+        self.lexer = lex.lex(module=self, **kwargs)
 
     def run(self) -> None:
-        if self.__lexer is None:
+        if self.lexer is None:
             print("ERROR: build the lexer first.")
             return None
 
         try:
-            with open(self.__input_file, "r") as file:
-                self.__lexer.input(file.read())
+            with open(self.input_file, "r") as file:
+                self.lexer.input(file.read())
 
             # Exportamos los tokens a un archivo
-            with open(self.__output_file, "w") as file:
-                for token in iter(self.__lexer.token, None):
+            with open(self.output_file, "w") as file:
+                for token in iter(self.lexer.token, None):
                     file.write(f"{token.type} {token.value}\n")
 
         except FileNotFoundError as e:

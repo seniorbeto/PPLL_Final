@@ -1,7 +1,7 @@
 import sys
 import os
 from lexer import ViperLexer
-from parser import Parser
+from parser import ViperParser
 
 class Main():
     def __init__(self, route):
@@ -9,8 +9,10 @@ class Main():
         self.__lexer = ViperLexer(self.__route)
         self.__lexer.build()
         self.__lexer.run()
-        #self.__parser = Parser(self.__lexer, self.__route)
-        #self.__parser.run()
+        self.__parser = ViperParser(self.__lexer, self.__route)
+
+        result = self.__parser.parse()
+        print("Árbol sintáctico resultante:", result)
 
 
 if __name__ == "__main__":
