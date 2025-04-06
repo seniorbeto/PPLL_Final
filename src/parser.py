@@ -94,7 +94,6 @@ class ViperParser:
     #  int a, b, c
     #  float x
     #
-    # TODO: AQUÍ DEBERÍA CONTEMPLAR DECLARAR E INICIALIZAR
     # TODO: AQUÍ DEBERÍAN CONTEMPLARSE LAS "VARIABLES DE TIPO REGISTRO"
     def p_declaration(self, p):
         """
@@ -111,7 +110,7 @@ class ViperParser:
     def p_var_decl(self, p):
         """
         var_decl : ID
-                 | LBRACKET DECIMAL RBRACKET ID
+                 | LBRACKET expression RBRACKET ID
         """
         if len(p) == 2:
             p[0] = ("var", p[1])
