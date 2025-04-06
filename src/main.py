@@ -20,4 +20,6 @@ if __name__ == "__main__":
         print("Usage: python3 main.py <file>")
         exit(1)
 
+    os.system("rm parser.out parsetab.py")
+
     Main(sys.argv[1])

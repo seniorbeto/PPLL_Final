@@ -142,13 +142,24 @@ class ViperParser:
         assignment : ID EQUALS expression
                     | ID LBRACKET expression RBRACKET EQUALS expression
                     | declaration EQUALS expression
+                    | ID EQUALS assignment
         """
-        if len(p) == 4:
-            # Asignación simple
-            p[0] = ("assign", p[1], p[3])
-        elif len(p) == 7:
-            # Asignación a un vector
+        if len(p) == 7:
+            # Asignación a un vector: ID [ expression ] = expression
             p[0] = ("assign_vector", p[1], p[3], p[6])
+        elif len(p) == 4:
+            # Si p[1] proviene de una declaración, usamos la alternativa declaration EQUALS expression
+            if isinstance(p[1], tuple) and p[1][0] == "declaration":
+                p[0] = ("assign_declaration", p[1], p[3])
+            else:
+                # Diferenciamos entre simple asignación (ID = expression)
+                # y asignación recursiva (ID = assignment) comprobando el tipo de p[3].
+                # Se asume que, en la alternativa recursiva, p[3] es una tupla
+                # cuyo primer elemento indica que es resultado de una asignación.
+                if isinstance(p[3], tuple) and p[3][0] in ("assign", "assign_vector", "assign_declaration", "assign_recursive"):
+                    p[0] = ("assign_recursive", p[1], p[3])
+                else:
+                    p[0] = ("assign", p[1], p[3])
 
     # ------------------------------------------------------------------
     # Estructura if/else
@@ -162,14 +173,24 @@ class ViperParser:
     def p_if_statement(self, p):
         """
         if_statement : IF expression COLON block
-                     | IF expression COLON block ELSE COLON block
+                     | IF expression COLON block newlines ELSE COLON block
         """
         if len(p) == 5:
             # if sin else
             p[0] = ("if", p[2], p[4], None)
         else:
-            # if con else
-            p[0] = ("if_else", p[2], p[4], p[7])
+            # if con else (p[5] corresponde a newlines, y p[8] es el bloque después de ELSE)
+            p[0] = ("if_else", p[2], p[4], p[8])
+
+    def p_newlines(self, p):
+        """
+        newlines : NEWLINE
+                 | newlines NEWLINE
+                 |
+        """
+        # No necesitamos construir un AST para los saltos de línea,
+        # simplemente ignoramos su contenido.
+        pass
 
     # Bucle while
     #
