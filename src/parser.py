@@ -84,7 +84,6 @@ class ViperParser:
                   | if_statement
                   | while_statement
                   | COMMENT NEWLINE
-                  | empty
         """
         p[0] = p[1]
 
@@ -93,7 +92,8 @@ class ViperParser:
     #  int a, b, c
     #  float x
     #
-    # Podrías permitir asignar:  int x = 10  => se complicaría un poco.
+    # TODO: AQUÍ DEBERÍA CONTEMPLAR DECLARAR E INICIALIZAR
+    # TODO: AQUÍ DEBERÍAN CONTEMPLARSE LAS "VARIABLES DE TIPO REGISTRO"
     def p_declaration(self, p):
         """
         declaration : INT_TYPE var_list
@@ -231,15 +231,6 @@ class ViperParser:
         expression : ID
         """
         p[0] = ("id", p[1])
-
-    # ------------------------------------------------------------------
-    # Regla "vacía" para simplificar
-    # ------------------------------------------------------------------
-    def p_empty(self, p):
-        """
-        empty :
-        """
-        p[0] = None
 
     # ------------------------------------------------------------------
     # Manejo de errores sintácticos
