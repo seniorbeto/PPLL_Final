@@ -109,7 +109,7 @@ class ViperParser:
     def p_var_decl(self, p):
         """
         var_decl : ID
-                 | ID LBRACKET expression RBRACKET
+                 | LBRACKET DECIMAL RBRACKET ID
         """
         if len(p) == 2:
             p[0] = ("var", p[1])
