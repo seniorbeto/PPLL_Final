@@ -84,6 +84,8 @@ class ViperParser:
                   | if_statement
                   | while_statement
                   | COMMENT NEWLINE
+                  | MLCOMMENT NEWLINE
+                  | NEWLINE
         """
         p[0] = p[1]
 
@@ -114,7 +116,7 @@ class ViperParser:
         if len(p) == 2:
             p[0] = ("var", p[1])
         else:
-            p[0] = ("vector", p[1], p[3])
+            p[0] = ("vector", p[4], p[2])  # p[4] es el ID, p[2] es el tamaño
 
     # var_list: una lista de identificadores separada por comas
     #
@@ -131,14 +133,23 @@ class ViperParser:
         else:
             p[0] = [p[1]]
 
-    # Sentencia de asignación (simplificada):
+    # Sentencia de asignación
     #
     #  a = expr
+    # También se puede asignar a un vector y asignar a un valor
+    # que se acaba de declarar
     def p_assignment(self, p):
         """
         assignment : ID EQUALS expression
+                    | ID LBRACKET expression RBRACKET EQUALS expression
+                    | declaration EQUALS expression
         """
-        p[0] = ("assign", p[1], p[3])
+        if len(p) == 4:
+            # Asignación simple
+            p[0] = ("assign", p[1], p[3])
+        elif len(p) == 7:
+            # Asignación a un vector
+            p[0] = ("assign_vector", p[1], p[3], p[6])
 
     # ------------------------------------------------------------------
     # Estructura if/else
@@ -148,6 +159,7 @@ class ViperParser:
     # Este es un ejemplo muy simplificado, asumiendo que el
     # parser reconoce : y un bloque luego (no implementado aquí).
     # ------------------------------------------------------------------
+    # TODO: SI HAY UN NEWLINE ANTES DEL ELSE, NO DEBERÍA SER UN ERROR Y ESO TODAVÍA NO SE CONTEMPLA
     def p_if_statement(self, p):
         """
         if_statement : IF expression COLON block
@@ -158,7 +170,7 @@ class ViperParser:
             p[0] = ("if", p[2], p[4], None)
         else:
             # if con else
-            p[0] = ("if", p[2], p[4], p[7])
+            p[0] = ("if_else", p[2], p[4], p[7])
 
     # Bucle while
     #

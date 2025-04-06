@@ -39,7 +39,7 @@ class ViperLexer:
                  'LPAREN', 'RPAREN',
                  'LBRACKET', 'RBRACKET',
                  'LBRACE', 'RBRACE',
-                 'COMMA', 'COLON', 'DOT',
+                 'COMMA', 'COLON', 'DOT', 'SEMICOLON',
                 'COMMENT', 'MLCOMMENT',
                 'NEWLINE'
              ] + list(reserved.values())
@@ -63,6 +63,7 @@ class ViperLexer:
     t_RBRACE     = r'\}'
     t_COMMA      = r','
     t_COLON      = r':'
+    t_SEMICOLON  = r';'
     t_DOT        = r'\.'
 
     # Ignorar espacios y tabulaciones (de momento)
