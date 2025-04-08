@@ -1,12 +1,19 @@
 if a:{
     a = 2
 }
-
-
-
-
-
-
 else : {
-    int[891029831400] tu_madre
+    int[c] tu_madre
+}
+int a=3
+
+
+type Tetico: {
+    int[c] tu_madre
+    float a,b,c = 3.14
+    }
+
+def int comemelhuevo(int f,a,c; float r):
+{
+    f = a + b + c
+    return f
 }

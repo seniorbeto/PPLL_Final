@@ -54,9 +54,10 @@ class ViperParser:
     def p_program(self, p):
         """
         program : statement_list
+                  |
         """
         # p[0] será la representación interna (AST, lista de sentencias, etc.)
-        p[0] = p[1]
+        p[0] = (p[1] if len(p) > 1 else None)
 
     # Lista de sentencias
     #
@@ -82,12 +83,14 @@ class ViperParser:
         statement : declaration NEWLINE
                   | assignment NEWLINE
                   | if_statement
+                  | TYPE register
                   | while_statement
                   | COMMENT NEWLINE
                   | MLCOMMENT NEWLINE
+                  | funct_decl
                   | NEWLINE
         """
-        p[0] = p[1]
+        p[0] = (p[1] if len(p) == 2 else p[2])
 
     # Sentencia de declaración, ejemplo simple:
     #
@@ -105,6 +108,13 @@ class ViperParser:
         # p[1] es el tipo (INT_TYPE, FLOAT_TYPE, etc.)
         # p[2] es la lista de variables devuelta por var_list
         p[0] = ("declaration", p[1], p[2])
+
+
+    def p_register(self,p):
+        """
+        register : ID COLON block
+        """
+        p[0] = ("register", p[1], p[3])
 
     # Declaración de variables o de vectores
     def p_var_decl(self, p):
@@ -136,11 +146,13 @@ class ViperParser:
     #
     #  a = expr
     # También se puede asignar a un vector y asignar a un valor
+    # TODO CREO QUE NO PODEMOS HACER ASIGNACIONES A UN VECTOR TIENE QUE SER UN INT POR COJONES O UNA VAR de tipo INT
     # que se acaba de declarar
     def p_assignment(self, p):
         """
         assignment : ID EQUALS expression
-                    | ID LBRACKET expression RBRACKET EQUALS expression
+                    | ID LBRACKET DECIMAL RBRACKET EQUALS expression
+                    | ID LBRACKET ID RBRACKET EQUALS expression
                     | declaration EQUALS expression
                     | ID EQUALS assignment
         """
@@ -161,6 +173,36 @@ class ViperParser:
                 else:
                     p[0] = ("assign", p[1], p[3])
 
+
+    #-------------------------------------------------------------------
+    # Estructura de declaración de funciones
+    # def <Tipo de retorno> <Id_funcion> "(" <lista_argumentos> ")" ":" <BLOQUE_FUNC>
+    #
+    # BLOQUE_FUNC es del tipo:
+    # "{" <BLOQUE_SENTENCIAS> return <SENTENCIA> "}"
+    def p_funct_decl(self, p):
+        """
+        funct_decl : DEF type_funct ID arg_funct COLON block_funct
+        """
+    #TODO ESTO LO HE DESARROLLADO COMO LA QUE HICIMOS EN LA PIZARRA    L-> type id D OTRA
+                                                                #TODO  D-> ,idD | lambda
+                                                                #TODO  OTRA-> ;L | lambda
+    #TODO NO SE SI VA
+    def p_arg_funct(self,p):
+        """
+        arg_funct : TYPE ID extra another
+        """
+    def p_extra(self,p):
+        """
+        extra : COMMA ID extra
+                |
+        """
+    def p_another(self,p):
+        """
+        another : SEMICOLON arg_funct
+                |
+        """
+
     # ------------------------------------------------------------------
     # Estructura if/else
     #
@@ -172,26 +214,21 @@ class ViperParser:
     # TODO: SI HAY UN NEWLINE ANTES DEL ELSE, NO DEBERÍA SER UN ERROR Y ESO TODAVÍA NO SE CONTEMPLA
     def p_if_statement(self, p):
         """
-        if_statement : IF expression COLON block
-                     | IF expression COLON block newlines ELSE COLON block
+        if_statement : IF expression COLON block else
         """
         if len(p) == 5:
             # if sin else
             p[0] = ("if", p[2], p[4], None)
         else:
             # if con else (p[5] corresponde a newlines, y p[8] es el bloque después de ELSE)
-            p[0] = ("if_else", p[2], p[4], p[8])
+            p[0] = ("if_else", p[2], p[4], p[5])
 
-    def p_newlines(self, p):
+    def p_else(self, p):
         """
-        newlines : NEWLINE
-                 | newlines NEWLINE
-                 |
+        else  : NEWLINE ELSE COLON block
+                | NEWLINE
         """
-        # No necesitamos construir un AST para los saltos de línea,
-        # simplemente ignoramos su contenido.
-        pass
-
+        p[0] = ("else", p[4]) if len(p) == 5 else None
     # Bucle while
     #
     # while <expr> : (bloque)
@@ -257,6 +294,14 @@ class ViperParser:
                    | CHAR_CONST
         """
         p[0] = ("literal", p[1])
+
+    def p_type_funct(self,p):
+        """
+        type_funct : INT_TYPE
+                   | FLOAT_TYPE
+                   | BOOL_TYPE
+                   | ID
+        """
 
     def p_expression_id(self, p):
         """
