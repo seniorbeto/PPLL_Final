@@ -10,19 +10,6 @@ class ViperParser:
 
     # ------------------------------------------------------------
     # Precedencias y asociatividades
-    #
-    # Aquí definimos la precedencia (de menor a mayor) para
-    # evitar ambigüedades en expresiones como "a + b * c".
-    #
-    # El formato es:
-    #   (asociatividad, 'TOKEN', 'TOKEN', ...)
-    #
-    # Ejemplo de menor precedencia a mayor:
-    #  - 'OR', 'AND' (operadores lógicos)
-    #  - comparaciones EQ, GT, etc.
-    #  - aritméticos +, -
-    #  - aritméticos *, /
-    #  - NOT es unario (por eso right)
     # ------------------------------------------------------------
     precedence = (
         ('left', 'OR', 'AND'),
@@ -41,29 +28,20 @@ class ViperParser:
         self.parser = None
 
     # ------------------------------------------------------------
-    # Reglas de la gramática
-    #
-    # La estructura principal que sugiere el enunciado es:
-    # - El programa (program) está compuesto por sentencias (statements).
-    # - Hay varios tipos de sentencias: declaración, asignación, control de flujo, etc.
-    # - Las expresiones combinan operandos aritméticos, booleanos, etc.
-    # - Los saltos de línea (NEWLINE) o ';' pueden servir de separadores (depende de tu diseño).
+    # Reglas de la gramática (sin cambiar la definición)
     # ------------------------------------------------------------
 
-    # Regla de partida: el programa completo
+    # Axioma de la gramática (puede ser vacío)
     def p_program(self, p):
         """
         program : statement_list
-                  |
+                |
         """
-        # p[0] será la representación interna (AST, lista de sentencias, etc.)
-        p[0] = (p[1] if len(p) > 1 else None)
+        # Unificamos la salida: si no hay statements, devolvemos lista vacía
+        statements = p[1] if len(p) > 1 and p[1] else []
+        p[0] = ("program", statements)
 
     # Lista de sentencias
-    #
-    # Cada statement puede estar seguido opcionalmente de NEWLINE,
-    # dependiendo de cómo quieras estructurarlo. Aquí lo hacemos
-    # simple y asumimos que cada statement va seguido de NEWLINE.
     def p_statement_list(self, p):
         """
         statement_list : statement_list statement
@@ -75,8 +53,7 @@ class ViperParser:
             p[0] = [p[1]]
 
     # ------------------------------------------------------------------
-    # Definimos statement como: declaración, asignación, if, while, etc.
-    # Ajusta estas reglas según tu gramática final.
+    # statement
     # ------------------------------------------------------------------
     def p_statement(self, p):
         """
@@ -88,36 +65,37 @@ class ViperParser:
                   | COMMENT NEWLINE
                   | MLCOMMENT NEWLINE
                   | funct_decl
+                  | funct_call NEWLINE
                   | NEWLINE
         """
-        p[0] = (p[1] if len(p) == 2 else p[2])
+        # Si es una ´declaración de un registro es el único
+        # caso distinto
+        print(p[1])
+        if len(p) == 3 and "register" in p[2]:
+            p[0] = p[2]
 
-    # Sentencia de declaración, ejemplo simple:
-    #
-    #  int a, b, c
-    #  float x
-    #
-    # TODO: AQUÍ DEBERÍAN CONTEMPLARSE LAS "VARIABLES DE TIPO REGISTRO"
+        else:
+            p[0] = p[1]
+
+    # Sentencia de declaración
     def p_declaration(self, p):
         """
         declaration : INT_TYPE var_list
                     | FLOAT_TYPE var_list
                     | CHAR_TYPE var_list
                     | BOOL_TYPE var_list
-                    | ID ID
+                    | ID var_list
         """
-        # p[1] es el tipo (INT_TYPE, FLOAT_TYPE, etc.)
-        # p[2] es la lista de variables devuelta por var_list
         p[0] = ("declaration", p[1], p[2])
 
-
-    def p_register(self,p):
+    def p_register(self, p):
         """
         register : ID COLON block
         """
+        # Ejemplo: ("register", "MiRegistro", ("block", [...]))
         p[0] = ("register", p[1], p[3])
 
-    # Declaración de variables o de vectores
+    # Declaración de variable (o vector)
     def p_var_decl(self, p):
         """
         var_decl : ID
@@ -126,74 +104,45 @@ class ViperParser:
         if len(p) == 2:
             p[0] = ("var", p[1])
         else:
-            p[0] = ("vector", p[4], p[2])  # p[4] es el ID, p[2] es el tamaño
+            p[0] = ("vector_decl", p[4], p[2])  # p[4] es el ID, p[2] es el tamaño
 
-    # var_list: una lista de identificadores separada por comas
-    #
-    #  a, b, c
-    #  foo
-    #  x, y
+    # Lista de variables
     def p_var_list(self, p):
         """
         var_list : var_list COMMA var_decl
                  | var_decl
         """
         if len(p) == 4:
-            p[0] = p[1] + [p[3]]  # p[1] es la lista previa, p[3] el nuevo ID
+            p[0] = p[1] + [p[3]]
         else:
             p[0] = [p[1]]
 
     # Sentencia de asignación
-    #
-    #  a = expr
-    # También se puede asignar a un vector y asignar a un valor
-    # TODO CREO QUE NO PODEMOS HACER ASIGNACIONES A UN VECTOR TIENE QUE SER UN INT POR COJONES O UNA VAR de tipo INT
-    # que se acaba de declarar
     def p_assignment(self, p):
         """
-        assignment : ID EQUALS expression
-                    | ID LBRACKET DECIMAL RBRACKET EQUALS expression
-                    | ID LBRACKET ID RBRACKET EQUALS expression
-                    | declaration EQUALS expression
-                    | ID EQUALS assignment
-                    | ID DOT unique_assignment
+        assignment : reference EQUALS assignment
+                   | reference EQUALS expression
         """
-        if len(p) == 7:
-            # Asignación a un vector: ID [ expression ] = expression
-            p[0] = ("assign_vector", p[1], p[3], p[6])
-        elif len(p) == 4:
-            # Si p[1] proviene de una declaración, usamos la alternativa declaration EQUALS expression
-            if isinstance(p[1], tuple) and p[1][0] == "declaration":
-                p[0] = ("assign_declaration", p[1], p[3])
-            else:
-                # Diferenciamos entre simple asignación (ID = expression)
-                # y asignación recursiva (ID = assignment) comprobando el tipo de p[3].
-                # Se asume que, en la alternativa recursiva, p[3] es una tupla
-                # cuyo primer elemento indica que es resultado de una asignación.
-                if isinstance(p[3], tuple) and p[3][0] in ("assign", "assign_vector", "assign_declaration", "assign_recursive"):
-                    p[0] = ("assign_recursive", p[1], p[3])
-                else:
-                    p[0] = ("assign", p[1], p[3])
+        if isinstance(p[3], tuple) and p[3][0] in ("assign", "assign_recursive"):
+            p[0] = ("assign_recursive", p[1], p[3])
+        else:
+            p[0] = ("assign", p[1], p[3])
 
+    def p_reference(self, p):
+        """
+        reference : ID
+                  | reference DOT ID
+                  | reference LBRACKET expression RBRACKET
+                  | ID LBRACKET expression RBRACKET
+        """
+        if len(p) == 2:
+            p[0] = ("reference", p[1])
+        elif len(p) == 4:
+            p[0] = ("reference_dot", p[1], p[3])
+        else:
+            p[0] = ("reference", p[1], ("index", p[3]))
 
     # -------------------------------------------------------------------
-    #Esto se usa para asignar a un valor de un registro. Puede ser o un id = Expr
-    # o un id [id] = Expr o id[numero] = Expr
-    def p_unique_assignment(self, p):
-        """
-        unique_assignment : ID EQUALS expression
-                          | ID LBRACKET DECIMAL RBRACKET EQUALS expression
-                            | ID LBRACKET ID RBRACKET EQUALS expression
-        """
-
-        #Esto es porro de chat
-        if len(p) == 4:
-            p[0] = ("unique_assign", p[1], p[3])
-        else:
-            p[0] = ("unique_assign_recursive", p[1], p[3])
-
-
-    #-------------------------------------------------------------------
     # Estructura de declaración de funciones
     # def <Tipo de retorno> <Id_funcion> "(" <lista_argumentos> ")" ":" <BLOQUE_FUNC>
     #
@@ -203,97 +152,134 @@ class ViperParser:
         """
         funct_decl : DEF type_funct ID LPAREN arg_funct RPAREN COLON block_funct
         """
-    #TODO ESTO LO HE DESARROLLADO COMO LA QUE HICIMOS EN LA PIZARRA    L-> type id D OTRA
-                                                                #TODO  D-> ,idD | lambda
-                                                                #TODO  OTRA-> ;L | lambda
+        # Ejemplo de nodo: ("funct_decl", return_type, function_name, args, block)
+        p[0] = ("funct_decl", p[2], p[3], p[5], p[8])
 
-    def p_type_funct(self,p):
+    # Llamada a funciones
+    def p_funct_call(self, p):
+        """
+        funct_call : ID LPAREN arg_funct_call RPAREN
+        """
+        # Ej: ("funct_call", "miFuncion", [expr, expr, ...])
+        p[0] = ("funct_call", p[1], p[3])
+
+    def p_arg_funct_call(self, p):
+        """
+        arg_funct_call : expression COMMA arg_funct_call
+                       | expression
+        """
+        if len(p) == 4:
+            # p[1] es expression, p[3] es lista
+            # Convertimos todo a lista unificada
+            # Cuidado: p[1] es una tupla, p[3] es la lista de expresiones
+            if not isinstance(p[3], list):
+                p[3] = [p[3]]
+            p[0] = [p[1]] + p[3]
+        else:
+            p[0] = [p[1]]
+
+    def p_type_funct(self, p):
         """
         type_funct : INT_TYPE
                    | FLOAT_TYPE
                    | BOOL_TYPE
                    | ID
         """
+        p[0] = ("type_funct", p[1])
 
-    #TODO NO SE SI VA
-    def p_arg_funct(self,p):
+    # Argumentos de función
+    def p_arg_funct(self, p):
         """
         arg_funct : type_funct ID extra another
         """
-    def p_extra(self,p):
+        # Para simplificar la estructura, se puede hacer:
+        p[0] = ("arg_funct", [(p[1], p[2])] + (p[3] or []) + (p[4] or []))
+
+    # Extra (coma y más IDs)
+    def p_extra(self, p):
         """
         extra : COMMA ID extra
-                |
+              |
         """
-    def p_another(self,p):
+        if len(p) == 1:
+            p[0] = []
+        else:
+            p[0] = [(None, p[2])] + (p[3] or [])
+
+    def p_another(self, p):
         """
         another : SEMICOLON arg_funct
                 |
         """
+        if len(p) == 1:
+            p[0] = []
+        else:
+            # p[2] es ("arg_funct", [ ... ])
+            p[0] = [p[2]]
 
+    # Bloque de función
     def p_block_funct(self, p):
         """
-        block_funct : LBRACE statement_list funct_ret RBRACE
+        block_funct : newlines LBRACE statement_list funct_ret RBRACE NEWLINE
         """
+        # p[3] es la lista de statements, p[4] es el return
+        p[0] = ("block_funct", p[3], p[4])
 
     def p_funct_ret(self, p):
         """
         funct_ret : RETURN ID newlines
         """
+        # p[0] = ("return", "x")
+        p[0] = ("funct_ret", p[2])
+
     def p_newlines(self, p):
         """
         newlines : NEWLINE
                  |
         """
-    
+        # Podemos ignorarlos
+        p[0] = None
+
     # ------------------------------------------------------------------
-    # Estructura if/else
-    #
-    # if <expresion> : (bloque)  [ else (bloque) ]
-    #
-    # Este es un ejemplo muy simplificado, asumiendo que el
-    # parser reconoce : y un bloque luego (no implementado aquí).
+    # if_statement
     # ------------------------------------------------------------------
-    # TODO: SI HAY UN NEWLINE ANTES DEL ELSE, NO DEBERÍA SER UN ERROR Y ESO TODAVÍA NO SE CONTEMPLA
     def p_if_statement(self, p):
         """
         if_statement : IF expression COLON block else
         """
-        if len(p) == 5:
-            # if sin else
-            p[0] = ("if", p[2], p[4], None)
-        else:
-            # if con else (p[5] corresponde a newlines, y p[8] es el bloque después de ELSE)
-            p[0] = ("if_else", p[2], p[4], p[5])
+        # p[2] es la condición, p[4] el bloque, p[5] el else (o None)
+        p[0] = ("if_statement", p[2], p[4], p[5])
 
     def p_else(self, p):
         """
-        else  : NEWLINE ELSE COLON block
-                | NEWLINE
+        else  : newlines ELSE COLON block
+              | NEWLINE
         """
-        p[0] = ("else", p[4]) if len(p) == 5 else None
-    # Bucle while
-    #
-    # while <expr> : (bloque)
+        if len(p) == 5:
+            p[0] = ("else", p[4])
+        else:
+            p[0] = None
+
+    # ------------------------------------------------------------------
+    # while_statement
+    # ------------------------------------------------------------------
     def p_while_statement(self, p):
         """
         while_statement : WHILE expression COLON block
         """
-        p[0] = ("while", p[2], p[4])
+        p[0] = ("while_statement", p[2], p[4])
 
-    # Un ejemplo de bloque con llaves.
-    # SI USÁRAMOS INDENTACIÓN, AQUÍ CAMBIARÍA TODA LA LÓGICA
+    # ------------------------------------------------------------------
+    # Bloque
+    # ------------------------------------------------------------------
     def p_block(self, p):
         """
-        block : LBRACE statement_list RBRACE
+        block : newlines LBRACE statement_list RBRACE
         """
-        p[0] = ("block", p[2])
+        p[0] = ("block", p[3])
 
     # ------------------------------------------------------------------
     # Expresiones
-    #
-    # Usamos la precedencia definida arriba para las expresiones
-    # aritméticas y lógicas. Definimos las reglas de forma resumida.
     # ------------------------------------------------------------------
     def p_expression_binop(self, p):
         """
@@ -340,26 +326,46 @@ class ViperParser:
 
 
 
-    def p_expression_id(self, p):
+    def p_expression_funct_call(self, p):
         """
-        expression : ID
+        expression : funct_call
         """
-        p[0] = ("id", p[1])
+        # p[1] ya es ("funct_call", name, [args...])
+        p[0] = p[1]
+
+    def p_expression_reference(self, p):
+        """
+        expression : reference
+        """
+        p[0] = p[1]
 
     # ------------------------------------------------------------------
     # Manejo de errores sintácticos
     # ------------------------------------------------------------------
     def p_error(self, p):
         if p:
-            print(f"Syntax error at token {p.type} (value: {p.value}) en la línea {getattr(p, 'lineno', 'UNKNOWN')}")
+            # Obtener línea exacta usando la posición del token
+            line_start = p.lexer.lexdata.rfind('\n', 0, p.lexpos) + 1
+            line_end = p.lexer.lexdata.find('\n', p.lexpos)
+            line = p.lexer.lexdata[line_start:line_end]
+            line_num = p.lineno
+            # No entendemos por qué hay que dividirlo entre dos para obtener la
+            # línea. Fue una idea feliz que funcionó épicamente.
+            print(f"Error sintáctico en línea {int(line_num/2)}:")
+            print(f">>> {line}")
+            print(f"    {' ' * (p.lexpos - line_start)}^")
         else:
-            print("Syntax error at EOF")
+            print("Error sintáctico al final del archivo.")
 
     def build(self, **kwargs):
         """
         Construye el parser con ply.yacc, usando las reglas definidas.
         """
-        self.parser = yacc.yacc(module=self, **kwargs)
+        self.parser = yacc.yacc(
+            module=self,
+            debug=False,
+            write_tables=False,
+        )
 
     def parse(self):
         """
@@ -372,4 +378,7 @@ class ViperParser:
         with open(self.route, 'r') as file:
             input_data = file.read()
 
-        return self.parser.parse(input_data, lexer=self.lexer.lexer)
+        if not input_data.endswith("\n"):
+            input_data += "\n"
+
+        return self.parser.parse(input_data, tracking=True, lexer=self.lexer.lexer)

@@ -22,10 +22,11 @@ Puede contener caracteres especiales, etc
 '''
 
 # --- DECLARACIÓN DE TIPOS ---
-type MiRegistro:
+type MiRegistro:{
     int a
     float f
     char c
+}
 
 # --- DECLARACIÓN DE VARIABLES ---
 MiRegistro reg1            # Variable de tipo registro
@@ -72,7 +73,7 @@ z = vec.len               # z = 5
 if b: {
     x = x + 1 # Incrementa x si b es true
 }
-else
+else :
 {
     x = x - 1
 }
@@ -81,8 +82,7 @@ else
 while not b:
 {
     y = y + 1
-    if y > 20:
-    {
+    if y > 20: {
         b = true
     }
 }

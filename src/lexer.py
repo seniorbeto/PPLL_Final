@@ -126,7 +126,7 @@ class ViperLexer:
     def t_NEWLINE(self, token):
         r'\n+'
         token.lexer.lineno += token.value.count("\n")
-        token.value = "\\n" # Esto es para poder imprimirlo como "\n" en el archivo de salida .token
+        token.value = "nl" # Esto es para poder imprimirlo como "\n" en el archivo de salida .token
         return token
 
     # Manejo de errores léxicos
