@@ -185,6 +185,8 @@ class ViperParser:
                           | ID LBRACKET DECIMAL RBRACKET EQUALS expression
                             | ID LBRACKET ID RBRACKET EQUALS expression
         """
+
+        #Esto es porro de chat
         if len(p) == 4:
             p[0] = ("unique_assign", p[1], p[3])
         else:
