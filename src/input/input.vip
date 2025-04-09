@@ -4,16 +4,16 @@ if a:{
 else : {
     int[c] tu_madre
 }
-int a=3
+type TETICO : {
+    int a
+    int[32] b
+}
+TETICO fuuck
 
+fuuck.a = 2
+fuuck.b[3] = 3
 
-type Tetico: {
-    int[c] tu_madre
-    float a,b,c = 3.14
-    }
-
-def int comemelhuevo(int f,a,c; float r):
-{
+def int comemelhuevo(int f,a,c; float r): {
     f = a + b + c
     return f
 }

@@ -104,6 +104,7 @@ class ViperParser:
                     | FLOAT_TYPE var_list
                     | CHAR_TYPE var_list
                     | BOOL_TYPE var_list
+                    | ID ID
         """
         # p[1] es el tipo (INT_TYPE, FLOAT_TYPE, etc.)
         # p[2] es la lista de variables devuelta por var_list
@@ -155,6 +156,7 @@ class ViperParser:
                     | ID LBRACKET ID RBRACKET EQUALS expression
                     | declaration EQUALS expression
                     | ID EQUALS assignment
+                    | ID DOT unique_assignment
         """
         if len(p) == 7:
             # Asignación a un vector: ID [ expression ] = expression
@@ -174,6 +176,21 @@ class ViperParser:
                     p[0] = ("assign", p[1], p[3])
 
 
+    # -------------------------------------------------------------------
+    #Esto se usa para asignar a un valor de un registro. Puede ser o un id = Expr
+    # o un id [id] = Expr o id[numero] = Expr
+    def p_unique_assignment(self, p):
+        """
+        unique_assignment : ID EQUALS expression
+                          | ID LBRACKET DECIMAL RBRACKET EQUALS expression
+                            | ID LBRACKET ID RBRACKET EQUALS expression
+        """
+        if len(p) == 4:
+            p[0] = ("unique_assign", p[1], p[3])
+        else:
+            p[0] = ("unique_assign_recursive", p[1], p[3])
+
+
     #-------------------------------------------------------------------
     # Estructura de declaración de funciones
     # def <Tipo de retorno> <Id_funcion> "(" <lista_argumentos> ")" ":" <BLOQUE_FUNC>
@@ -182,15 +199,24 @@ class ViperParser:
     # "{" <BLOQUE_SENTENCIAS> return <SENTENCIA> "}"
     def p_funct_decl(self, p):
         """
-        funct_decl : DEF type_funct ID arg_funct COLON block_funct
+        funct_decl : DEF type_funct ID LPAREN arg_funct RPAREN COLON block_funct
         """
     #TODO ESTO LO HE DESARROLLADO COMO LA QUE HICIMOS EN LA PIZARRA    L-> type id D OTRA
                                                                 #TODO  D-> ,idD | lambda
                                                                 #TODO  OTRA-> ;L | lambda
+
+    def p_type_funct(self,p):
+        """
+        type_funct : INT_TYPE
+                   | FLOAT_TYPE
+                   | BOOL_TYPE
+                   | ID
+        """
+
     #TODO NO SE SI VA
     def p_arg_funct(self,p):
         """
-        arg_funct : TYPE ID extra another
+        arg_funct : type_funct ID extra another
         """
     def p_extra(self,p):
         """
@@ -203,6 +229,21 @@ class ViperParser:
                 |
         """
 
+    def p_block_funct(self, p):
+        """
+        block_funct : LBRACE statement_list funct_ret RBRACE
+        """
+
+    def p_funct_ret(self, p):
+        """
+        funct_ret : RETURN ID newlines
+        """
+    def p_newlines(self, p):
+        """
+        newlines : NEWLINE
+                 |
+        """
+    
     # ------------------------------------------------------------------
     # Estructura if/else
     #
@@ -295,13 +336,7 @@ class ViperParser:
         """
         p[0] = ("literal", p[1])
 
-    def p_type_funct(self,p):
-        """
-        type_funct : INT_TYPE
-                   | FLOAT_TYPE
-                   | BOOL_TYPE
-                   | ID
-        """
+
 
     def p_expression_id(self, p):
         """
