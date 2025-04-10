@@ -1,0 +1,5 @@
+Error sintáctico en línea:
+>>> a + 4 + B = 3 - 7
+      ^
+('program',
+ [('assign', ('id', 'B'), ('binop', '-', ('literal', 3), ('literal', 7)))])

@@ -1,0 +1,13 @@
+# Función sin bloque ni retorno
+def int miFuncion(int x) :
+
+
+# Definición de tipos sin bloques de código
+type Persona :
+int edad
+char inicial
+
+
+# Uso de ";" en lugar de nueva linea (esto no es C amigo)
+int a; a = 5
+

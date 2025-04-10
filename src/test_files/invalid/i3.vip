@@ -1,0 +1,2 @@
+# Asignación dentro de asignación
+int b = (a = 3) + 2

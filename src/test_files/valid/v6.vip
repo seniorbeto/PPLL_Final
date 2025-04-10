@@ -1,0 +1,32 @@
+# --- CONTROL DE FLUJO IF/ELSE ---
+if b: {
+    x = x + 1
+}
+else :
+{
+    x = x - 1
+}
+
+# --- BUCLE WHILE ---
+while not b:
+{
+    y = y + 1
+    if y > 20: {
+        b = true
+        while true:
+        {
+            x = x + 1
+            if x > 10: {
+                a = 2
+            }
+        }
+    }
+}
+
+# --- VARIABLES DE TIPO REGISTRO ---
+
+type MiRegistro:{
+    int a
+    float f
+    char c
+}

@@ -1,0 +1,4 @@
+Error sintáctico en línea:
+>>> int b = (a = 3) + 2
+               ^
+('program', ['nl'])

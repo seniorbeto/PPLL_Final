@@ -1,0 +1,20 @@
+# --- ASIGNACIONES BÁSICAS ---
+x = 42
+y = 0b101         # binario
+z = 0o712         # octal
+x = 0xAA          # hexadecimal
+x = 3 * 5 + 2 * 8
+valor = 12.34
+otra = 1.5e2      # notación científica (150.0)
+car = 'a'
+otroCar = '9'
+b = true
+b = false
+int[1932] vec
+char[b + 3] vec2    # El tamaño de un vector puede ser una expresión
+
+# --- DECLARACIONES CON ASIGNACIONES ---
+
+int a = 5
+char b = 'b'
+char c = 102983    # Esto no debería de poderse pero es responsabilidad del semántico

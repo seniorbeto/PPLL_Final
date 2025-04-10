@@ -1,0 +1,14 @@
+# --- DECLARACIÓN DE FUNCIÓN ---
+def float hacerCalculo(int p; float q; bool r):
+{
+    float resultado
+    resultado = p + q
+    if r:
+    {
+        resultado = resultado * 2
+    }
+    return resultado
+}
+
+# --- LLAMADA A FUNCIÓN ---
+valor = hacerCalculo(x, 3.14, b)

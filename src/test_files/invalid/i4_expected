@@ -1,0 +1,10 @@
+Error sintáctico en línea:
+>>> # Definición de tipos sin bloques de código
+                                               ^
+Error sintáctico en línea:
+>>> int edad
+    ^
+Error sintáctico en línea:
+>>> int a; a = 5
+         ^
+('program', [('assign', ('id', 'a'), ('literal', 5))])

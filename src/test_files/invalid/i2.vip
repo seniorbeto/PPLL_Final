@@ -1,0 +1,3 @@
+if x < 10 {                 # Es incorrecto porque falta el token ":"
+  x = x + 1
+}

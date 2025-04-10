@@ -1,0 +1,7 @@
+Error sintáctico en línea:
+>>> if x < 10 {                 # Es incorrecto porque falta el token ":"
+              ^
+Error sintáctico en línea:
+>>> }
+    ^
+('program', ['nl'])

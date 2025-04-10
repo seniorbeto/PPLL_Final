@@ -19,7 +19,7 @@ run_test() {
     local output_file
     output_file="temp/$(basename "$input_file")"
 
-    python3 main.py "$input_file" > "$output_file"
+    python3 main.py "$input_file" > "$output_file" 2> /dev/null
     if cmp -s "$expected_file" "$output_file"; then
         echo -e "Test $(basename "$input_file"): ${GREEN} SUCCESS ${RESET}"
     else
@@ -31,17 +31,24 @@ echo ""
 echo "TEST VÁLIDOS"
 echo ""
 
-run_test input/valid_declarations input/expected_01
-run_test input/valid_assignments input/expected_01
-run_test input/valid_assignments input/expected_01
-run_test input/valid_all.vip input/expected_all
+run_test ./test_files/valid/v0.vip ./test_files/valid/v0_expected     # Fichero vacío
+run_test ./test_files/valid/v1.vip ./test_files/valid/v1_expected     # Fichero con comentarios
+run_test ./test_files/valid/v2.vip ./test_files/valid/v2_expected     # Fichero con declaraciones
+run_test ./test_files/valid/v3.vip ./test_files/valid/v3_expected     # Fichero con asignaciones
+run_test ./test_files/valid/v4.vip ./test_files/valid/v4_expected     # Fichero con operadores y asignaciones múltiples
+run_test ./test_files/valid/v5.vip ./test_files/valid/v5_expected     # Fichero con asignaciones a vectores y operadores de registro
+run_test ./test_files/valid/v6.vip ./test_files/valid/v6_expected     # Fichero con ifs, bucles y registros
+run_test ./test_files/valid/v7.vip ./test_files/valid/v7_expected     # Fichero con funciones y llamadas a funciones
 
 echo ""
 echo "TEST INVÁLIDOS"
 echo ""
 
-run_test test_files/invalid_01 test_files/expected_inv_01
-run_test test_files/invalid_02 test_files/expected_inv_02
-run_test test_files/invalid_03 test_files/expected_inv_03
+# Comprobaremos únicamente errores de sintaxis, no léxicos (puesto que son triviales) ni semánticos
+run_test ./test_files/invalid/i0.vip ./test_files/invalid/i0_expected
+run_test ./test_files/invalid/i1.vip ./test_files/invalid/i1_expected
+run_test ./test_files/invalid/i2.vip ./test_files/invalid/i2_expected
+run_test ./test_files/invalid/i3.vip ./test_files/invalid/i3_expected
+run_test ./test_files/invalid/i4.vip ./test_files/invalid/i4_expected
 
 rm -rf temp
