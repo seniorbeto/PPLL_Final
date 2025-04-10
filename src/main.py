@@ -1,11 +1,9 @@
 import sys
 import os
 
-EXPORT_TREE = False
 try:
     from graphviz import Digraph
     from tree_gen import TreeGen
-    EXPORT_TREE = True
 except ImportError:
     pass
 
@@ -27,18 +25,32 @@ class Main:
         if not EXPORT_TREE:
             pp(result)
         else:
-            self.__output_filename = self.__route.split("/input/")[-1].replace(".vip", "")
+            self.__output_filename = route.replace(".vip", "")
             try:
                 TreeGen(result,self.__output_filename, "/tree_gen/")
             except Exception as e:
                 print(f"[ERROR] {e}")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python3 main.py <file>")
+    if len(sys.argv) not in [2, 3] or (len(sys.argv) == 3 and sys.argv[2] != "true"):
+        print("Usage: python3 main.py <file> <print_graph>")
+        print("Argument <print_graph> is optional. If provided, it must be \"true\"")
+        print(" and package graphviz needs to be installed.")
+        print(" This will export the graph to a separate file.")
+        print(" If not provided, the syntax tree will be printed to the console.")
         exit(1)
 
+    EXPORT_TREE = False
+    if len(sys.argv) == 3 and sys.argv[2] != "true":
+        try:
+            from graphviz import Digraph
+            from tree_gen import TreeGen
+            EXPORT_TREE = True
+            os.system("rm -rf ./tree_gen/*")
+        except ImportError:
+            print("[ERROR] graphviz package not installed. Please install it with pip.")
+            exit(1)
+
     os.system("rm parser.out parsetab.py")
-    os.system("rm -rf ./tree_gen/*")
 
     Main(sys.argv[1])

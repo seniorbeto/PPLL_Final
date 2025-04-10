@@ -416,7 +416,7 @@ class ViperParser:
         Construye el parser con ply.yacc, usando las reglas definidas.
         """
         self.parser = yacc.yacc(
-            module=self,
+            module=self
         )
 
     def parse(self):

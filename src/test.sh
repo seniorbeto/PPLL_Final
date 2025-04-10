@@ -20,7 +20,7 @@ run_test() {
     output_file="temp/$(basename "$input_file")"
 
     python3 main.py "$input_file" > "$output_file" 2> /dev/null
-    if cmp -s "$expected_file" "$output_file"; then
+    if cmp "$expected_file" "$output_file"; then
         echo -e "Test $(basename "$input_file"): ${GREEN} SUCCESS ${RESET}"
     else
         echo -e "Test $(basename "$input_file"): ${RED} FAIL ${RESET}"
@@ -51,4 +51,4 @@ run_test ./test_files/invalid/i2.vip ./test_files/invalid/i2_expected
 run_test ./test_files/invalid/i3.vip ./test_files/invalid/i3_expected
 run_test ./test_files/invalid/i4.vip ./test_files/invalid/i4_expected
 
-rm -rf temp
+#rm -rf temp
