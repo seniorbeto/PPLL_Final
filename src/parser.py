@@ -128,6 +128,7 @@ class ViperParser:
         else:
             p[0] = [p[1]]
 
+
     # Sentencia de asignación
     def p_assignment(self, p):
         """
@@ -139,6 +140,7 @@ class ViperParser:
         else:
             p[0] = ("assign", p[1], p[3])
 
+    #TODO pero deberia estar biwen lo de las p
     def p_reference(self, p):
         """
         reference : ID rest_ref
@@ -149,6 +151,7 @@ class ViperParser:
         else:
             p[0] = (p[2][0], ref, *p[2][1:])
 
+    #TODO pero deberia estar bien o de las p
     def p_rest_ref(self, p):
         """
         rest_ref :
