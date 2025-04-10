@@ -18,8 +18,10 @@ class Main:
         self.__parser = ViperParser(self.__lexer, self.__route)
         result = self.__parser.parse()
         self.__output_filename = self.__route.split("/input/")[-1].replace(".vip", "")
-        TreeGen(result,self.__output_filename, "/tree_gen/")
-
+        try:
+            TreeGen(result,self.__output_filename, "/tree_gen/")
+        except Exception as e:
+            print(f"[ERROR] {e}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
