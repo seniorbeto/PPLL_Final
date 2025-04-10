@@ -5,7 +5,12 @@ class ViperLexer:
         self.lexer = None
         self.input_file = route
         self.output_file = route.replace(".vip", ".token")
-
+        #PEQUEÑA DISTINCION PARA REDIRIGIR LOS .token DE LOS CASOS DE PRUEBA
+        if "test_files/valid" in self.output_file or "test_files/invalid" in self.output_file:
+            if "test_files/valid" in self.output_file:
+                self.output_file = self.output_file.replace("test_files/valid", "test_files/outputs")
+            else:
+                self.output_file = self.output_file.replace("test_files/invalid", "test_files/outputs")
     # Palabras reservadas
     reserved = {
         'true': 'TRUE',

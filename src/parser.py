@@ -94,7 +94,6 @@ class ViperParser:
         # Ejemplo: ("register", "MiRegistro", ("block", [...]))
         p[0] = ("register", p[1], p[3])
 
-    # TODO
     # Declaración de variable (o vector)
     def p_var_decl(self, p):
         """
@@ -108,7 +107,6 @@ class ViperParser:
 
 
 
-    #TODO
     def p_decl_assign(self, p):
         """
         decl_assign : EQUALS expression
@@ -140,7 +138,6 @@ class ViperParser:
         else:
             p[0] = ("assign", p[1], p[3])
 
-    #TODO pero deberia estar biwen lo de las p
     def p_reference(self, p):
         """
         reference : ID rest_ref
@@ -151,7 +148,6 @@ class ViperParser:
         else:
             p[0] = (p[2][0], ref, *p[2][1:])
 
-    #TODO pero deberia estar bien o de las p
     def p_rest_ref(self, p):
         """
         rest_ref :
@@ -195,7 +191,6 @@ class ViperParser:
         # Ej: ("funct_call", "miFuncion", [expr, expr, ...])
         p[0] = ("funct_call", p[1], p[3])
 
-    #TODO
     def p_arg_funct_call(self, p):
         """
         arg_funct_call : expression COMMA arg_funct_call
@@ -223,7 +218,6 @@ class ViperParser:
         """
         p[0] = ("type_funct", p[1])
 
-    # TODO
     # Argumentos de función
     def p_arg_funct(self, p):
         """
@@ -234,7 +228,6 @@ class ViperParser:
         if len(p) > 1:
             p[0] = ("arg_funct", "type", p[1], "args", p[2])
 
-    # TODO
     def p_arg_funct2(self, p):
         """
         arg_funct2 : ID extra another
@@ -242,7 +235,6 @@ class ViperParser:
         # Para simplificar la estructura, se puede hacer:
         p[0] = ((p[1]) , (p[2] or []) , (p[3] or []))
 
-    # TODO
     def p_arg_funct_rec(self,p):
         """
         arg_funct_rec : type_funct ID extra another

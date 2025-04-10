@@ -1,0 +1,170 @@
+type Point:{
+ float x, y
+}
+type Circle:
+{
+    Point center
+    float radius
+}
+Circle[2] balls
+
+# 1st ball
+balls[0].center.x = 0b101
+balls[0].center.y = 0xFF
+balls[0].radius = 1.74
+
+# 2nd ball
+balls[1].center.x = 10e-1
+balls[1].center.y = -31
+balls[1].radius = 3.2
+
+int i = 0
+while i < balls.len:
+{
+    balls[i].center.x = balls[i].center.x + 1
+    balls[i].center.y = balls[i].center.y + 2
+    i = i + 1
+}
+
+def bool gte(int a, b):
+{
+    return a > b
+}
+
+'''
+COMMENT
+'''
+
+char result
+if gte(balls[0].radius, balls[1].radius):
+{
+    result = 'Y'
+    }
+else:
+{
+    result = 'N'
+}
+
+int a, b, c, d = 0
+a = c = d = 2 * 3
+# a, c y d son iguales a 6
+# b es igual a 0
+
+int a, b
+a = 10
+b = a * b <= 200
+c = '$'
+
+float d, e = 0xFF / (0b101 * (0o702 - 1e-10))
+
+bool var1, VAR1, Var1
+float var1
+
+VAR1 = false  # OK: VAR1=(bool, false)
+VAR1 = true   # OK: la reasignación sí está permitida
+
+
+int[3] vector_3d
+vector_3d[0] = 5
+vector_3d[1] = 2
+vector_3d[2] = 1
+
+int array_length = vector_3d_len  # Es igual a 3
+vector_3d[1] = vector_3d[2] - 4
+
+type Point:
+{
+    float x, y
+}
+
+Point[2] line
+line[1].x = 1
+line[1].y = 2
+
+type Circle: {
+    float cx, cy, radius
+    char color
+}
+
+Circle c
+c.radius = 10.2
+c.color = 'R'
+int circle_area = 3.14 * c.radius * c.radius
+
+Square s  # Error: tipo Square no definido
+
+
+float f1, f2
+int t
+bool b
+
+f1 = 7.5    # Ok: float -> float
+f2 = 0b11   # Ok: int -> float
+t = 'a'     # Ok: char -> int
+b = true    # Ok: bool -> bool
+
+t = 7.5     # Error: float -> int
+b = 7       # Error: int -> bool
+
+if f2 == 3 or b1 and b2 or 10 - 5 * i1 >= 0xFF - 1e-1:
+{
+    f2 = f2 - 3
+} else: {
+    f2 = 10 - f1 * f1
+}
+
+int i, var = 0
+
+while i < 10: {
+    var = (var + 1) * 2
+    i = i + 1
+}
+
+def int mod(int a, b): {
+    while a >= b:
+    {
+        a = a - b
+    }
+    return a
+}
+
+def int greatest_common_divisor(int a, b):
+{
+    int temp
+    while not b == 0:
+    {
+        temp = b
+        b = mod(a, b)
+        a = temp
+        }
+    return a
+}
+
+int result = greatest_common_divisor(132, 0xFF)
+
+
+type Strings: {
+    char[64] _
+}
+type User: {
+    int user_id
+    Strings nickname
+}
+int global_id = 0
+
+def User new_user(Strings nickname):
+{
+    User user
+    user.user_id = global_id
+    global_id = global_id + 1
+    user.nickname = nickname
+    return user
+}
+
+Strings nickname
+nickname._[0] = 'V'
+nickname._[1] = 'i'
+nickname._[2] = 'p'
+nickname._[3] = 'e'
+nickname._[4] = 'r'
+new_user(nickname)

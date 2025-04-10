@@ -1,4 +1,17 @@
-# --- CONTROL DE FLUJO IF/ELSE ---
+# --- CONTROL DE FLUJO IF ---
+if b: {
+    x = x + 1
+}
+
+# --- CONTROL DE FLUJO IF/ELSE con else sin \n ---
+if b: {
+    x = x + 1
+}else :
+{
+    x = x - 1
+}
+
+# --- CONTROL DE FLUJO IF/ELSE con else con \n ---
 if b: {
     x = x + 1
 }
@@ -6,6 +19,9 @@ else :
 {
     x = x - 1
 }
+
+
+
 
 # --- BUCLE WHILE ---
 while not b:
@@ -22,6 +38,8 @@ while not b:
         }
     }
 }
+
+
 
 # --- VARIABLES DE TIPO REGISTRO ---
 

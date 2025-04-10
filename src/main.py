@@ -13,7 +13,7 @@ from pprint import pprint as pp
 
 
 class Main:
-    def __init__(self, route):
+    def __init__(self, route, export_tree):
         self.__route = os.path.join(os.path.dirname(__file__), route)
         self.__lexer = ViperLexer(self.__route)
         self.__lexer.build()
@@ -22,7 +22,7 @@ class Main:
         result = self.__parser.parse()
 
         # Únicamente exporamos el árbol si se ha importado graphviz
-        if not EXPORT_TREE:
+        if not export_tree:
             pp(result)
         else:
             self.__output_filename = route.replace(".vip", "")
@@ -40,17 +40,16 @@ if __name__ == "__main__":
         print(" If not provided, the syntax tree will be printed to the console.")
         exit(1)
 
-    EXPORT_TREE = False
-    if len(sys.argv) == 3 and sys.argv[2] != "true":
+    export_tree = False
+    if len(sys.argv) == 3 and sys.argv[2] == "true":
         try:
             from graphviz import Digraph
             from tree_gen import TreeGen
-            EXPORT_TREE = True
-            os.system("rm -rf ./tree_gen/*")
+            export_tree = True
         except ImportError:
             print("[ERROR] graphviz package not installed. Please install it with pip.")
             exit(1)
 
     os.system("rm parser.out parsetab.py")
 
-    Main(sys.argv[1])
+    Main(sys.argv[1],export_tree)
