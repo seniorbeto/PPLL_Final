@@ -106,6 +106,8 @@ class ViperParser:
         else:
             p[0] = ("vector_decl", p[4], p[2], ("assignment",p[5]))  # p[4] es el ID, p[2] es el tamaño
 
+
+
     #TODO
     def p_decl_assign(self, p):
         """
@@ -113,7 +115,6 @@ class ViperParser:
                     |
         """
         if len(p) == 3:
-            print("sensual")
             p[0] = ("assign", p[2])
 
     # Lista de variables
@@ -140,17 +141,35 @@ class ViperParser:
 
     def p_reference(self, p):
         """
-        reference : ID
-                  | reference DOT ID
-                  | reference LBRACKET expression RBRACKET
-                  | ID LBRACKET expression RBRACKET
+        reference : ID rest_ref
         """
-        if len(p) == 2:
-            p[0] = ("reference", p[1])
-        elif len(p) == 4:
-            p[0] = ("reference_dot", p[1], p[3])
+        ref = ("id", p[1])
+        if p[2] is None:
+            p[0] = ref
         else:
-            p[0] = ("reference", p[1], ("index", p[3]))
+            p[0] = (p[2][0], ref, *p[2][1:])
+
+    def p_rest_ref(self, p):
+        """
+        rest_ref :
+                 | DOT ID rest_ref
+                 | LBRACKET expression RBRACKET rest_ref
+        """
+        if len(p) == 1:
+            p[0] = None  # fin de la referencia
+        elif len(p) == 4:
+            # Caso DOT ID rest_ref
+            if p[3] is None:
+                p[0] = ("dot", ("id", p[2]))
+            else:
+                p[0] = ("dot", ("id", p[2]), p[3])
+        else:
+            # Caso LBRACKET expression RBRACKET rest_ref
+            if p[4] is None:
+                p[0] = ("index", p[2])
+            else:
+                p[0] = ("index", p[2], p[4])
+
 
     # -------------------------------------------------------------------
     # Estructura de declaración de funciones

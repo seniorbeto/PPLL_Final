@@ -27,6 +27,6 @@ if __name__ == "__main__":
         exit(1)
 
     os.system("rm parser.out parsetab.py")
-    os.system("rm -rf /tree_gen/*")
+    os.system("rm -rf ./tree_gen/*")
 
     Main(sys.argv[1])
