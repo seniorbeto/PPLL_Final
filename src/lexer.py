@@ -4,8 +4,7 @@ class ViperLexer:
     def __init__(self, route: str):
         self.lexer = None
         self.input_file = route
-        self.output_file = route.replace("/input/", "/output/")
-        self.output_file = self.output_file.replace(".vip", ".token")
+        self.output_file = route.replace(".vip", ".token")
 
     # Palabras reservadas
     reserved = {

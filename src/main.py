@@ -1,12 +1,17 @@
 import sys
 import os
 
-from graphviz import Digraph
+EXPORT_TREE = False
+try:
+    from graphviz import Digraph
+    from tree_gen import TreeGen
+    EXPORT_TREE = True
+except ImportError:
+    pass
 
 from lexer import ViperLexer
 from parser import ViperParser
 from pprint import pprint as pp
-from tree_gen import TreeGen
 
 
 class Main:
@@ -17,11 +22,16 @@ class Main:
         self.__lexer.run()
         self.__parser = ViperParser(self.__lexer, self.__route)
         result = self.__parser.parse()
-        self.__output_filename = self.__route.split("/input/")[-1].replace(".vip", "")
-        try:
-            TreeGen(result,self.__output_filename, "/tree_gen/")
-        except Exception as e:
-            print(f"[ERROR] {e}")
+
+        # Únicamente exporamos el árbol si se ha importado graphviz
+        if not EXPORT_TREE:
+            pp(result)
+        else:
+            self.__output_filename = self.__route.split("/input/")[-1].replace(".vip", "")
+            try:
+                TreeGen(result,self.__output_filename, "/tree_gen/")
+            except Exception as e:
+                print(f"[ERROR] {e}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
