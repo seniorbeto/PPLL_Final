@@ -5,5 +5,13 @@ def int foo(int a, b; char c): {
     return 0
 }
 
+int function = foo(1 +3 *(a-b), 3, 'a')
 
-foo(1 +3 *(a-b), 3, 'a')
+def float float_func(): {
+    int a
+    int b
+    char c
+    return float_func(a,b,c)
+}
+int fff = 5
+float result = float_func()

@@ -70,7 +70,6 @@ class ViperParser:
         """
         # Si es una ´declaración de un registro es el único
         # caso distinto
-        print(p[1])
         if len(p) == 3 and "register" in p[2]:
             p[0] = p[2]
 
@@ -95,16 +94,27 @@ class ViperParser:
         # Ejemplo: ("register", "MiRegistro", ("block", [...]))
         p[0] = ("register", p[1], p[3])
 
+    # TODO
     # Declaración de variable (o vector)
     def p_var_decl(self, p):
         """
-        var_decl : ID
-                 | LBRACKET expression RBRACKET ID
+        var_decl : ID decl_assign
+                 | LBRACKET expression RBRACKET ID decl_assign
         """
-        if len(p) == 2:
-            p[0] = ("var", p[1])
+        if len(p) == 3:
+            p[0] = ("var", p[1],("assignment",p[2]))
         else:
-            p[0] = ("vector_decl", p[4], p[2])  # p[4] es el ID, p[2] es el tamaño
+            p[0] = ("vector_decl", p[4], p[2], ("assignment",p[5]))  # p[4] es el ID, p[2] es el tamaño
+
+    #TODO
+    def p_decl_assign(self, p):
+        """
+        decl_assign : EQUALS expression
+                    |
+        """
+        if len(p) == 3:
+            print("sensual")
+            p[0] = ("assign", p[2])
 
     # Lista de variables
     def p_var_list(self, p):
@@ -163,10 +173,12 @@ class ViperParser:
         # Ej: ("funct_call", "miFuncion", [expr, expr, ...])
         p[0] = ("funct_call", p[1], p[3])
 
+    #TODO
     def p_arg_funct_call(self, p):
         """
         arg_funct_call : expression COMMA arg_funct_call
                        | expression
+                       |
         """
         if len(p) == 4:
             # p[1] es expression, p[3] es lista
@@ -175,25 +187,45 @@ class ViperParser:
             if not isinstance(p[3], list):
                 p[3] = [p[3]]
             p[0] = [p[1]] + p[3]
-        else:
+        elif len(p) == 2:
             p[0] = [p[1]]
+
 
     def p_type_funct(self, p):
         """
         type_funct : INT_TYPE
                    | FLOAT_TYPE
                    | BOOL_TYPE
+                   | CHAR_TYPE
                    | ID
         """
         p[0] = ("type_funct", p[1])
 
+    # TODO
     # Argumentos de función
     def p_arg_funct(self, p):
         """
-        arg_funct : type_funct ID extra another
+        arg_funct : type_funct arg_funct2
+                  |
         """
         # Para simplificar la estructura, se puede hacer:
-        p[0] = ("arg_funct", [(p[1], p[2])] + (p[3] or []) + (p[4] or []))
+        if len(p) > 1:
+            p[0] = ("arg_funct", "type", p[1], "args", p[2])
+
+    # TODO
+    def p_arg_funct2(self, p):
+        """
+        arg_funct2 : ID extra another
+        """
+        # Para simplificar la estructura, se puede hacer:
+        p[0] = ((p[1]) , (p[2] or []) , (p[3] or []))
+
+    # TODO
+    def p_arg_funct_rec(self,p):
+        """
+        arg_funct_rec : type_funct ID extra another
+        """
+        p[0] = ([(p[1], p[2])] + (p[3] or []) + (p[4] or []))
 
     # Extra (coma y más IDs)
     def p_extra(self, p):
@@ -208,13 +240,13 @@ class ViperParser:
 
     def p_another(self, p):
         """
-        another : SEMICOLON arg_funct
+        another : SEMICOLON arg_funct_rec
                 |
         """
         if len(p) == 1:
             p[0] = []
         else:
-            # p[2] es ("arg_funct", [ ... ])
+            # p[2] es ("arg_funct_rec", [ ... ])
             p[0] = [p[2]]
 
     # Bloque de función
@@ -227,7 +259,7 @@ class ViperParser:
 
     def p_funct_ret(self, p):
         """
-        funct_ret : RETURN ID newlines
+        funct_ret : RETURN expression newlines
         """
         # p[0] = ("return", "x")
         p[0] = ("funct_ret", p[2])
@@ -351,7 +383,7 @@ class ViperParser:
             line_num = p.lineno
             # No entendemos por qué hay que dividirlo entre dos para obtener la
             # línea. Fue una idea feliz que funcionó épicamente.
-            print(f"Error sintáctico en línea {int(line_num/2)}:")
+            print(f"Error sintáctico en línea:")
             print(f">>> {line}")
             print(f"    {' ' * (p.lexpos - line_start)}^")
         else:
@@ -363,8 +395,6 @@ class ViperParser:
         """
         self.parser = yacc.yacc(
             module=self,
-            debug=False,
-            write_tables=False,
         )
 
     def parse(self):
@@ -381,4 +411,4 @@ class ViperParser:
         if not input_data.endswith("\n"):
             input_data += "\n"
 
-        return self.parser.parse(input_data, tracking=True, lexer=self.lexer.lexer)
+        return self.parser.parse(input_data, lexer=self.lexer.lexer)

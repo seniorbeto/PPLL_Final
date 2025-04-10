@@ -1,0 +1,91 @@
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+nl
+('declaration', 'int', [('var', 'a')])
+('declaration', 'float', [('var', 'f')])
+('declaration', 'char', [('var', 'c')])
+type
+nl
+nl
+('declaration', 'MiRegistro', [('var', 'reg1')])
+('declaration', 'int', [('var', 'x'), ('var', 'y'), ('var', 'z')])
+('declaration', 'float', [('var', 'valor'), ('var', 'otra')])
+('declaration', 'bool', [('var', 'b')])
+('declaration', 'char', [('var', 'car'), ('var', 'otroCar')])
+('declaration', 'int', [('vector_decl', 'vec', ('literal', 5))])
+('declaration', 'MiRegistro', [('vector_decl', 'regArray', ('literal', 2))])
+nl
+('assign', ('reference', 'x'), ('literal', 42))
+('assign', ('reference', 'y'), ('literal', 5))
+('assign', ('reference', 'z'), ('literal', 458))
+('assign', ('reference', 'x'), ('literal', 170))
+('assign', ('reference', 'x'), ('binop', '+', ('binop', '*', ('literal', 3), ('literal', 5)), ('binop', '*', ('literal', 2), ('literal', 8))))
+('assign', ('reference', 'valor'), ('literal', 12.34))
+('assign', ('reference', 'otra'), ('literal', 150.0))
+('assign', ('reference', 'car'), ('literal', 'a'))
+('assign', ('reference', 'otroCar'), ('literal', '9'))
+('assign', ('reference', 'b'), ('literal', 'true'))
+('assign', ('reference', 'b'), ('literal', 'false'))
+nl
+('assign', ('reference', 'x'), ('binop', '+', ('reference', 'x'), ('literal', 10)))
+('assign', ('reference', 'y'), ('binop', '-', ('reference', 'y'), ('literal', 1)))
+('assign', ('reference', 'y'), ('binop', '*', ('reference', 'y'), ('literal', 2)))
+('assign', ('reference', 'valor'), ('binop', '/', ('reference', 'valor'), ('literal', 2.0)))
+('assign', ('reference', 'b'), ('unary', 'not', ('reference', 'b')))
+('assign', ('reference', 'b'), ('binop', 'and', ('literal', 'true'), ('literal', 'false')))
+('assign', ('reference', 'b'), ('binop', 'or', ('literal', 'false'), ('binop', '==', ('reference', 'x'), ('literal', 170))))
+nl
+('assign', ('reference', 'vec', ('index', ('literal', 0))), ('literal', 100))
+('assign', ('reference', 'vec', ('index', ('literal', 1))), ('reference', 'x'))
+('assign', ('reference_dot', ('reference', 'reg1'), 'a'), ('reference', 'x'))
+('assign', ('reference_dot', ('reference', 'reg1'), 'f'), ('reference', 'valor'))
+('assign', ('reference_dot', ('reference', 'reg1'), 'c'), ('reference', 'car'))
+nl
+('assign', ('reference', 'z'), ('reference_dot', ('reference', 'vec'), 'len'))
+nl
+nl
+('assign', ('reference', 'x'), ('binop', '+', ('reference', 'x'), ('literal', 1)))
+nl
+('assign', ('reference', 'x'), ('binop', '-', ('reference', 'x'), ('literal', 1)))
+('if_statement', ('reference', 'b'), ('block', ['nl', ('assign', ('reference', 'x'), ('binop', '+', ('reference', 'x'), ('literal', 1)))]), ('else', ('block', ['nl', ('assign', ('reference', 'x'), ('binop', '-', ('reference', 'x'), ('literal', 1)))])))
+nl
+nl
+nl
+('assign', ('reference', 'y'), ('binop', '+', ('reference', 'y'), ('literal', 1)))
+nl
+('assign', ('reference', 'b'), ('literal', 'true'))
+('if_statement', ('binop', '>', ('reference', 'y'), ('literal', 20)), ('block', ['nl', ('assign', ('reference', 'b'), ('literal', 'true'))]), None)
+('while_statement', ('unary', 'not', ('reference', 'b')), ('block', ['nl', ('assign', ('reference', 'y'), ('binop', '+', ('reference', 'y'), ('literal', 1))), ('if_statement', ('binop', '>', ('reference', 'y'), ('literal', 20)), ('block', ['nl', ('assign', ('reference', 'b'), ('literal', 'true'))]), None)]))
+nl
+nl
+nl
+('declaration', 'float', [('var', 'resultado')])
+('assign', ('reference', 'resultado'), ('binop', '+', ('reference', 'p'), ('reference', 'q')))
+nl
+('assign', ('reference', 'resultado'), ('binop', '*', ('reference', 'resultado'), ('literal', 2)))
+('if_statement', ('reference', 'r'), ('block', ['nl', ('assign', ('reference', 'resultado'), ('binop', '*', ('reference', 'resultado'), ('literal', 2)))]), None)
+('funct_decl', ('type_funct', 'float'), 'hacerCalculo', ('arg_funct', [(('type_funct', 'int'), 'p'), ('arg_funct', [(('type_funct', 'float'), 'q'), ('arg_funct', [(('type_funct', 'bool'), 'r')])])]), ('block_funct', ['nl', ('declaration', 'float', [('var', 'resultado')]), ('assign', ('reference', 'resultado'), ('binop', '+', ('reference', 'p'), ('reference', 'q'))), ('if_statement', ('reference', 'r'), ('block', ['nl', ('assign', ('reference', 'resultado'), ('binop', '*', ('reference', 'resultado'), ('literal', 2)))]), None)], ('funct_ret', 'resultado')))
+nl
+('assign', ('reference', 'valor'), ('funct_call', 'hacerCalculo', [('reference', 'x'), ('literal', 3.14), ('reference', 'b')]))
+nl
+('assign', ('reference', 'b'), ('binop', 'or', ('binop', '>=', ('reference', 'x'), ('reference', 'y')), ('binop', '<', ('reference_dot', ('reference', 'reg1'), 'a'), ('literal', 100))))
+('assign', ('reference', 'b'), ('binop', '==', ('reference_dot', ('reference', 'reg1'), 'a'), ('literal', 170)))
+nl
+nl
+nl
