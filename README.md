@@ -19,7 +19,7 @@ Entrega Parcial Ejercicio Final
 
 ## Índice
 
-1. [Analizador Léxico](#_page1_x72.00_y140.67)
+1. [Analizador Léxico](#analizador-lexico)
 2. [Analizador Sintáctico](#analizador-sintactico)  
    - [Definición formal de la gramática](#definición-formal-de-la-gramática)  
    - [Decisiones principales de diseño de la gramática](#decisiones-principales-de-diseño-de-la-gramática)
@@ -27,14 +27,14 @@ Entrega Parcial Ejercicio Final
    - [Aclaraciones Importantes](#aclaraciones-importantes)
 4. [Contenido Extra: Visualización del Árbol Sintáctico](#contenido-extra-visualización-del-árbol-sintáctico)
 
-# <a name="_page2_x72.00_y104.53"></a>**Analizador Léxico** 
+# <a name="_page2_x72.00_y104.53"></a>Analizador Léxico
 Para el analizador léxico, hemos definido la secuencia de tokens que se han especificado en el enunciado,  teniendo  en  cuenta  como  tokens  los  comentarios  simples  y  los  comentarios multilínea, para llevar un conteo de la línea del código actual, usada para llevar a cabo una forma trazable de recuperación de errores. Se han definido, además, una serie de palabras reservadas, de nuevo, las especificadas en el enunciado. 
 
 A tener en cuenta, esta vez se exporta un fichero .token con los tokens hallados en el fichero de entrada. Cabe mencionar que se espera que el fichero de entrada tenga extensión .vip, ya que de no ser así, el fichero de tokens reescribirá el fichero de entrada. 
-# <a name="_page2_x72.00_y286.34"></a>**Analizador Sintáctico** 
+# <a name="_page2_x72.00_y286.34"></a>Analizador Sintáctico
 Para el desarrollo de la gramática, se ha seguido cuidadosamente los requisitos y limitaciones del  enunciado,  habiendo  optado  (por  simplicidad  y  limpieza  de  código)  no  usar  las indentaciones propuestas, si no los *brackets* de apertura y cierre.    
 
-<a name="_page2_x72.00_y372.95"></a>Definición formal de la gramática 
+# <a name="_page2_x72.00_y372.95"></a>Definición formal de la gramática 
 
 De manera formal, nuestro diseño de gramática es el siguiente: 
 
@@ -111,7 +111,7 @@ Tampoco  se  podrá  realizar  el  cierre  de  múltiples  bloques  de  llaves  
 Otro tema a considerar es que nosotros dentro de los índices de un vector permitimos al lenguaje  encapsular  todo  tipo  de  expresiones,  incluidas  por  ejemplo  las  de  tipo  float  y booleano,  pese  a  que  sabemos que luego en el semántico va a producir error porque se necesita una expresión de tipo entero, pero entendemos que eso es un punto a tratar en la próxima parte de la práctica. Por ende, el resto \*de momento\* son válidos. Así pues, se puede asignar al índice de un vector la llamada a una función. Luego será cosa del sintáctico el verificar por ejemplo que esa función tenga una sentencia de retorno que sea de tipo entero, pero a ese punto no tenemos que llegar todavía, simplemente se han descartado las opciones que son sintácticamente incorrectas. 
 
 Cabe mencionar, además, que cuando existe algún error sintáctico en el fichero de entrada, se imprime la línea en la que se encuentra, de forma en la que se señala exactamente dónde se encuentra el error y se recupera del mismo pasando directamente a la siguiente línea. 
-# <a name="_page5_x72.00_y394.43"></a>**Batería de Pruebas** 
+# <a name="_page5_x72.00_y394.43"></a> Batería de Pruebas
 Para la batería de pruebas, hemos generado un *shell script* con distintos casos de prueba. Estos casos siguen la estructura “v[n]\_[referencia\_a\_funcionalidad\_test]” ∀ n ∈ ℕ y se basan en  la  generación  de  un  archivo  temporal en el directorio /temp (el cual es eliminado al finalizar la ejecución de las pruebas) y la comparación de este fichero con la salida esperada almacenada en los ficheros con estructura “v[n]\_[referencia\_a\_funcionalidad\_test]\_expected” ∀ n ∈ ℕ. 
 
 Si se quisiera visualizar la salida de cada uno de los ficheros de entrada del programa, basta con  comentar  o eliminar la última sentencia del fichero de test *run.sh*, que es la que se encarga  de  eliminar  el  directorio  temporal  que  se  ha creado. Esto se puede hacer de la siguiente manera:  
