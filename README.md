@@ -17,8 +17,16 @@ Alberto Penas Díaz | Héctor Álvarez Marcos
 
 Entrega Parcial Ejercicio Final  
 
-# <a name="_page1_x72.00_y140.67"></a>**Índice** 
-[**Índice___________________________________________________________________________ 1](#_page1_x72.00_y140.67) **[Analizador Léxico_________________________________________________________________ 2](#_page2_x72.00_y104.53) [Analizador Sintáctico______________________________________________________________ 2](#_page2_x72.00_y286.34) [Definición formal de la gramática__________________________________________________ 2](#_page2_x72.00_y372.95)** [Decisiones principales de diseño de la gramática______________________________________ 4](#_page4_x72.00_y374.29) [**Batería de Pruebas________________________________________________________________ 5](#_page5_x72.00_y394.43) **[Aclaraciones Importantes_________________________________________________________6](#_page6_x72.00_y104.53)** [**Contenido Extra: Visualización del Árbol Sintáctico____________________________________ 6](#_page6_x72.00_y426.29)** 
+## Índice
+
+1. [Analizador Léxico](#_page1_x72.00_y140.67)
+2. [Analizador Sintáctico](#analizador-sintactico)  
+   - [Definición formal de la gramática](#definición-formal-de-la-gramática)  
+   - [Decisiones principales de diseño de la gramática](#decisiones-principales-de-diseño-de-la-gramática)
+3. [Batería de Pruebas](#batería-de-pruebas)  
+   - [Aclaraciones Importantes](#aclaraciones-importantes)
+4. [Contenido Extra: Visualización del Árbol Sintáctico](#contenido-extra-visualización-del-árbol-sintáctico)
+
 # <a name="_page2_x72.00_y104.53"></a>**Analizador Léxico** 
 Para el analizador léxico, hemos definido la secuencia de tokens que se han especificado en el enunciado,  teniendo  en  cuenta  como  tokens  los  comentarios  simples  y  los  comentarios multilínea, para llevar un conteo de la línea del código actual, usada para llevar a cabo una forma trazable de recuperación de errores. Se han definido, además, una serie de palabras reservadas, de nuevo, las especificadas en el enunciado. 
 
