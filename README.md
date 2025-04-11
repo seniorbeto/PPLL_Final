@@ -23,7 +23,7 @@ Entrega Parcial Ejercicio Final
 2. [Analizador Sintáctico](#Analizador-Sintáctico)  
    - [Definición formal de la gramática](#Definición-formal-de-la-gramática)  
    - [Decisiones principales de diseño de la gramática](#Decisiones-principales-de-diseño-de-la-gramática)
-3. [Batería de Pruebas](#Batería-de-pruebas)  
+3. [Batería de Pruebas](#Batería-de-Pruebas)  
    - [Aclaraciones Importantes](#Aclaraciones-Importantes)
 4. [Contenido Extra: Visualización del Árbol Sintáctico](#Contenido-Extra-Visualización-del-Árbol-Sintáctico)
 
