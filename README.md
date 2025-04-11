@@ -1,19 +1,21 @@
 # Entrega Parcial Práctica Final 'Viper'
-**Procesadores del Lenguaje 
+**Procesadores del Lenguaje**
 
-**Alberto Penas Díaz:
+**Alberto Penas Díaz**:
 
 NIA: 100471939 
 
 Correo: 100471939@alumnos.uc3m.es Titulación: Ingeniería informática 
 
-**Héctor Álvarez Marcos:
+**Héctor Álvarez Marcos**:
 
 NIA: 100495794 
 
 Correo: 100495794@alumnos.uc3m.es Titulación: Ingeniería informática 
 
-Alberto Penas Díaz | Héctor Álvarez Marcos  Entrega Parcial Ejercicio Final  
+Alberto Penas Díaz | Héctor Álvarez Marcos 
+
+Entrega Parcial Ejercicio Final  
 
 # <a name="_page1_x72.00_y140.67"></a>**Índice** 
 [**Índice___________________________________________________________________________ 1](#_page1_x72.00_y140.67) **[Analizador Léxico_________________________________________________________________ 2](#_page2_x72.00_y104.53) [Analizador Sintáctico______________________________________________________________ 2](#_page2_x72.00_y286.34) [Definición formal de la gramática__________________________________________________ 2](#_page2_x72.00_y372.95)** [Decisiones principales de diseño de la gramática______________________________________ 4](#_page4_x72.00_y374.29) [**Batería de Pruebas________________________________________________________________ 5](#_page5_x72.00_y394.43) **[Aclaraciones Importantes_________________________________________________________6](#_page6_x72.00_y104.53)** [**Contenido Extra: Visualización del Árbol Sintáctico____________________________________ 6](#_page6_x72.00_y426.29)** 
@@ -39,18 +41,15 @@ P = {
 S ::= program 
 
 program ::= statement\_list 
-
-`          `| λ 
+| λ 
 
 statement\_list ::= statement\_list statement   | statement 
 
-statement ::= declaration NEWLINE | assignment NEWLINE | if\_statement | TYPE register             | while\_statement | COMMENT NEWLINE | MLCOMMENT NEWLINE 
+statement ::= declaration NEWLINE | assignment NEWLINE | if\_statement | TYPE register | while\_statement | COMMENT NEWLINE | MLCOMMENT NEWLINE 
+| funct\_decl  | funct\_call NEWLINE | NEWLINE 
 
-`            `| funct\_decl  | funct\_call NEWLINE | NEWLINE 
-
-declaration ::= INT\_TYPE var\_list | FLOAT\_TYPE var\_list   | CHAR\_TYPE var\_list               | BOOL\_TYPE var\_list 
-
-`              `| ID var\_list 
+declaration ::= INT\_TYPE var\_list | FLOAT\_TYPE var\_list   | CHAR\_TYPE var\_list | BOOL\_TYPE var\_list 
+ | ID var\_list 
 
 register ::= ID COLON block 
 
@@ -81,12 +80,9 @@ newlines ::= NEWLINE | λ
 if\_statement ::= IF expression COLON block else\_ else\_ ::= newlines ELSE COLON block  | NEWLINE while\_statement ::= WHILE expression COLON block block ::= newlines LBRACE statement\_list RBRACE 
 
 expression ::= expression PLUS expression | expression MINUS expression 
-
-`  `| expression TIMES expression | expression DIVIDE expression | expression EQ expression   | expression GT expression  | expression LT expression  | expression GE expression 
-
-`  `| expression LE expression | expression AND expression | expression OR expression 
-
-`  `| NOT expression | MINUS expression | PLUS expression | LPAREN expression RPAREN   | DECIMAL | BINARY | OCTAL | HEXADECIMAL | FLOAT\_CONST | TRUE  | FALSE   | CHAR\_CONST | funct\_call | reference 
+| expression TIMES expression | expression DIVIDE expression | expression EQ expression   | expression GT expression  | expression LT expression  | expression GE expression 
+| expression LE expression | expression AND expression | expression OR expression 
+| NOT expression | MINUS expression | PLUS expression | LPAREN expression RPAREN   | DECIMAL | BINARY | OCTAL | HEXADECIMAL | FLOAT\_CONST | TRUE  | FALSE   | CHAR\_CONST | funct\_call | reference 
 
 } 
 ## <a name="_page4_x72.00_y374.29"></a>Decisiones principales de diseño de la gramática 
