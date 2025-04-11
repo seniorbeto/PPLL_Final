@@ -98,8 +98,8 @@ Las decisiones de diseño principales de la gramática han sido el cómo conside
 
 if b: { 
 x = x + 1
-}else :                                      Este es el único caso en el que se puede escribir algo que no  {                                               sea \n después de un cierre de llaves.
-x = x - 1
+} else : {                                   Este es el único caso en el que se puede escribir algo que
+x = x - 1                                   no  sea  después de un cierre de llaves
 }  
 
 Tampoco  se  podrá  realizar  el  cierre  de  múltiples  bloques  de  llaves  de  forma consecutiva(“}}}...”) ya que como se ha dicho, después de cada llave tiene que existir un salto de línea. 
