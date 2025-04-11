@@ -97,13 +97,9 @@ expression ::= expression PLUS expression | expression MINUS expression
 Las decisiones de diseño principales de la gramática han sido el cómo consideramos nosotros el  tratamiento  de  los  “newlines”.  Básicamente consideramos tanto uno como n newlines seguidos un único token newline, por lo que por ejemplo, en los casos de control de flujo if/else, entre el cierre de llaves del if y del else puede haber tantos \n como guste, como ocurre en otros lenguajes, no hemos querido hacer limitación en eso. Otro punto es el tema ya mencionado de la elección de brackets, ya que para mantener una estructura limpia, todos los tokens  de  llave  derecha  “}”,  que  implican  el  cierre  de  una  serie  de  sentencias,  de  un controlador de flujo o de un bloque de función van a ir seguidos de un salto de linea, con el fin de evitar nuevas declaraciones o sentencias en la misma línea del cierre de llaves. El único caso en el que esto no funciona así es en el bucle if/else, ya que se permite que justo después del cierre del bloque if, sí y sólo si va un “else”, se permita ponerlo a la misma altura. De esta forma: 
 
 if b: { 
-
-`   `x = x + 1                                          
-
-}else :                                      Este es el único caso en el que se puede escribir algo que no  {                                               sea \n después de un cierre de llaves.      
-
-`   `x = x - 1 
-
+x = x + 1
+}else :                                      Este es el único caso en el que se puede escribir algo que no  {                                               sea \n después de un cierre de llaves.
+x = x - 1
 }  
 
 Tampoco  se  podrá  realizar  el  cierre  de  múltiples  bloques  de  llaves  de  forma consecutiva(“}}}...”) ya que como se ha dicho, después de cada llave tiene que existir un salto de línea. 
