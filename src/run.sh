@@ -1,17 +1,17 @@
 #!/bin/bash
-
 RED="\033[31m"
 GREEN="\033[32m"
 RESET="\033[0m"
-
 mkdir -p temp
 
 echo ""
 echo -e "\033[34m
 BATERÍA DE PRUEBAS PROCESADORES DE LENGUAJE\033[0m"
+echo -e "\033[31m
+        PRÁCTICA FINAL 'VIPER'\033[0m"
+echo ""
 echo "Alberto Penas Díaz | Hector Álvarez Marcos"
 echo ""
-
 
 run_test() {
     local input_file="$1"
@@ -47,10 +47,10 @@ echo "TEST INVÁLIDOS"
 echo ""
 
 # Comprobaremos únicamente errores de sintaxis, no léxicos (puesto que son triviales) ni semánticos
-run_test ./test_files/invalid/i0.vip ./test_files/invalid/i0_expected
-run_test ./test_files/invalid/i1.vip ./test_files/invalid/i1_expected
-run_test ./test_files/invalid/i2.vip ./test_files/invalid/i2_expected
-run_test ./test_files/invalid/i3.vip ./test_files/invalid/i3_expected
-run_test ./test_files/invalid/i4.vip ./test_files/invalid/i4_expected
+run_test ./test_files/invalid/i0_multiple_assignment.vip ./test_files/invalid/i0_multiple_assignment_expected
+run_test ./test_files/invalid/i1_decl_and_parenthesis.vip ./test_files/invalid/i1_decl_and_parenthesis_expected
+run_test ./test_files/invalid/i2_flux_if.vip ./test_files/invalid/i2_flux_if_expected
+run_test ./test_files/invalid/i3_reassign.vip ./test_files/invalid/i3_reassign_expected
+run_test ./test_files/invalid/i4_blocks.vip ./test_files/invalid/i4_blocks_expected
 
-rm -rf temp
+#rm -rf temp

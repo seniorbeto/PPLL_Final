@@ -1,0 +1,1330 @@
+// Árbol Sintáctico
+digraph {
+	0 [label=program]
+	1 [label=nl]
+	0 -> 1
+	2 [label=nl]
+	1 -> 2
+	3 [label=nl]
+	1 -> 3
+	4 [label=nl]
+	1 -> 4
+	5 [label=declaration]
+	1 -> 5
+	6 [label=MiRegistro]
+	5 -> 6
+	7 [label="('var', 'reg1', ('assignment', None))"]
+	5 -> 7
+	8 [label=var]
+	7 -> 8
+	9 [label=reg1]
+	8 -> 9
+	10 [label=assignment]
+	8 -> 10
+	11 [label=declaration]
+	1 -> 11
+	12 [label=int]
+	11 -> 12
+	13 [label="('var', 'x', ('assignment', None))"]
+	11 -> 13
+	14 [label=var]
+	13 -> 14
+	15 [label=x]
+	14 -> 15
+	16 [label=assignment]
+	14 -> 16
+	17 [label=var]
+	13 -> 17
+	18 [label=y]
+	17 -> 18
+	19 [label=assignment]
+	17 -> 19
+	20 [label=var]
+	13 -> 20
+	21 [label=z]
+	20 -> 21
+	22 [label=assignment]
+	20 -> 22
+	23 [label=declaration]
+	1 -> 23
+	24 [label=float]
+	23 -> 24
+	25 [label="('var', 'valor', ('assignment', None))"]
+	23 -> 25
+	26 [label=var]
+	25 -> 26
+	27 [label=valor]
+	26 -> 27
+	28 [label=assignment]
+	26 -> 28
+	29 [label=var]
+	25 -> 29
+	30 [label=otra]
+	29 -> 30
+	31 [label=assignment]
+	29 -> 31
+	32 [label=declaration]
+	1 -> 32
+	33 [label=bool]
+	32 -> 33
+	34 [label="('var', 'b', ('assignment', None))"]
+	32 -> 34
+	35 [label=var]
+	34 -> 35
+	36 [label=b]
+	35 -> 36
+	37 [label=assignment]
+	35 -> 37
+	38 [label=declaration]
+	1 -> 38
+	39 [label=char]
+	38 -> 39
+	40 [label="('var', 'car', ('assignment', None))"]
+	38 -> 40
+	41 [label=var]
+	40 -> 41
+	42 [label=car]
+	41 -> 42
+	43 [label=assignment]
+	41 -> 43
+	44 [label=var]
+	40 -> 44
+	45 [label=otroCar]
+	44 -> 45
+	46 [label=assignment]
+	44 -> 46
+	47 [label=declaration]
+	1 -> 47
+	48 [label=int]
+	47 -> 48
+	49 [label="('vector_decl', 'vec', ('literal', 5), ('assignment', None))"]
+	47 -> 49
+	50 [label=vector_decl]
+	49 -> 50
+	51 [label=vec]
+	50 -> 51
+	52 [label=literal]
+	50 -> 52
+	53 [label=5]
+	52 -> 53
+	54 [label=assignment]
+	50 -> 54
+	55 [label=declaration]
+	1 -> 55
+	56 [label=MiRegistro]
+	55 -> 56
+	57 [label="('vector_decl', 'regArray', ('literal', 2), ('assignment', None))"]
+	55 -> 57
+	58 [label=vector_decl]
+	57 -> 58
+	59 [label=regArray]
+	58 -> 59
+	60 [label=literal]
+	58 -> 60
+	61 [label=2]
+	60 -> 61
+	62 [label=assignment]
+	58 -> 62
+	63 [label=declaration]
+	1 -> 63
+	64 [label=char]
+	63 -> 64
+	65 [label="('vector_decl', 'vec2', ('binop', '+', ('binop', '*', ('id', 'a'), ('literal', 2)), ('id', 'c')), ('assignment', None))"]
+	63 -> 65
+	66 [label=vector_decl]
+	65 -> 66
+	67 [label=vec2]
+	66 -> 67
+	68 [label=binop]
+	66 -> 68
+	69 [label="+"]
+	68 -> 69
+	70 [label=binop]
+	68 -> 70
+	71 [label="*"]
+	70 -> 71
+	72 [label=id]
+	70 -> 72
+	73 [label=a]
+	72 -> 73
+	74 [label=literal]
+	70 -> 74
+	75 [label=2]
+	74 -> 75
+	76 [label=id]
+	68 -> 76
+	77 [label=c]
+	76 -> 77
+	78 [label=assignment]
+	66 -> 78
+	79 [label=nl]
+	1 -> 79
+	80 [label=assign]
+	1 -> 80
+	81 [label=id]
+	80 -> 81
+	82 [label=x]
+	81 -> 82
+	83 [label=literal]
+	80 -> 83
+	84 [label=42]
+	83 -> 84
+	85 [label=assign]
+	1 -> 85
+	86 [label=id]
+	85 -> 86
+	87 [label=y]
+	86 -> 87
+	88 [label=literal]
+	85 -> 88
+	89 [label=5]
+	88 -> 89
+	90 [label=assign]
+	1 -> 90
+	91 [label=id]
+	90 -> 91
+	92 [label=z]
+	91 -> 92
+	93 [label=literal]
+	90 -> 93
+	94 [label=458]
+	93 -> 94
+	95 [label=assign]
+	1 -> 95
+	96 [label=id]
+	95 -> 96
+	97 [label=x]
+	96 -> 97
+	98 [label=literal]
+	95 -> 98
+	99 [label=170]
+	98 -> 99
+	100 [label=assign]
+	1 -> 100
+	101 [label=id]
+	100 -> 101
+	102 [label=x]
+	101 -> 102
+	103 [label=binop]
+	100 -> 103
+	104 [label="+"]
+	103 -> 104
+	105 [label=binop]
+	103 -> 105
+	106 [label="*"]
+	105 -> 106
+	107 [label=literal]
+	105 -> 107
+	108 [label=3]
+	107 -> 108
+	109 [label=literal]
+	105 -> 109
+	110 [label=5]
+	109 -> 110
+	111 [label=binop]
+	103 -> 111
+	112 [label="*"]
+	111 -> 112
+	113 [label=literal]
+	111 -> 113
+	114 [label=2]
+	113 -> 114
+	115 [label=literal]
+	111 -> 115
+	116 [label=8]
+	115 -> 116
+	117 [label=assign]
+	1 -> 117
+	118 [label=id]
+	117 -> 118
+	119 [label=valor]
+	118 -> 119
+	120 [label=literal]
+	117 -> 120
+	121 [label=12.34]
+	120 -> 121
+	122 [label=assign]
+	1 -> 122
+	123 [label=id]
+	122 -> 123
+	124 [label=otra]
+	123 -> 124
+	125 [label=literal]
+	122 -> 125
+	126 [label=150.0]
+	125 -> 126
+	127 [label=assign]
+	1 -> 127
+	128 [label=id]
+	127 -> 128
+	129 [label=car]
+	128 -> 129
+	130 [label=literal]
+	127 -> 130
+	131 [label=a]
+	130 -> 131
+	132 [label=assign]
+	1 -> 132
+	133 [label=id]
+	132 -> 133
+	134 [label=otroCar]
+	133 -> 134
+	135 [label=literal]
+	132 -> 135
+	136 [label=9]
+	135 -> 136
+	137 [label=assign]
+	1 -> 137
+	138 [label=id]
+	137 -> 138
+	139 [label=b]
+	138 -> 139
+	140 [label=literal]
+	137 -> 140
+	141 [label=true]
+	140 -> 141
+	142 [label=assign]
+	1 -> 142
+	143 [label=id]
+	142 -> 143
+	144 [label=b]
+	143 -> 144
+	145 [label=literal]
+	142 -> 145
+	146 [label=false]
+	145 -> 146
+	147 [label=declaration]
+	1 -> 147
+	148 [label=int]
+	147 -> 148
+	149 [label="('vector_decl', 'vec', ('literal', 1932), ('assignment', None))"]
+	147 -> 149
+	150 [label=vector_decl]
+	149 -> 150
+	151 [label=vec]
+	150 -> 151
+	152 [label=literal]
+	150 -> 152
+	153 [label=1932]
+	152 -> 153
+	154 [label=assignment]
+	150 -> 154
+	155 [label=declaration]
+	1 -> 155
+	156 [label=char]
+	155 -> 156
+	157 [label="('vector_decl', 'vec2', ('binop', '+', ('id', 'b'), ('literal', 3)), ('assignment', None))"]
+	155 -> 157
+	158 [label=vector_decl]
+	157 -> 158
+	159 [label=vec2]
+	158 -> 159
+	160 [label=binop]
+	158 -> 160
+	161 [label="+"]
+	160 -> 161
+	162 [label=id]
+	160 -> 162
+	163 [label=b]
+	162 -> 163
+	164 [label=literal]
+	160 -> 164
+	165 [label=3]
+	164 -> 165
+	166 [label=assignment]
+	158 -> 166
+	167 [label=nl]
+	1 -> 167
+	168 [label=declaration]
+	1 -> 168
+	169 [label=int]
+	168 -> 169
+	170 [label="('var', 'a', ('assignment', ('assign', ('literal', 5))))"]
+	168 -> 170
+	171 [label=var]
+	170 -> 171
+	172 [label=a]
+	171 -> 172
+	173 [label=assignment]
+	171 -> 173
+	174 [label=assign]
+	173 -> 174
+	175 [label=literal]
+	174 -> 175
+	176 [label=5]
+	175 -> 176
+	177 [label=declaration]
+	1 -> 177
+	178 [label=char]
+	177 -> 178
+	179 [label="('var', 'b', ('assignment', ('assign', ('literal', 'b'))))"]
+	177 -> 179
+	180 [label=var]
+	179 -> 180
+	181 [label=b]
+	180 -> 181
+	182 [label=assignment]
+	180 -> 182
+	183 [label=assign]
+	182 -> 183
+	184 [label=literal]
+	183 -> 184
+	185 [label=b]
+	184 -> 185
+	186 [label=declaration]
+	1 -> 186
+	187 [label=char]
+	186 -> 187
+	188 [label="('var', 'c', ('assignment', ('assign', ('literal', 102983))))"]
+	186 -> 188
+	189 [label=var]
+	188 -> 189
+	190 [label=c]
+	189 -> 190
+	191 [label=assignment]
+	189 -> 191
+	192 [label=assign]
+	191 -> 192
+	193 [label=literal]
+	192 -> 193
+	194 [label=102983]
+	193 -> 194
+	195 [label=nl]
+	1 -> 195
+	196 [label=assign]
+	1 -> 196
+	197 [label=id]
+	196 -> 197
+	198 [label=x]
+	197 -> 198
+	199 [label=binop]
+	196 -> 199
+	200 [label="+"]
+	199 -> 200
+	201 [label=id]
+	199 -> 201
+	202 [label=x]
+	201 -> 202
+	203 [label=literal]
+	199 -> 203
+	204 [label=10]
+	203 -> 204
+	205 [label=assign]
+	1 -> 205
+	206 [label=id]
+	205 -> 206
+	207 [label=y]
+	206 -> 207
+	208 [label=binop]
+	205 -> 208
+	209 [label="-"]
+	208 -> 209
+	210 [label=id]
+	208 -> 210
+	211 [label=y]
+	210 -> 211
+	212 [label=literal]
+	208 -> 212
+	213 [label=1]
+	212 -> 213
+	214 [label=assign]
+	1 -> 214
+	215 [label=id]
+	214 -> 215
+	216 [label=y]
+	215 -> 216
+	217 [label=binop]
+	214 -> 217
+	218 [label="*"]
+	217 -> 218
+	219 [label=id]
+	217 -> 219
+	220 [label=y]
+	219 -> 220
+	221 [label=literal]
+	217 -> 221
+	222 [label=2]
+	221 -> 222
+	223 [label=assign]
+	1 -> 223
+	224 [label=id]
+	223 -> 224
+	225 [label=valor]
+	224 -> 225
+	226 [label=binop]
+	223 -> 226
+	227 [label="/"]
+	226 -> 227
+	228 [label=id]
+	226 -> 228
+	229 [label=valor]
+	228 -> 229
+	230 [label=literal]
+	226 -> 230
+	231 [label=2.0]
+	230 -> 231
+	232 [label=assign]
+	1 -> 232
+	233 [label=id]
+	232 -> 233
+	234 [label=b]
+	233 -> 234
+	235 [label=unary]
+	232 -> 235
+	236 [label=not]
+	235 -> 236
+	237 [label=id]
+	235 -> 237
+	238 [label=b]
+	237 -> 238
+	239 [label=assign]
+	1 -> 239
+	240 [label=id]
+	239 -> 240
+	241 [label=b]
+	240 -> 241
+	242 [label=binop]
+	239 -> 242
+	243 [label=and]
+	242 -> 243
+	244 [label=literal]
+	242 -> 244
+	245 [label=true]
+	244 -> 245
+	246 [label=literal]
+	242 -> 246
+	247 [label=false]
+	246 -> 247
+	248 [label=assign]
+	1 -> 248
+	249 [label=id]
+	248 -> 249
+	250 [label=b]
+	249 -> 250
+	251 [label=binop]
+	248 -> 251
+	252 [label=or]
+	251 -> 252
+	253 [label=literal]
+	251 -> 253
+	254 [label=false]
+	253 -> 254
+	255 [label=binop]
+	251 -> 255
+	256 [label="=="]
+	255 -> 256
+	257 [label=id]
+	255 -> 257
+	258 [label=x]
+	257 -> 258
+	259 [label=literal]
+	255 -> 259
+	260 [label=170]
+	259 -> 260
+	261 [label=nl]
+	1 -> 261
+	262 [label=declaration]
+	1 -> 262
+	263 [label=int]
+	262 -> 263
+	264 [label="('var', 'a', ('assignment', None))"]
+	262 -> 264
+	265 [label=var]
+	264 -> 265
+	266 [label=a]
+	265 -> 266
+	267 [label=assignment]
+	265 -> 267
+	268 [label=var]
+	264 -> 268
+	269 [label=b]
+	268 -> 269
+	270 [label=assignment]
+	268 -> 270
+	271 [label=var]
+	264 -> 271
+	272 [label=c]
+	271 -> 272
+	273 [label=assignment]
+	271 -> 273
+	274 [label=var]
+	264 -> 274
+	275 [label=d]
+	274 -> 275
+	276 [label=assignment]
+	274 -> 276
+	277 [label=assign]
+	276 -> 277
+	278 [label=literal]
+	277 -> 278
+	279 [label=0]
+	278 -> 279
+	280 [label=assign_recursive]
+	1 -> 280
+	281 [label=id]
+	280 -> 281
+	282 [label=x]
+	281 -> 282
+	283 [label=assign]
+	280 -> 283
+	284 [label=id]
+	283 -> 284
+	285 [label=y]
+	284 -> 285
+	286 [label=literal]
+	283 -> 286
+	287 [label=0]
+	286 -> 287
+	288 [label=nl]
+	1 -> 288
+	289 [label=assign]
+	1 -> 289
+	290 [label=index]
+	289 -> 290
+	291 [label=id]
+	290 -> 291
+	292 [label=vec]
+	291 -> 292
+	293 [label=literal]
+	290 -> 293
+	294 [label=0]
+	293 -> 294
+	295 [label=literal]
+	289 -> 295
+	296 [label=100]
+	295 -> 296
+	297 [label=assign]
+	1 -> 297
+	298 [label=index]
+	297 -> 298
+	299 [label=id]
+	298 -> 299
+	300 [label=vec]
+	299 -> 300
+	301 [label=literal]
+	298 -> 301
+	302 [label=1]
+	301 -> 302
+	303 [label=id]
+	297 -> 303
+	304 [label=x]
+	303 -> 304
+	305 [label=assign]
+	1 -> 305
+	306 [label=dot]
+	305 -> 306
+	307 [label=id]
+	306 -> 307
+	308 [label=reg1]
+	307 -> 308
+	309 [label=id]
+	306 -> 309
+	310 [label=a]
+	309 -> 310
+	311 [label=id]
+	305 -> 311
+	312 [label=x]
+	311 -> 312
+	313 [label=assign]
+	1 -> 313
+	314 [label=dot]
+	313 -> 314
+	315 [label=id]
+	314 -> 315
+	316 [label=reg1]
+	315 -> 316
+	317 [label=id]
+	314 -> 317
+	318 [label=f]
+	317 -> 318
+	319 [label=id]
+	313 -> 319
+	320 [label=valor]
+	319 -> 320
+	321 [label=assign]
+	1 -> 321
+	322 [label=dot]
+	321 -> 322
+	323 [label=id]
+	322 -> 323
+	324 [label=reg1]
+	323 -> 324
+	325 [label=id]
+	322 -> 325
+	326 [label=c]
+	325 -> 326
+	327 [label=id]
+	321 -> 327
+	328 [label=car]
+	327 -> 328
+	329 [label=assign_recursive]
+	1 -> 329
+	330 [label=dot]
+	329 -> 330
+	331 [label=id]
+	330 -> 331
+	332 [label=reg1]
+	331 -> 332
+	333 [label=id]
+	330 -> 333
+	334 [label=_]
+	333 -> 334
+	335 [label=index]
+	330 -> 335
+	336 [label=literal]
+	335 -> 336
+	337 [label=0]
+	336 -> 337
+	338 [label=assign_recursive]
+	329 -> 338
+	339 [label=dot]
+	338 -> 339
+	340 [label=id]
+	339 -> 340
+	341 [label=reg1]
+	340 -> 341
+	342 [label=id]
+	339 -> 342
+	343 [label=_]
+	342 -> 343
+	344 [label=index]
+	339 -> 344
+	345 [label=literal]
+	344 -> 345
+	346 [label=1]
+	345 -> 346
+	347 [label=assign]
+	338 -> 347
+	348 [label=dot]
+	347 -> 348
+	349 [label=id]
+	348 -> 349
+	350 [label=reg1]
+	349 -> 350
+	351 [label=id]
+	348 -> 351
+	352 [label=_]
+	351 -> 352
+	353 [label=index]
+	348 -> 353
+	354 [label=literal]
+	353 -> 354
+	355 [label=2]
+	354 -> 355
+	356 [label=literal]
+	347 -> 356
+	357 [label=0]
+	356 -> 357
+	358 [label=nl]
+	1 -> 358
+	359 [label=if_statement]
+	1 -> 359
+	360 [label=id]
+	359 -> 360
+	361 [label=b]
+	360 -> 361
+	362 [label=block]
+	359 -> 362
+	363 [label=nl]
+	362 -> 363
+	364 [label=nl]
+	363 -> 364
+	365 [label=assign]
+	363 -> 365
+	366 [label=id]
+	365 -> 366
+	367 [label=x]
+	366 -> 367
+	368 [label=binop]
+	365 -> 368
+	369 [label="+"]
+	368 -> 369
+	370 [label=id]
+	368 -> 370
+	371 [label=x]
+	370 -> 371
+	372 [label=literal]
+	368 -> 372
+	373 [label=1]
+	372 -> 373
+	374 [label=nl]
+	1 -> 374
+	375 [label=if_statement]
+	1 -> 375
+	376 [label=id]
+	375 -> 376
+	377 [label=b]
+	376 -> 377
+	378 [label=block]
+	375 -> 378
+	379 [label=nl]
+	378 -> 379
+	380 [label=nl]
+	379 -> 380
+	381 [label=assign]
+	379 -> 381
+	382 [label=id]
+	381 -> 382
+	383 [label=x]
+	382 -> 383
+	384 [label=binop]
+	381 -> 384
+	385 [label="+"]
+	384 -> 385
+	386 [label=id]
+	384 -> 386
+	387 [label=x]
+	386 -> 387
+	388 [label=literal]
+	384 -> 388
+	389 [label=1]
+	388 -> 389
+	390 [label=else]
+	375 -> 390
+	391 [label=block]
+	390 -> 391
+	392 [label=nl]
+	391 -> 392
+	393 [label=nl]
+	392 -> 393
+	394 [label=assign]
+	392 -> 394
+	395 [label=id]
+	394 -> 395
+	396 [label=x]
+	395 -> 396
+	397 [label=binop]
+	394 -> 397
+	398 [label="-"]
+	397 -> 398
+	399 [label=id]
+	397 -> 399
+	400 [label=x]
+	399 -> 400
+	401 [label=literal]
+	397 -> 401
+	402 [label=1]
+	401 -> 402
+	403 [label=nl]
+	1 -> 403
+	404 [label=nl]
+	1 -> 404
+	405 [label=if_statement]
+	1 -> 405
+	406 [label=id]
+	405 -> 406
+	407 [label=b]
+	406 -> 407
+	408 [label=block]
+	405 -> 408
+	409 [label=nl]
+	408 -> 409
+	410 [label=nl]
+	409 -> 410
+	411 [label=assign]
+	409 -> 411
+	412 [label=id]
+	411 -> 412
+	413 [label=x]
+	412 -> 413
+	414 [label=binop]
+	411 -> 414
+	415 [label="+"]
+	414 -> 415
+	416 [label=id]
+	414 -> 416
+	417 [label=x]
+	416 -> 417
+	418 [label=literal]
+	414 -> 418
+	419 [label=1]
+	418 -> 419
+	420 [label=else]
+	405 -> 420
+	421 [label=block]
+	420 -> 421
+	422 [label=nl]
+	421 -> 422
+	423 [label=nl]
+	422 -> 423
+	424 [label=assign]
+	422 -> 424
+	425 [label=id]
+	424 -> 425
+	426 [label=x]
+	425 -> 426
+	427 [label=binop]
+	424 -> 427
+	428 [label="-"]
+	427 -> 428
+	429 [label=id]
+	427 -> 429
+	430 [label=x]
+	429 -> 430
+	431 [label=literal]
+	427 -> 431
+	432 [label=1]
+	431 -> 432
+	433 [label=nl]
+	1 -> 433
+	434 [label=nl]
+	1 -> 434
+	435 [label=while_statement]
+	1 -> 435
+	436 [label=unary]
+	435 -> 436
+	437 [label=not]
+	436 -> 437
+	438 [label=id]
+	436 -> 438
+	439 [label=b]
+	438 -> 439
+	440 [label=block]
+	435 -> 440
+	441 [label=nl]
+	440 -> 441
+	442 [label=nl]
+	441 -> 442
+	443 [label=assign]
+	441 -> 443
+	444 [label=id]
+	443 -> 444
+	445 [label=y]
+	444 -> 445
+	446 [label=binop]
+	443 -> 446
+	447 [label="+"]
+	446 -> 447
+	448 [label=id]
+	446 -> 448
+	449 [label=y]
+	448 -> 449
+	450 [label=literal]
+	446 -> 450
+	451 [label=1]
+	450 -> 451
+	452 [label=if_statement]
+	441 -> 452
+	453 [label=binop]
+	452 -> 453
+	454 [label=">"]
+	453 -> 454
+	455 [label=id]
+	453 -> 455
+	456 [label=y]
+	455 -> 456
+	457 [label=literal]
+	453 -> 457
+	458 [label=20]
+	457 -> 458
+	459 [label=block]
+	452 -> 459
+	460 [label=nl]
+	459 -> 460
+	461 [label=nl]
+	460 -> 461
+	462 [label=assign]
+	460 -> 462
+	463 [label=id]
+	462 -> 463
+	464 [label=b]
+	463 -> 464
+	465 [label=literal]
+	462 -> 465
+	466 [label=true]
+	465 -> 466
+	467 [label=while_statement]
+	460 -> 467
+	468 [label=literal]
+	467 -> 468
+	469 [label=true]
+	468 -> 469
+	470 [label=block]
+	467 -> 470
+	471 [label=nl]
+	470 -> 471
+	472 [label=nl]
+	471 -> 472
+	473 [label=assign]
+	471 -> 473
+	474 [label=id]
+	473 -> 474
+	475 [label=x]
+	474 -> 475
+	476 [label=binop]
+	473 -> 476
+	477 [label="+"]
+	476 -> 477
+	478 [label=id]
+	476 -> 478
+	479 [label=x]
+	478 -> 479
+	480 [label=literal]
+	476 -> 480
+	481 [label=1]
+	480 -> 481
+	482 [label=if_statement]
+	471 -> 482
+	483 [label=binop]
+	482 -> 483
+	484 [label=">"]
+	483 -> 484
+	485 [label=id]
+	483 -> 485
+	486 [label=x]
+	485 -> 486
+	487 [label=literal]
+	483 -> 487
+	488 [label=10]
+	487 -> 488
+	489 [label=block]
+	482 -> 489
+	490 [label=nl]
+	489 -> 490
+	491 [label=nl]
+	490 -> 491
+	492 [label=assign]
+	490 -> 492
+	493 [label=id]
+	492 -> 493
+	494 [label=a]
+	493 -> 494
+	495 [label=literal]
+	492 -> 495
+	496 [label=2]
+	495 -> 496
+	497 [label=nl]
+	460 -> 497
+	498 [label=nl]
+	1 -> 498
+	499 [label=nl]
+	1 -> 499
+	500 [label=register]
+	1 -> 500
+	501 [label=MiRegistro]
+	500 -> 501
+	502 [label=block]
+	500 -> 502
+	503 [label=nl]
+	502 -> 503
+	504 [label=nl]
+	503 -> 504
+	505 [label=declaration]
+	503 -> 505
+	506 [label=int]
+	505 -> 506
+	507 [label="('var', 'a', ('assignment', None))"]
+	505 -> 507
+	508 [label=var]
+	507 -> 508
+	509 [label=a]
+	508 -> 509
+	510 [label=assignment]
+	508 -> 510
+	511 [label=declaration]
+	503 -> 511
+	512 [label=float]
+	511 -> 512
+	513 [label="('var', 'f', ('assignment', None))"]
+	511 -> 513
+	514 [label=var]
+	513 -> 514
+	515 [label=f]
+	514 -> 515
+	516 [label=assignment]
+	514 -> 516
+	517 [label=declaration]
+	503 -> 517
+	518 [label=char]
+	517 -> 518
+	519 [label="('var', 'c', ('assignment', None))"]
+	517 -> 519
+	520 [label=var]
+	519 -> 520
+	521 [label=c]
+	520 -> 521
+	522 [label=assignment]
+	520 -> 522
+	523 [label=nl]
+	1 -> 523
+	524 [label=nl]
+	1 -> 524
+	525 [label=funct_decl]
+	1 -> 525
+	526 [label=type_funct]
+	525 -> 526
+	527 [label=float]
+	526 -> 527
+	528 [label=hacerCalculo]
+	525 -> 528
+	529 [label=arg_funct]
+	525 -> 529
+	530 [label=type]
+	529 -> 530
+	531 [label=type_funct]
+	529 -> 531
+	532 [label=int]
+	531 -> 532
+	533 [label=args]
+	529 -> 533
+	534 [label=p]
+	529 -> 534
+	535 [label="[]"]
+	534 -> 535
+	536 [label="[(('type_funct', 'float'), 'q'), [(('type_funct', 'bool'), 'r')]]"]
+	534 -> 536
+	537 [label="(('type_funct', 'float'), 'q')"]
+	536 -> 537
+	538 [label="('type_funct', 'float')"]
+	537 -> 538
+	539 [label=q]
+	538 -> 539
+	540 [label="(('type_funct', 'bool'), 'r')"]
+	537 -> 540
+	541 [label="('type_funct', 'bool')"]
+	540 -> 541
+	542 [label=r]
+	541 -> 542
+	543 [label=block_funct]
+	525 -> 543
+	544 [label=nl]
+	543 -> 544
+	545 [label=nl]
+	544 -> 545
+	546 [label=declaration]
+	544 -> 546
+	547 [label=float]
+	546 -> 547
+	548 [label="('var', 'resultado', ('assignment', None))"]
+	546 -> 548
+	549 [label=var]
+	548 -> 549
+	550 [label=resultado]
+	549 -> 550
+	551 [label=assignment]
+	549 -> 551
+	552 [label=assign]
+	544 -> 552
+	553 [label=id]
+	552 -> 553
+	554 [label=resultado]
+	553 -> 554
+	555 [label=binop]
+	552 -> 555
+	556 [label="+"]
+	555 -> 556
+	557 [label=id]
+	555 -> 557
+	558 [label=p]
+	557 -> 558
+	559 [label=id]
+	555 -> 559
+	560 [label=q]
+	559 -> 560
+	561 [label=if_statement]
+	544 -> 561
+	562 [label=id]
+	561 -> 562
+	563 [label=r]
+	562 -> 563
+	564 [label=block]
+	561 -> 564
+	565 [label=nl]
+	564 -> 565
+	566 [label=nl]
+	565 -> 566
+	567 [label=assign]
+	565 -> 567
+	568 [label=id]
+	567 -> 568
+	569 [label=resultado]
+	568 -> 569
+	570 [label=binop]
+	567 -> 570
+	571 [label="*"]
+	570 -> 571
+	572 [label=id]
+	570 -> 572
+	573 [label=resultado]
+	572 -> 573
+	574 [label=literal]
+	570 -> 574
+	575 [label=2]
+	574 -> 575
+	576 [label=funct_ret]
+	543 -> 576
+	577 [label=id]
+	576 -> 577
+	578 [label=resultado]
+	577 -> 578
+	579 [label=nl]
+	1 -> 579
+	580 [label=assign]
+	1 -> 580
+	581 [label=id]
+	580 -> 581
+	582 [label=valor]
+	581 -> 582
+	583 [label=funct_call]
+	580 -> 583
+	584 [label=hacerCalculo]
+	583 -> 584
+	585 [label="('id', 'x')"]
+	583 -> 585
+	586 [label=id]
+	585 -> 586
+	587 [label=x]
+	586 -> 587
+	588 [label=literal]
+	585 -> 588
+	589 [label=3.14]
+	588 -> 589
+	590 [label=id]
+	585 -> 590
+	591 [label=b]
+	590 -> 591
+	592 [label=nl]
+	1 -> 592
+	593 [label=assign]
+	1 -> 593
+	594 [label=id]
+	593 -> 594
+	595 [label=valor]
+	594 -> 595
+	596 [label=binop]
+	593 -> 596
+	597 [label="+"]
+	596 -> 597
+	598 [label=funct_call]
+	596 -> 598
+	599 [label=hacerCalculo]
+	598 -> 599
+	600 [label="('id', 'x')"]
+	598 -> 600
+	601 [label=id]
+	600 -> 601
+	602 [label=x]
+	601 -> 602
+	603 [label=literal]
+	600 -> 603
+	604 [label=3.14]
+	603 -> 604
+	605 [label=id]
+	600 -> 605
+	606 [label=b]
+	605 -> 606
+	607 [label=funct_call]
+	596 -> 607
+	608 [label=hacerCalculo]
+	607 -> 608
+	609 [label="('id', 'x')"]
+	607 -> 609
+	610 [label=id]
+	609 -> 610
+	611 [label=x]
+	610 -> 611
+	612 [label=literal]
+	609 -> 612
+	613 [label=3.14]
+	612 -> 613
+	614 [label=id]
+	609 -> 614
+	615 [label=b]
+	614 -> 615
+	616 [label=nl]
+	1 -> 616
+	617 [label=funct_decl]
+	1 -> 617
+	618 [label=type_funct]
+	617 -> 618
+	619 [label=bool]
+	618 -> 619
+	620 [label=is_big_endian]
+	617 -> 620
+	621 [label=arg_funct]
+	617 -> 621
+	622 [label=type]
+	621 -> 622
+	623 [label=type_funct]
+	621 -> 623
+	624 [label=int]
+	623 -> 624
+	625 [label=args]
+	621 -> 625
+	626 [label=p]
+	621 -> 626
+	627 [label="[]"]
+	626 -> 627
+	628 [label="[]"]
+	626 -> 628
+	629 [label=block_funct]
+	617 -> 629
+	630 [label=nl]
+	629 -> 630
+	631 [label=nl]
+	630 -> 631
+	632 [label=declaration]
+	630 -> 632
+	633 [label=int]
+	632 -> 633
+	634 [label="('var', 'x', ('assignment', None))"]
+	632 -> 634
+	635 [label=var]
+	634 -> 635
+	636 [label=x]
+	635 -> 636
+	637 [label=assignment]
+	635 -> 637
+	638 [label=var]
+	634 -> 638
+	639 [label=b]
+	638 -> 639
+	640 [label=assignment]
+	638 -> 640
+	641 [label=assign]
+	630 -> 641
+	642 [label=id]
+	641 -> 642
+	643 [label=x]
+	642 -> 643
+	644 [label=binop]
+	641 -> 644
+	645 [label="+"]
+	644 -> 645
+	646 [label=id]
+	644 -> 646
+	647 [label=p]
+	646 -> 647
+	648 [label=binop]
+	644 -> 648
+	649 [label="/"]
+	648 -> 649
+	650 [label=id]
+	648 -> 650
+	651 [label=x]
+	650 -> 651
+	652 [label=id]
+	648 -> 652
+	653 [label=b]
+	652 -> 653
+	654 [label=funct_ret]
+	629 -> 654
+	655 [label=funct_call]
+	654 -> 655
+	656 [label=hacer_calculo]
+	655 -> 656
+	657 [label="('id', 'x')"]
+	655 -> 657
+	658 [label=id]
+	657 -> 658
+	659 [label=x]
+	658 -> 659
+	660 [label=literal]
+	657 -> 660
+	661 [label=3.14]
+	660 -> 661
+	662 [label=id]
+	657 -> 662
+	663 [label=b]
+	662 -> 663
+}

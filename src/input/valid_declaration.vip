@@ -1,8 +1,0 @@
-# --- DECLARACIÓN DE VARIABLES ---
-MiRegistro reg1            # Variable de tipo registro
-int x, y, z                # Varias variables int en una sola línea
-float valor, otra          # Variables de tipo float
-bool b                     # Variable booleana
-char car, otroCar          # Varias variables char
-int[5] vec                 # Vector de 5 enteros
-MiRegistro[2] regArray     # Vector de 2 registros de tipo MiRegistro

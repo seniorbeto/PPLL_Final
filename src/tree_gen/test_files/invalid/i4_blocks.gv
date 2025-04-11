@@ -1,0 +1,16 @@
+// Árbol Sintáctico
+digraph {
+	0 [label=program]
+	1 [label="('assign', ('id', 'a'), ('literal', 5))"]
+	0 -> 1
+	2 [label=assign]
+	1 -> 2
+	3 [label=id]
+	2 -> 3
+	4 [label=a]
+	3 -> 4
+	5 [label=literal]
+	2 -> 5
+	6 [label=5]
+	5 -> 6
+}
