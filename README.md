@@ -20,12 +20,12 @@ Entrega Parcial Ejercicio Final
 ## Índice
 
 1. [Analizador Léxico](#Analizador-Léxico)
-2. [Analizador Sintáctico](#Analizador-Sintactico)  
+2. [Analizador Sintáctico](#Analizador-Sintáctico)  
    - [Definición formal de la gramática](#Definición-formal-de-la-gramática)  
-   - [Decisiones principales de diseño de la gramática](#decisiones-principales-de-diseño-de-la-gramática)
-3. [Batería de Pruebas](#batería-de-pruebas)  
-   - [Aclaraciones Importantes](#aclaraciones-importantes)
-4. [Contenido Extra: Visualización del Árbol Sintáctico](#contenido-extra-visualización-del-árbol-sintáctico)
+   - [Decisiones principales de diseño de la gramática](#Decisiones-principales-de-diseño-de-la-gramática)
+3. [Batería de Pruebas](#Batería-de-pruebas)  
+   - [Aclaraciones Importantes](#Aclaraciones-Importantes)
+4. [Contenido Extra: Visualización del Árbol Sintáctico](#Contenido-Extra-Visualización-del-Árbol-Sintáctico)
 
 # <a name="_page2_x72.00_y104.53"></a>Analizador Léxico
 Para el analizador léxico, hemos definido la secuencia de tokens que se han especificado en el enunciado,  teniendo  en  cuenta  como  tokens  los  comentarios  simples  y  los  comentarios multilínea, para llevar un conteo de la línea del código actual, usada para llevar a cabo una forma trazable de recuperación de errores. Se han definido, además, una serie de palabras reservadas, de nuevo, las especificadas en el enunciado. 
@@ -131,7 +131,7 @@ python3 main.py "$input\_file" > "$output\_file" por:
 python main.py "$input\_file" > "$output\_file" 
 
 Además, es importante mencionar que si no se puede ejecutar el fichero run.sh, es posible que haya que darle permisos de administrador con el comando chmod +x run.sh 
-# <a name="_page6_x72.00_y426.29"></a>**Contenido Extra: Visualización del Árbol Sintáctico** 
+# <a name="_page6_x72.00_y426.29"></a>Contenido Extra: Visualización del Árbol Sintáctico
 Para facilitar el desarrollo del árbol sintáctico, se ha utilizado una herramienta para poder visualizar de forma gráfica el árbol resultante de la siguiente manera:  
 
 ![](./doc/foto_arbol_readme_md.jpeg)
