@@ -19,9 +19,9 @@ Entrega Parcial Ejercicio Final
 
 ## Índice
 
-1. [Analizador Léxico](#analizador-lexico)
-2. [Analizador Sintáctico](#analizador-sintactico)  
-   - [Definición formal de la gramática](#definición-formal-de-la-gramática)  
+1. [Analizador Léxico](#Analizador-Léxico)
+2. [Analizador Sintáctico](#Analizador-Sintactico)  
+   - [Definición formal de la gramática](#Definición-formal-de-la-gramática)  
    - [Decisiones principales de diseño de la gramática](#decisiones-principales-de-diseño-de-la-gramática)
 3. [Batería de Pruebas](#batería-de-pruebas)  
    - [Aclaraciones Importantes](#aclaraciones-importantes)
