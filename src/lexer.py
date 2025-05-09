@@ -1,10 +1,19 @@
+import os
+import shlex
 import ply.lex as lex
 
 
 class ViperLexer:
-    def __init__(self, route: str):
+    def __init__(self, route: str, allow_preprocess: bool = False):
+        self.allow_preprocess = allow_preprocess
         self.lexer = None
         self.input_file = route
+
+        # Este será el path al que accederá el parser para analizar el
+        # el código. Si el preprocesador está activado, esta ruta se cambiará
+        # por la del fichero preprocesado para que el parser pueda analizarlo correctamente.
+        self.parser_input_file = route
+
         if route.endswith(".vip"):
             self.output_file = route.replace(".vip", ".token")
         else:
@@ -170,7 +179,20 @@ class ViperLexer:
 
         try:
             with open(self.input_file, "r") as file:
-                self.lexer.input(file.read())
+                content = file.read()
+
+            if self.allow_preprocess:
+                # Preprocesamos el contenido
+                content = self.preprocess(self.input_file)
+
+                # Actualizamos la ruta del fichero de entrada para el parser
+                self.parser_input_file = self.output_file.replace(".token", ".postprocessed")
+
+                # Exportamos un fichero con el contenido preprocesado
+                with open(self.output_file.replace(".token", ".postprocessed"), "w") as pre_file:
+                    pre_file.write(content)
+
+            self.lexer.input(content)
 
             # Exportamos los tokens a un archivo
             with open(self.output_file, "w") as file:
@@ -180,6 +202,61 @@ class ViperLexer:
         except FileNotFoundError as e:
             print(f"ERROR: {e}")
             exit(-1)
+
+    def preprocess(self, file_path, visited=None):
+        """
+        Lee el fichero en file_path, expande %append y aplica %supplant,
+        devolviendo el contenido resultante como cadena.
+        Evita inclusiones cíclicas usando el conjunto `visited`.
+        """
+        if visited is None:
+            visited = set()
+
+        # Normaliza y detecta ciclos
+        file_path = os.path.abspath(file_path)
+        if file_path in visited:
+            raise ValueError(f"Circular include detectado: {file_path}")
+        visited.add(file_path)
+
+        # Lectura de líneas originales
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        replacements = []
+        output_lines = []
+
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('%'):
+                parts = shlex.split(stripped)
+                cmd = parts[0]
+
+                # %append <ruta>
+                if cmd == '%append' and len(parts) == 2:
+                    include_path = parts[1]
+                    # ruta relativa → absoluta (respecto al directorio del fichero padre)
+                    if not os.path.isabs(include_path):
+                        include_path = os.path.join(os.path.dirname(file_path), include_path)
+                    # recursividad para el fichero incluido, por si hay %appends dentro de %appends
+                    included = self.preprocess(include_path, visited)
+                    output_lines.append(included)
+                    continue
+
+                # %supplant A B
+                elif cmd == '%supplant' and len(parts) == 3:
+                    old, new = parts[1], parts[2]
+                    replacements.append((old, new))
+                    continue
+
+            # Si no era directiva, la conservamos
+            output_lines.append(line)
+
+        # Ensamblamos el fichero resultante
+        content = ''.join(output_lines)
+        for old, new in replacements:
+            content = content.replace(old, new)
+
+        return content
 
     def token(self):
         """

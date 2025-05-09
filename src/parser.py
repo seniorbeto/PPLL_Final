@@ -21,12 +21,12 @@ class ViperParser:
         ("right", "NOT"),
     )
 
-    def __init__(self, lexer: ViperLexer, route: str):
+    def __init__(self, lexer: ViperLexer):
         """
         Creamos una instancia de ViperLexer y el parser Yacc.
         """
         self.lexer = lexer
-        self.route = route
+        self.route = self.lexer.parser_input_file
         self.parser = None
 
     # ------------------------------------------------------------
