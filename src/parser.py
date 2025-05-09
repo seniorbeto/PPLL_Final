@@ -64,7 +64,7 @@ class ViperParser:
                   | function_definition NEWLINE
                   | NEWLINE
         """
-        if len(p) == 2:
+        if len(p) == 3:
             p[0] = p[1]
         else:
             p[0] = None
@@ -103,7 +103,7 @@ class ViperParser:
                    | expression AND expression
                    | expression OR expression
         """
-        p[0] = (p[2], p[1], p[3])
+        p[0] = (p[1], p[2], p[3])
 
     def p_expression_unary(self, p):
         """
@@ -152,7 +152,7 @@ class ViperParser:
         """
         expression : ID reference
         """
-        p[0] = ("reference", p[1], p[2])
+        p[0] = (p[1], p[2])
 
     # Una referencia es la indexación de un vector o el acceso a un campo
     # de un registro. Ambas cosas pueden ser recursivas. Además, también
@@ -165,9 +165,9 @@ class ViperParser:
                   |
         """
         if len(p) == 5:
-            p[0] = ("index", p[2])
+            p[0] = ("vector_index", p[2], p[4])
         elif len(p) == 4:
-            p[0] = ("field", p[2])
+            p[0] = ("field", p[2], p[3])
         else:
             p[0] = None
 
@@ -177,26 +177,17 @@ class ViperParser:
         assignment : ID reference EQUALS expression
                    | ID reference EQUALS assignment
         """
-        if len(p) == 5:
-            p[0] = ("assignment", p[1], p[3])
-        else:
-            p[0] = ("chain_assignment", p[1], p[3])
+        p[0] = ("assignment", p[1], p[2], p[4])
 
     def p_declaration(self, p):
         """
-        declaration : object_type variable_list
+        declaration : INT_TYPE variable_list
+                   | FLOAT_TYPE variable_list
+                   | BOOL_TYPE variable_list
+                   | CHAR_TYPE variable_list
+                   | ID variable_list
         """
         p[0] = ("declaration", p[1], p[2])
-
-    def p_object_type(self, p):
-        """
-        object_type : INT_TYPE
-                   | FLOAT_TYPE
-                   | BOOL_TYPE
-                   | CHAR_TYPE
-                   | ID
-        """
-        p[0] = p[1]
 
     def p_declaration_list(self, p):
         """
@@ -241,31 +232,41 @@ class ViperParser:
     # es lo que se especifica en el enunciado.
     def p_if_statement(self, p):
         """
-        if_statement : IF expression COLON LBRACE sentence_list RBRACE
-                     | IF expression COLON LBRACE sentence_list RBRACE NEWLINE ELSE COLON LBRACE sentence_list RBRACE
+        if_statement : IF expression COLON LBRACE NEWLINE sentence_list RBRACE
+                     | IF expression COLON LBRACE NEWLINE sentence_list RBRACE ELSE COLON LBRACE NEWLINE sentence_list RBRACE
         """
-        if len(p) == 6:
-            p[0] = ("if", p[2], p[5])
+        if len(p) == 8:
+            p[0] = ("if", p[2], p[6])
         else:
-            p[0] = ("if_else", p[2], p[5], p[11])
+            p[0] = ("if_else", p[2], p[6], p[12])
 
     def p_while_statement(self, p):
         """
-        while_statement : WHILE expression COLON LBRACE sentence_list RBRACE
+        while_statement : WHILE expression COLON LBRACE NEWLINE sentence_list RBRACE
         """
-        p[0] = ("while", p[2], p[5])
+        p[0] = ("while", p[2], p[6])
 
     def p_type_definition(self, p):
         """
-        type_definition : TYPE ID COLON LBRACE declaration_list RBRACE
+        type_definition : TYPE ID COLON LBRACE NEWLINE declaration_list RBRACE
         """
-        p[0] = ("type_definition", p[2], p[5])
+        p[0] = ("type_definition", p[2], p[6])
 
     def p_function_definition(self, p):
         """
-        function_definition : DEF object_type ID LPAREN argument_list RPAREN COLON LBRACE sentence_list RETURN sentence RBRACE
+        function_definition : DEF function_type ID LPAREN argument_list RPAREN COLON LBRACE NEWLINE sentence_list RETURN sentence RBRACE
         """
-        p[0] = ("function_definition", p[2], p[5], p[9], p[11])
+        p[0] = ("function_definition", p[2], p[3], p[5], p[10], p[12])
+
+    def p_function_type(self, p):
+        """
+        function_type : INT_TYPE
+                      | FLOAT_TYPE
+                      | BOOL_TYPE
+                      | CHAR_TYPE
+                      | ID
+        """
+        p[0] = p[1]
 
     def p_argument_list(self, p):
         """
@@ -273,10 +274,10 @@ class ViperParser:
                       | declaration
                       |
         """
-        if len(p) == 5:
-            p[0] = p[1] + [(p[3], p[4])]
-        elif len(p) == 3:
-            p[0] = [(p[1], p[2])]
+        if len(p) == 4:
+            p[0] = p[1] + [p[3]]
+        elif len(p) == 2:
+            p[0] = [p[1]]
         else:
             p[0] = []
 
