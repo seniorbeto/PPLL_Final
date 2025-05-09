@@ -59,9 +59,9 @@ class ViperParser:
     # ------------------------------------------------------------------
     def p_statement(self, p):
         """
-        statement : sentence
-                  | type_definition
-                  | function_definition
+        statement : sentence NEWLINE
+                  | type_definition NEWLINE
+                  | function_definition NEWLINE
                   | NEWLINE
         """
         if len(p) == 2:
@@ -69,11 +69,21 @@ class ViperParser:
         else:
             p[0] = None
 
+    def p_sentence_list(self, p):
+        """
+        sentence_list : sentence_list sentence NEWLINE
+                      | sentence NEWLINE
+        """
+        if len(p) == 4:
+            p[0] = p[1] + [p[2]]
+        else:
+            p[0] = [p[1]]
+
     def p_sentence(self, p):
         """
-        sentence : expression NEWLINE
-                 | assignment NEWLINE
-                 | declaration NEWLINE
+        sentence : expression
+                 | assignment
+                 | declaration
                  | if_statement
                  | while_statement
         """
@@ -108,7 +118,6 @@ class ViperParser:
         expression : INT
                    | FLOAT
                    | CHAR
-                   | ID
                    | TRUE
                    | FALSE
         """
@@ -116,15 +125,15 @@ class ViperParser:
 
     def p_expression_func_call(self, p):
         """
-        expression : ID LPAREN argument_list RPAREN
+        expression : ID LPAREN function_call_argument_list RPAREN
         """
         p[0] = ("function_call", p[1], p[3])
 
-    def p_argument_list(self, p):
+    def p_function_call_argument_list(self, p):
         """
-        argument_list : argument_list COMMA expression
-                      | expression
-                      |
+        function_call_argument_list : expression COMMA function_call_argument_list
+                                    | expression
+                                    |
         """
         if len(p) == 4:
             p[0] = p[1] + [p[3]]
@@ -151,16 +160,16 @@ class ViperParser:
     # ser lambda.
     def p_reference(self, p):
         """
-        reference : reference LBRACKET expression RBRACKET
-                  | reference DOT ID
+        reference : LBRACKET expression RBRACKET reference
+                  | DOT ID reference
                   |
         """
-        if len(p) == 4:
+        if len(p) == 5:
             p[0] = ("index", p[2])
-        elif len(p) == 3:
+        elif len(p) == 4:
             p[0] = ("field", p[2])
         else:
-            p[0] = (p[2], p[1])
+            p[0] = None
 
     # En la siguiente regla contemplamos asignaciones simples y asignaciones en cadena
     def p_assignment(self, p):
@@ -175,13 +184,29 @@ class ViperParser:
 
     def p_declaration(self, p):
         """
-        declaration : INT_TYPE variable_list
-                    | FLOAT_TYPE variable_list
-                    | CHAR_TYPE variable_list
-                    | BOOL_TYPE variable_list
-                    | ID variable_list
+        declaration : object_type variable_list
         """
         p[0] = ("declaration", p[1], p[2])
+
+    def p_object_type(self, p):
+        """
+        object_type : INT_TYPE
+                   | FLOAT_TYPE
+                   | BOOL_TYPE
+                   | CHAR_TYPE
+                   | ID
+        """
+        p[0] = p[1]
+
+    def p_declaration_list(self, p):
+        """
+        declaration_list : declaration_list declaration
+                         | declaration
+        """
+        if len(p) == 3:
+            p[0] = p[1] + [p[2]]
+        else:
+            p[0] = [p[1]]
 
     def p_variable_list(self, p):
         """
@@ -199,9 +224,9 @@ class ViperParser:
                              | LBRACKET expression RBRACKET ID assignment_declaration
         """
         if len(p) == 3:
-            p[0] = ("var", p[1],("assignment",p[2]))
+            p[0] = ("var", p[1], ("assignment", p[2]))
         else:
-            p[0] = ("vector_decl", p[4], p[2], ("assignment",p[5]))
+            p[0] = ("vector_decl", p[4], p[2], ("assignment", p[5]))
 
     def p_assignment_declaration(self, p):
         """
@@ -211,6 +236,49 @@ class ViperParser:
         if len(p) == 3:
             p[0] = ("assign", p[2])
 
+    # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
+    # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
+    # es lo que se especifica en el enunciado.
+    def p_if_statement(self, p):
+        """
+        if_statement : IF expression COLON LBRACE sentence_list RBRACE
+                     | IF expression COLON LBRACE sentence_list RBRACE NEWLINE ELSE COLON LBRACE sentence_list RBRACE
+        """
+        if len(p) == 6:
+            p[0] = ("if", p[2], p[5])
+        else:
+            p[0] = ("if_else", p[2], p[5], p[11])
+
+    def p_while_statement(self, p):
+        """
+        while_statement : WHILE expression COLON LBRACE sentence_list RBRACE
+        """
+        p[0] = ("while", p[2], p[5])
+
+    def p_type_definition(self, p):
+        """
+        type_definition : TYPE ID COLON LBRACE declaration_list RBRACE
+        """
+        p[0] = ("type_definition", p[2], p[5])
+
+    def p_function_definition(self, p):
+        """
+        function_definition : DEF object_type ID LPAREN argument_list RPAREN COLON LBRACE sentence_list RETURN sentence RBRACE
+        """
+        p[0] = ("function_definition", p[2], p[5], p[9], p[11])
+
+    def p_argument_list(self, p):
+        """
+        argument_list : declaration SEMICOLON argument_list
+                      | declaration
+                      |
+        """
+        if len(p) == 5:
+            p[0] = p[1] + [(p[3], p[4])]
+        elif len(p) == 3:
+            p[0] = [(p[1], p[2])]
+        else:
+            p[0] = []
 
     # ------------------------------------------------------------------
     # Manejo de errores sintácticos
@@ -234,7 +302,7 @@ class ViperParser:
         """
         Construye el parser con ply.yacc, usando las reglas definidas.
         """
-        self.parser = yacc.yacc(module=self)
+        self.parser = yacc.yacc(module=self, debug=True, **kwargs)
 
     def parse(self):
         """

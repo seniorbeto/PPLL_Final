@@ -68,8 +68,6 @@ class ViperLexer:
         "COLON",
         "DOT",
         "SEMICOLON",
-        "COMMENT",
-        "MLCOMMENT",
         "NEWLINE",
     ] + list(reserved.values())
 
