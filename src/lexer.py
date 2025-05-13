@@ -143,6 +143,8 @@ class ViperLexer:
     # Carácter: cualquier símbolo ASCII-extendido delimitado por comillas simples
     def t_CHAR(self, t):
         r"'(?:[\x00-\xff]|\\.)'"
+        # ASÍ ES COMO LO TIENE EL PROFE
+        # '[\x00-\xff]'
         # Se descartan las comillas simples
         t.value = t.value[1:-1]
         return t

@@ -1,7 +1,5 @@
 BASIC_FORMAT = ["int", "str", "float", "bool"] #ETC
 
-from sem import Semantic
-
 
 def check_table(datatype, existing_dict ):
     if datatype in existing_dict.keys():
@@ -71,27 +69,27 @@ class Function:
 
 
 
+if __name__ == "__main__":
+    datatype = {}
 
-datatype = {}
-
-variable1 = Variable("var1", "int" , datatype)
-print(variable1)
-variable2 = Variable("var2", "float", datatype)
-print(variable2)
+    variable1 = Variable("var1", "int" , datatype)
+    print(variable1)
+    variable2 = Variable("var2", "float", datatype)
+    print(variable2)
 
 
-arguments = {"b": ["int"],"a": ["char"], "c": ["Register", 3]}
-c = Register("register", **arguments)
-datatype[c._name] = c._atributes
+    arguments = {"b": ["int"],"a": ["char"], "c": ["Register", 3]}
+    c = Register("register", **arguments)
+    datatype[c._name] = c._atributes
 
-print(c)
+    print(c)
 
-variable3 = Variable("var3", "register", datatype)
-print(variable3)
+    variable3 = Variable("var3", "register", datatype)
+    print(variable3)
 
-func_arg = {"a": "int", "b": "char", "c": "Register"}
-funcionn = Function("funcion", "int", arguments, datatype)
-print(funcionn)
+    func_arg = {"a": "int", "b": "char", "c": "Register"}
+    funcionn = Function("funcion", "int", arguments, datatype)
+    print(funcionn)
 
 
 
