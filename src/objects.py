@@ -36,13 +36,53 @@ class Register:
 
 
 class Variable:
-    def __init__(self, name:str, datatype:str, existing_dict:dict,value=None,):
-        self._name = name
-        self._datatype = datatype if BASIC_FORMAT.__contains__(datatype) else check_table(datatype, existing_dict)
-        self._value = None
+    def __init__(self, id: str, datatype: any, value = None):
+        self._name = id
+        self._datatype = datatype
+        self._value = value
 
-    def __str__(self):
-        return f"Variable\n(\tname:{self._name}\n\ttype: {self._datatype}\n\tvalue: {self._value}\n)"
+    def __repr__(self):
+        return f"Variable {self._name}({self._datatype}) With value {self._value}"
+
+
+    def verify_type_value(self):
+        if self._value == None:
+            return "Pinga"
+
+
+
+
+class Expression:
+    def __init__(self, express_params:tuple):
+        self._return_type = None
+
+exp1 = (('literal', 3), '/', ('literal', 7))
+exp2 = ('function_call', 'tete', [])
+exp3 = ('vector_index', ('literal', 3), None)
+
+
+"""('program',
+ [None,
+  ('declaration',
+   'int',
+   [('vector_decl',
+     'a',
+     (('literal', 3), '/', ('literal', 7)),
+     ('assignment', None))]),
+  ('declaration',
+   'int',
+   [('vector_decl', 'd', ('function_call', 'tete', []), ('assignment', None))]),
+  ('declaration',
+   'int',
+   [('vector_decl',
+     'd',
+     ('t', ('vector_index', ('literal', 3), None)),
+     ('assignment', None))])])"""
+
+
+
+
+
 
 
 class Function:

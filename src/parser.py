@@ -1,6 +1,9 @@
 import ply.yacc as yacc
 from lexer import ViperLexer
 
+from tables import Recordtable, SymbolTable
+from objects import *
+
 
 class ViperParser:
     """
@@ -28,6 +31,9 @@ class ViperParser:
         self.lexer = lexer
         self.route = self.lexer.parser_input_file
         self.parser = None
+
+        self.record_table = Recordtable()
+        self.symbol_table = SymbolTable()
 
     # ------------------------------------------------------------
     # Reglas de la gramática (sin cambiar la definición)
@@ -205,8 +211,10 @@ class ViperParser:
                       | variable_declaration
         """
         if len(p) == 4:
+            # p[0] = p[1] + [p[3]]
             p[0] = p[1] + [p[3]]
         else:
+            # p[0] = [p[1]]
             p[0] = [p[1]]
 
     def p_variable_declaration(self, p):

@@ -1,3 +1,19 @@
-class Recordtable: ...
+class Recordtable:
+    def __init__(self):
+        self._table = {}
 
-class SymbolTable: ...
+
+
+
+
+
+
+
+
+class SymbolTable:
+    def __init__(self):
+        self._table = {}
+
+
+
+
