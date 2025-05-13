@@ -38,12 +38,13 @@ class Register:
 
 
 class Variable:
-    def __init__(self, name:str, datatype:str, existing_dict:dict):
+    def __init__(self, name:str, datatype:str, existing_dict:dict,value=None,):
         self._name = name
         self._datatype = datatype if BASIC_FORMAT.__contains__(datatype) else check_table(datatype, existing_dict)
+        self._value = None
 
     def __str__(self):
-        return f"Variable({self._name}, {self._datatype})"
+        return f"Variable\n(\tname:{self._name}\n\ttype: {self._datatype}\n\tvalue: {self._value}\n)"
 
 
 class Function:
@@ -55,7 +56,7 @@ class Function:
             if BASIC_FORMAT.__contains__(arg):
                 self._arguments.append(arg)
             else :
-                if check_table(arg, existing_dict) != ValueError :
+                if check_table(arg[0], existing_dict) != ValueError :
                     self._arguments.append(arg)
 
 
