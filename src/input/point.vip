@@ -1,4 +1,4 @@
 type Point: {
-    x: Int
-    y: Int
+    int x
+    int y
 }

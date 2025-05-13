@@ -167,6 +167,7 @@ class ViperLexer:
         print(f"Caracter ilegal '{t.value[0]}' en la línea {t.lineno}")
         t.lexer.skip(1)
 
+
     # Método para construir el lexer
     def build(self, **kwargs):
         """

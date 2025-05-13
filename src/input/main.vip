@@ -1,7 +1,22 @@
-bool t = 3
+%append point.vip
 
 
-int a, b, c,d, e, f, g, h, i, j, k = 'p'       # esto está mal
+
+Point a, b, c,d, e, f, g, h, i, j, k    #
 int d, e, f             # esto está bien
 
+if a>b:
+{
 
+
+
+
+
+    c = 3
+} else:
+
+{
+
+  b = 2
+}
+c =3

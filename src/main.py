@@ -50,6 +50,7 @@ if __name__ == "__main__":
             print("[ERROR] graphviz package not installed. Please install it with pip.")
             exit(1)
 
-    os.system("rm parser.out parsetab.py")
+    route = os.path.dirname(__file__)
+    os.system(f"rm {route}/parser.out {route}/parsetab.py")
 
     Main(sys.argv[1],export_tree)

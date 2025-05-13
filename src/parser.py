@@ -127,7 +127,7 @@ class ViperParser:
                    | TRUE
                    | FALSE
         """
-        p[0] = ("literal", p[1])
+        p[0] = p.slice[1].type
 
     def p_expression_func_call(self, p):
         """
@@ -193,7 +193,17 @@ class ViperParser:
                    | CHAR_TYPE variable_list
                    | ID variable_list
         """
-        p[0] = ("declaration", p[1], p[2])
+        type = p[1]
+        if p[2][-1]._value != None:
+            for var in p[2]:
+                var._value = p[2][-1]._value
+        for var in p[2]:
+            var._datatype = type
+            print(var)
+            if var._datatype.upper() != var._value and var._value != None:
+                print(var._datatype)
+                print(var._value)
+                print("Eres mi putita")
 
     def p_declaration_list(self, p):
         """
@@ -223,7 +233,11 @@ class ViperParser:
                              | LBRACKET expression RBRACKET ID assignment_declaration
         """
         if len(p) == 3:
-            p[0] = ("var", p[1], ("assignment", p[2]))
+            #p[0] = ("var", p[1], ("assignment", p[2]))
+            id = p[1]
+            assignment = p[2]
+            p[0] = Variable(id, None,assignment)
+
         else:
             p[0] = ("vector_decl", p[4], p[2], ("assignment", p[5]))
 
@@ -233,20 +247,35 @@ class ViperParser:
                                |
         """
         if len(p) == 3:
-            p[0] = ("assign", p[2])
+            p[0] = p[2]
 
     # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
     # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
     # es lo que se especifica en el enunciado.
     def p_if_statement(self, p):
         """
-        if_statement : IF expression COLON LBRACE NEWLINE sentence_list RBRACE
-                     | IF expression COLON LBRACE NEWLINE sentence_list RBRACE ELSE COLON LBRACE NEWLINE sentence_list RBRACE
+        if_statement : IF expression COLON newlines LBRACE newlines sentence_list RBRACE newlines else_statement
         """
-        if len(p) == 8:
-            p[0] = ("if", p[2], p[6])
+        """if len(p) == 9:
+            p[0] = ("if", p[2], p[7])
         else:
-            p[0] = ("if_else", p[2], p[6], p[12])
+            p[0] = ("if_else", p[2], p[8], p[15])"""
+        p[0] = ("if", p[2], p[7], p[8])
+
+    def p_else_statement(self,p):
+        """
+         else_statement : ELSE COLON newlines LBRACE newlines sentence_list RBRACE
+                        |
+        """
+        if len(p) == 9:
+            p[0] = ("else", p[6])
+        else:
+            p[0] = None
+    def p_newlines(self, p):
+        """
+        newlines : newlines NEWLINE
+                |
+        """
 
     def p_while_statement(self, p):
         """
