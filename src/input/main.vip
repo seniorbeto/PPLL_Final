@@ -1,15 +1,12 @@
 type Sexo: {
-    int aa
-    char bb
+    int a,b,c
+    char r
     }
 
 
-Sexo tete
+Sxo tete
 
 int b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
-
-
-a = tete
 
 
 

@@ -213,13 +213,12 @@ class ViperParser:
                 print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
                 print(f"\tVariable {identifier} not found.")
             else:
-                print(isinstance(value, Expression))
-                print(value)
-                print(self.record_table.exists(value))
                 if isinstance(value, VariableRef) and self.record_table.exists(value) == False:
+                    # SI ES UNA REFERENCIA QUE NO ESTA EN LA TABLA DE REGISTROS NO ES NADA, ERROR SEMANTICO
                     print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
                     print(f"\tInvalid assignment to variable '{identifier}'. Attribute: {value} is not defined")
                 else:
+                    #COMPROBACION DE DATATYPE == VALOR ASIGNADO
                     if var.datatype != value.infer_type(var.datatype, value):
                         print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
                         print(f"\tIncompatible types: {var.datatype.upper()} and {value.infer_type(var.datatype, value).upper()}")
@@ -249,13 +248,17 @@ class ViperParser:
                 for var in variables:
                     var.datatype = datatype
                     var.value = type
-                    print(f"scope es {self.symbol_table._scope} y voy a guardar {var}")
                     self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
         else:
-            for var in variables:
-                var.datatype = datatype
-                print(f"scope es {self.symbol_table._scope} y voy a guardar {var}")
-                self.symbol_table.add_variable(var)
+            #Hay que verificar que el tipo declarado sea correcto, pese a que el valor sea nulo
+            if datatype not in self.record_table._basic_symbols and self.record_table.exists(datatype) == False:
+                print("SEMANTIC ERROR DETECTED IN DECLARATION:")
+                print(f"\tRecord {datatype} not found.")
+                print(f"\tVariables Affected: {', '.join(var.name for var in variables)}")
+            else:
+                for var in variables:
+                    var.datatype = datatype
+                    self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
 
 
 
@@ -268,8 +271,6 @@ class ViperParser:
                          | declaration NEWLINE
         """
         if len(p) == 4:
-            print(f"p1 es {p[1]}")
-            print(f"p2 es {p[2]}")
             p[0] = p[1] + [p[2]]
         else:
             p[0] = [p[1]]
@@ -333,12 +334,35 @@ class ViperParser:
         """
         p[0] = ("while", p[2], p[6])
 
-    def p_type_definition(self, p):
+    def p_type_definition(self,p):
         """
-        type_definition : TYPE ID COLON LBRACE NEWLINE declaration_list RBRACE
+        type_definition : type_definition_header type_definition_body
+        """
+        print(f"type_definition body es {p[2]}")
+        type_name = p[1]
+        fields_declared = p[2]
+        fields = []
+        for field in fields_declared:
+            #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0]
+            for elems in field[2]:
+                fields.append(elems)
+        self.record_table.add_record(type_name, tuple(fields))
+        print(self.record_table)
+        p[0] = ("type_definition", p[2])
+
+    def p_type_definition_header(self, p):
+        """
+        type_definition_header : TYPE ID COLON LBRACE NEWLINE
         """
         self.symbol_table._scope = "Type Definition"
-        p[0] = ("type_definition", p[2], p[6])
+        p[0] = p[2]
+
+
+    def p_type_definition_body(self, p):
+        """
+        type_definition_body : declaration_list RBRACE
+        """
+        p[0] = p[1]
 
     def p_function_definition(self, p):
         """

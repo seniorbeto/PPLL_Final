@@ -4,14 +4,16 @@ class Recordtable:
     def __init__(self):
         # mapea nombre de record -> Record
         self._table = {}
+        self._basic_symbols = ("int", "float", "char",)
 
-    def add_record(self, record):
+    def add_record(self, type_name, fields):
         """Añade una definición de Record.
         record: instancia de objects.Record"""
-        name = record.name
-        if name in self._table:
-            raise SemanticError(f"Record '{name}' ya definido")
-        self._table[name] = record
+
+        if type_name in self._table:
+            raise SemanticError(f"Record '{type_name}' ya definido")
+        self._table[type_name] = fields
+
 
     def lookup(self, name):
         """Devuelve el Record con ese nombre o None si no existe"""
@@ -20,6 +22,9 @@ class Recordtable:
     def exists(self, name):
         """Comprueba si un Record está definido"""
         return name in self._table
+
+    def __str__(self):
+        return f"Record Table: {self._table}"
 
 
 class SymbolTable:
