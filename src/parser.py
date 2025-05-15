@@ -340,6 +340,7 @@ class ViperParser:
         """
         type_name = p[1]
         fields_declared = p[2]
+
         fields = []
         for field in fields_declared:
             #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0]
