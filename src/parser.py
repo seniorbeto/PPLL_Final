@@ -127,7 +127,7 @@ class ViperParser:
                    | TRUE
                    | FALSE
         """
-        p[0] = ("literal", p[1])
+        p[0] = p.slice[1].type
 
     def p_expression_func_call(self, p):
         """
@@ -193,7 +193,25 @@ class ViperParser:
                    | CHAR_TYPE variable_list
                    | ID variable_list
         """
-        p[0] = ("declaration", p[1], p[2])
+        datatype = p[1]
+        variables = p[2]
+        primitive_datatypes = ["int", "float", "bool", "char", "true", "false"]
+        for new_var in variables:
+            """if new_var._value is None:
+                pass"""
+            print(f"Printeo de variables {new_var}")
+            if datatype in primitive_datatypes:
+                # Es una variable simple
+                new_var._datatype = datatype
+
+                if new_var._value not in primitive_datatypes:
+                    print("ERROR SEMÁNTICO. LOS TIPOS NO COINCIDEN")
+                else:
+                    print(f"OK para var {new_var} con value {new_var._value}")
+            else:
+                ...
+
+        print(p[2])
 
     def p_declaration_list(self, p):
         """
@@ -210,6 +228,7 @@ class ViperParser:
         variable_list : variable_list COMMA variable_declaration
                       | variable_declaration
         """
+        list_variable = []
         if len(p) == 4:
             # p[0] = p[1] + [p[3]]
             p[0] = p[1] + [p[3]]
@@ -223,9 +242,17 @@ class ViperParser:
                              | LBRACKET expression RBRACKET ID assignment_declaration
         """
         if len(p) == 3:
-            p[0] = ("var", p[1], ("assignment", p[2]))
+            # p[0] = ("var", p[1], ("assignment", p[2]))
+            id = p[1]
+            assignement = p[2]
+            # Aquí sabemos que es una declaración sencilla. Es posible que
+            # assignement sea None, en cuyo caso no asignamos nada.
+            new_var = Variable(id, None, assignement)
+            p[0] = new_var
         else:
             p[0] = ("vector_decl", p[4], p[2], ("assignment", p[5]))
+            # id = p[4]
+            # len = p[2]
 
     def p_assignment_declaration(self, p):
         """
@@ -233,7 +260,7 @@ class ViperParser:
                                |
         """
         if len(p) == 3:
-            p[0] = ("assign", p[2])
+            p[0] = p[2]
 
     # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
     # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
