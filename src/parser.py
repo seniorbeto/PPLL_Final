@@ -209,7 +209,10 @@ class ViperParser:
                 print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
                 print(f"\tVariable {identifier} not found.")
             else:
-                if not isinstance(value, Expression) and  self.record_table.exists(value) != None:
+                print(isinstance(value, Expression))
+                print(value)
+                print(self.record_table.exists(value))
+                if isinstance(value, VariableRef) and self.record_table.exists(value) == False:
                     print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
                     print(f"\tInvalid assignment to variable '{identifier}'. Attribute: {value} is not defined")
                 else:
