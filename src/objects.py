@@ -118,10 +118,58 @@ class FunctionCall(Expression):
                                     (self.name, expected, actual))
         return func.return_type
 
-# ——— Record (definición de tipo) ————————————————————————————————————
+class BinaryExpr(Expression):
+    def __init__(self, op, left, right):
+        self.op = op        # '+', '-', '*', '/', '==', '>', '<=', 'and', 'or',...
+        self.left = left    # Expression
+        self.right = right  # Expression
+
+    def infer_type(self, symbols, records):
+        lt = self.left.infer_type(symbols, records)
+        rt = self.right.infer_type(symbols, records)
+        # Aritméticas
+        if self.op in ('+', '-', '*', '/'):
+            if lt in ('int','float') and rt in ('int','float'):
+                return 'float' if 'float' in (lt,rt) else 'int'
+        # Relacionales
+        if self.op in ('==','!=','>','<','>=','<='):
+            if lt == rt:
+                return 'bool'
+        # Lógicas
+        if self.op in ('and','or'):
+            if lt == 'bool' and rt == 'bool':
+                return 'bool'
+        raise SemanticError(f"Operador '{self.op}' no válido para tipos {lt} y {rt}")
+
+class UnaryExpr(Expression):
+    def __init__(self, op, expr):
+        self.op = op       # '-', '+', 'not'
+        self.expr = expr   # Expression
+
+    def infer_type(self, symbols, records):
+        t = self.expr.infer_type(symbols, records)
+        if self.op in ('-','+'):
+            if t in ('int','float'):
+                return t
+        if self.op == 'not':
+            if t == 'bool':
+                return 'bool'
+        raise SemanticError(f"Operador unario '{self.op}' no válido para tipo {t}")
 
 class Record:
     def __init__(self, name, fields):
         # fields: dict nombre_campo -> tipo (string)
         self.name = name
         self.fields = fields
+
+class Variable:
+    def __init__(self, name, datatype):
+        self.name = name          # identificador
+        self.datatype = datatype  # 'int', 'float', 'bool', 'char', 'Pair', 'int[]', etc.
+
+# Definición de función (metadatos en tabla de símbolos)
+class Function:
+    def __init__(self, name, parameters, return_type):
+        self.name = name                 # identificador
+        self.parameters = parameters     # lista de tipos de parámetros, e.g. ['int','float']
+        self.return_type = return_type   # tipo de retorno, e.g. 'bool'

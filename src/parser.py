@@ -109,7 +109,7 @@ class ViperParser:
                    | expression AND expression
                    | expression OR expression
         """
-        p[0] = (p[1], p[2], p[3])
+        p[0] = BinaryExpr(p[2], p[1], p[3])
 
     def p_expression_unary(self, p):
         """
@@ -117,7 +117,7 @@ class ViperParser:
                    | MINUS expression %prec MINUS
                    | PLUS expression %prec PLUS
         """
-        p[0] = ("unary", p[1], p[2])
+        p[0] = UnaryExpr(p[2], p[1])
 
     def p_expression_literal(self, p):
         """
@@ -161,6 +161,8 @@ class ViperParser:
         var = VariableRef(p[1])
 
         # P[1] es la lista de accesos a campos o índices recursivos
+        # DENTRO DE ADD_FIELD O ADD_INDEX SE VERIFICA QUE NO EXISTA ANTES
+        # EN LA TABLA DE SÍMBOLOS
         for kind, payload in p[2]:
             if kind == 'field':
                 var.add_field(payload, self.symbol_table, self.record_table)
@@ -211,6 +213,18 @@ class ViperParser:
         datatype = p[1]
         variables = p[2]
 
+        for var in variables:
+            name, init = var
+            new = Variable(name, datatype)
+            self.symbol_table.add_variable(new)
+            if init is not None:
+                # Si hay inicialización, comprobamos que el tipo sea correct
+                tipo = init.infer_type(self.symbol_table, self.record_table)
+                if tipo != datatype:
+                    raise SemanticError(f"Tipo de inicialización no coincide con el tipo de variable: {name}")
+
+        p[0] = ("declaration", datatype, variables) # Esto es para acumular algo
+
     def p_declaration_list(self, p):
         """
         declaration_list : declaration_list declaration
@@ -239,6 +253,15 @@ class ViperParser:
         variable_declaration : ID assignment_declaration
                              | LBRACKET expression RBRACKET ID assignment_declaration
         """
+        if len(p) == 3:
+            name = p[1]
+            init = p[2]
+            p[0] = (name, init)
+        else:
+            size = p[2]
+            name = p[4]
+            init = p[5]
+            p[0] = ((name, size), init)
 
 
     def p_assignment_declaration(self, p):
@@ -248,6 +271,8 @@ class ViperParser:
         """
         if len(p) == 3:
             p[0] = p[2]
+        else:
+            p[0] = None
 
     # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
     # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
