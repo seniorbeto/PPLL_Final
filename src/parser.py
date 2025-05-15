@@ -1,8 +1,8 @@
 import ply.yacc as yacc
 from lexer import ViperLexer
 
-from tables import Recordtable, SymbolTable
 from objects import *
+from tables import Recordtable, SymbolTable
 
 
 class ViperParser:
@@ -127,13 +127,13 @@ class ViperParser:
                    | TRUE
                    | FALSE
         """
-        p[0] = p.slice[1].type
+        p[0] = Literal(p[1])
 
     def p_expression_func_call(self, p):
         """
         expression : ID LPAREN function_call_argument_list RPAREN
         """
-        p[0] = ("function_call", p[1], p[3])
+        p[0] = FunctionCall(p[1], p[3])
 
     def p_function_call_argument_list(self, p):
         """
@@ -158,7 +158,16 @@ class ViperParser:
         """
         expression : ID reference
         """
-        p[0] = (p[1], p[2])
+        var = VariableRef(p[1])
+
+        # P[1] es la lista de accesos a campos o índices recursivos
+        for kind, payload in p[2]:
+            if kind == 'field':
+                var.add_field(payload)
+            else:  # 'index'
+                var.add_index(payload)
+
+        p[0] = var
 
     # Una referencia es la indexación de un vector o el acceso a un campo
     # de un registro. Ambas cosas pueden ser recursivas. Además, también
@@ -170,12 +179,18 @@ class ViperParser:
                   | DOT ID reference
                   |
         """
-        if len(p) == 5:
-            p[0] = ("vector_index", p[2], p[4])
-        elif len(p) == 4:
-            p[0] = ("field", p[2], p[3])
+        # Caso en el que no hay más accesos
+        if len(p) == 1:
+            p[0] = []
+            return
+
+        # Caso vector
+        if p[1] == '[':
+            # p[2] = expresión del índice, p[4] = resto de la cadena
+            p[0] = [('index', p[2])] + p[4]
         else:
-            p[0] = None
+            # Caso campo
+            p[0] = [('field', p[2])] + p[3]
 
     # En la siguiente regla contemplamos asignaciones simples y asignaciones en cadena
     def p_assignment(self, p):
@@ -195,23 +210,6 @@ class ViperParser:
         """
         datatype = p[1]
         variables = p[2]
-        primitive_datatypes = ["int", "float", "bool", "char", "true", "false"]
-        for new_var in variables:
-            """if new_var._value is None:
-                pass"""
-            print(f"Printeo de variables {new_var}")
-            if datatype in primitive_datatypes:
-                # Es una variable simple
-                new_var._datatype = datatype
-
-                if new_var._value not in primitive_datatypes:
-                    print("ERROR SEMÁNTICO. LOS TIPOS NO COINCIDEN")
-                else:
-                    print(f"OK para var {new_var} con value {new_var._value}")
-            else:
-                ...
-
-        print(p[2])
 
     def p_declaration_list(self, p):
         """
@@ -241,18 +239,7 @@ class ViperParser:
         variable_declaration : ID assignment_declaration
                              | LBRACKET expression RBRACKET ID assignment_declaration
         """
-        if len(p) == 3:
-            # p[0] = ("var", p[1], ("assignment", p[2]))
-            id = p[1]
-            assignement = p[2]
-            # Aquí sabemos que es una declaración sencilla. Es posible que
-            # assignement sea None, en cuyo caso no asignamos nada.
-            new_var = Variable(id, None, assignement)
-            p[0] = new_var
-        else:
-            p[0] = ("vector_decl", p[4], p[2], ("assignment", p[5]))
-            # id = p[4]
-            # len = p[2]
+
 
     def p_assignment_declaration(self, p):
         """
