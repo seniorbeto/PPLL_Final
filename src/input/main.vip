@@ -1,21 +1,16 @@
-
-
-'''
 type Sexo: {
-    int a
-    char[10] b
-}
-'''
+    int aa
+    char bb
+    }
 
 
-int a, b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
+Sexo tete
+
+int b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
 
 
 a = tete
 
-
-
-a = 5/3
 
 
 int de, ee, efe            # esto está bien

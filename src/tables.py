@@ -27,6 +27,7 @@ class SymbolTable:
         # tablas separadas para variables y funciones
         self._variables = {}
         self._functions = {}
+        self._scope = None
 
     # ——— Variables ———————————————————————————————————————————
     def add_variable(self, variable):

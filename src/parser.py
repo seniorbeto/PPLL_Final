@@ -70,6 +70,7 @@ class ViperParser:
                   | function_definition NEWLINE
                   | NEWLINE
         """
+        self.symbol_table._scope = "statement"
         if len(p) == 3:
             p[0] = p[1]
         else:
@@ -93,6 +94,7 @@ class ViperParser:
                  | if_statement
                  | while_statement
         """
+        self.symbol_table._scope = "sentence"
         p[0] = p[1]
 
     def p_expression_binary(self, p):
@@ -159,7 +161,9 @@ class ViperParser:
         expression : ID reference
         """
         var = VariableRef(p[1])
+        print(f"var es {var}")
 
+        print(f"p2 de expresion reference es {p[2]}")
         # P[1] es la lista de accesos a campos o índices recursivos
         # DENTRO DE ADD_FIELD O ADD_INDEX SE VERIFICA QUE NO EXISTA ANTES
         # EN LA TABLA DE SÍMBOLOS
@@ -241,14 +245,16 @@ class ViperParser:
                 print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:")
                 print(f"\tIncompatible types: {datatype.upper()} and {variables[-1].value.infer_type(datatype, variables[-1].value).upper()}")
                 print(f"\tVariables Affected: {', '.join(var.name for var in variables)}")
-            for var in variables:
-                var.datatype = datatype
-                var.value = type
-                self.symbol_table.add_variable(var)
+            else:
+                for var in variables:
+                    var.datatype = datatype
+                    var.value = type
+                    print(f"scope es {self.symbol_table._scope} y voy a guardar {var}")
+                    self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
         else:
-            print("SIN ASIGNACION")
             for var in variables:
                 var.datatype = datatype
+                print(f"scope es {self.symbol_table._scope} y voy a guardar {var}")
                 self.symbol_table.add_variable(var)
 
 
@@ -258,10 +264,12 @@ class ViperParser:
 
     def p_declaration_list(self, p):
         """
-        declaration_list : declaration_list declaration
-                         | declaration
+        declaration_list : declaration_list declaration NEWLINE
+                         | declaration NEWLINE
         """
-        if len(p) == 3:
+        if len(p) == 4:
+            print(f"p1 es {p[1]}")
+            print(f"p2 es {p[2]}")
             p[0] = p[1] + [p[2]]
         else:
             p[0] = [p[1]]
@@ -329,6 +337,7 @@ class ViperParser:
         """
         type_definition : TYPE ID COLON LBRACE NEWLINE declaration_list RBRACE
         """
+        self.symbol_table._scope = "Type Definition"
         p[0] = ("type_definition", p[2], p[6])
 
     def p_function_definition(self, p):
