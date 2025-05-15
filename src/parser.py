@@ -163,9 +163,9 @@ class ViperParser:
         # P[1] es la lista de accesos a campos o índices recursivos
         for kind, payload in p[2]:
             if kind == 'field':
-                var.add_field(payload)
+                var.add_field(payload, self.symbol_table, self.record_table)
             else:  # 'index'
-                var.add_index(payload)
+                var.add_index(payload, self.symbol_table, self.record_table)
 
         p[0] = var
 

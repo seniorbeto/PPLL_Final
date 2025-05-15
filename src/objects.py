@@ -1,9 +1,7 @@
 # objects.py
 # Modelo de los nodos AST para Viper
 
-# Excepción semántica general
-class SemanticError(Exception):
-    pass
+from exception import SemanticError
 
 # Nodo base para todas las expresiones
 class Expression:
@@ -36,11 +34,30 @@ class VariableRef(Expression):
         # ref_chain para futuros accesos a campos o índices
         self.ref_chain = []
 
-    def add_field(self, field_name):
+    def add_field(self, field_name, symbols, records):
+        # 1. Inferimos el tipo actual de esta referencia
+        base_type = self.infer_type(symbols, records)
+        # 2. Comprobamos que es un record conocido
+        record_def = records.lookup(base_type)
+        if record_def is None:
+            raise SemanticError(f"Tipo `{base_type}` no es un record")
+        # 3. Comprobamos que el campo existe
+        if field_name not in record_def.fields:
+            raise SemanticError(f"Field `{field_name}` no existe en record `{base_type}`")
+        # 4. Finalmente, registramos el acceso
         self.ref_chain.append(('field', field_name))
         return self
 
-    def add_index(self, index_expr):
+    def add_index(self, index_expr, symbols, records):
+        # 1. Comprobamos el índice es un int
+        idx_type = index_expr.infer_type(symbols, records)
+        if idx_type != 'int':
+            raise SemanticError(f"Índice de vector debe ser `int` (vino `{idx_type}`)")
+        # 2. Inferimos el tipo actual y comprobamos que es vector
+        base_type = self.infer_type(symbols, records)
+        if not base_type.endswith('[]'):
+            raise SemanticError(f"Tipo `{base_type}` no es un vector")
+        # 3. Registramos el acceso
         self.ref_chain.append(('index', index_expr))
         return self
 

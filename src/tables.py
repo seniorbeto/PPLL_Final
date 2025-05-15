@@ -1,19 +1,69 @@
+from exception import SemanticError
+
 class Recordtable:
     def __init__(self):
+        # mapea nombre de record -> Record
         self._table = {}
 
+    def add_record(self, record):
+        """Añade una definición de Record.
+        record: instancia de objects.Record"""
+        name = record.name
+        if name in self._table:
+            raise SemanticError(f"Record '{name}' ya definido")
+        self._table[name] = record
 
+    def lookup(self, name):
+        """Devuelve el Record con ese nombre o None si no existe"""
+        return self._table.get(name)
 
-
-
-
-
+    def exists(self, name):
+        """Comprueba si un Record está definido"""
+        return name in self._table
 
 
 class SymbolTable:
     def __init__(self):
-        self._table = {}
+        # tablas separadas para variables y funciones
+        self._variables = {}
+        self._functions = {}
 
+    # ——— Variables ———————————————————————————————————————————
+    def add_variable(self, variable):
+        """Añade una Variable.
+        variable: instancia de objects.Variable"""
+        name = variable.name
+        if name in self._variables:
+            raise SemanticError(f"Variable '{name}' ya definida")
+        self._variables[name] = variable
 
+    def lookup_variable(self, name):
+        """Devuelve la Variable con ese nombre o None si no existe"""
+        return self._variables.get(name)
 
+    def exists_variable(self, name):
+        """Comprueba si una variable está definida"""
+        return name in self._variables
 
+    # ——— Funciones ———————————————————————————————————————————
+    def add_function(self, function):
+        """Añade una Function.
+        function: instancia de objects.Function"""
+        name = function.name
+        if name in self._functions:
+            raise SemanticError(f"Función '{name}' ya definida")
+        self._functions[name] = function
+
+    def lookup_function(self, name):
+        """Devuelve la Function con ese nombre o None si no existe"""
+        return self._functions.get(name)
+
+    def exists_function(self, name):
+        """Comprueba si una función está definida"""
+        return name in self._functions
+
+    # ——— Genéricos ————————————————————————————————————————————
+    def clear(self):
+        """Vací­a ambas tablas"""
+        self._variables.clear()
+        self._functions.clear()
