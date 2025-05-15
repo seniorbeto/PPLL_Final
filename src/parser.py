@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 from lexer import ViperLexer
 
-from tables import Recordtable, SymbolTable
+from tables import *
 from objects import *
 
 
@@ -127,7 +127,7 @@ class ViperParser:
                    | TRUE
                    | FALSE
         """
-        p[0] = ("literal", p[1])
+        p[0] = p.slice[1].type
 
     def p_expression_func_call(self, p):
         """
@@ -193,7 +193,23 @@ class ViperParser:
                    | CHAR_TYPE variable_list
                    | ID variable_list
         """
-        p[0] = ("declaration", p[1], p[2])
+        type = p[1]
+        list_variables = p[2]
+
+        #De momento, de existir value(Declaracion con asignación, este valor se guarda en el ultimo elemento solo
+        if list_variables[-1]._value != None:
+            x = check_compatibility(type, list_variables[-1]._value)
+            if x == False:
+                print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:")
+                print(f"\tIncompatible types: {type.upper()} and {list_variables[-1]._value}")
+                print(f"\tVariables Affected: {', '.join(var._name for var in list_variables)}")
+            else:
+                for var in list_variables:
+                    var._value = x.upper()
+                    var._datatype  = type
+
+
+
 
     def p_declaration_list(self, p):
         """
@@ -223,7 +239,11 @@ class ViperParser:
                              | LBRACKET expression RBRACKET ID assignment_declaration
         """
         if len(p) == 3:
-            p[0] = ("var", p[1], ("assignment", p[2]))
+            #p[0] = ("var", p[1], ("assignment", p[2]))
+            id = p[1]
+            assignment = p[2]
+            p[0] = Variable(id, None,assignment)
+
         else:
             p[0] = ("vector_decl", p[4], p[2], ("assignment", p[5]))
 
@@ -233,9 +253,9 @@ class ViperParser:
                                |
         """
         if len(p) == 3:
-            p[0] = ("assign", p[2])
+            p[0] = p[2]
 
-    # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
+     # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
     # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
     # es lo que se especifica en el enunciado.
     def p_if_statement(self, p):
