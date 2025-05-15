@@ -25,6 +25,9 @@ class Literal(Expression):
             return 'int'
         if isinstance(self.value, float):
             return 'float'
+
+        if self.value == "true" or self.value == "false":
+            return 'bool'
         if isinstance(self.value, str):
             return 'char'
         raise SemanticError("Tipo de literal desconocido: %r" % self.value)

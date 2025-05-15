@@ -338,7 +338,6 @@ class ViperParser:
         """
         type_definition : type_definition_header type_definition_body
         """
-        print(f"type_definition body es {p[2]}")
         type_name = p[1]
         fields_declared = p[2]
         fields = []
@@ -347,7 +346,6 @@ class ViperParser:
             for elems in field[2]:
                 fields.append(elems)
         self.record_table.add_record(type_name, tuple(fields))
-        print(self.record_table)
         p[0] = ("type_definition", p[2])
 
     def p_type_definition_header(self, p):

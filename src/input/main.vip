@@ -3,8 +3,11 @@ type Sexo: {
     char r
     }
 
+Sexo tetico
 
-Sxo tete
+bool paco = true
+
+bool pacito = false
 
 int b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
 
