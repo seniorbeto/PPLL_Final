@@ -200,7 +200,25 @@ class ViperParser:
         assignment : ID reference EQUALS expression
                    | ID reference EQUALS assignment
         """
+        identifier = p[1]
+        reference = p[2]
+        value = p[4]
+        if reference == []:
+            var = self.symbol_table.lookup_variable(identifier)
+            if var is None:
+                print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
+                print(f"\tVariable {identifier} not found.")
+            else:
+                if not isinstance(value, Expression) and  self.record_table.exists(value) != None:
+                    print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
+                    print(f"\tInvalid assignment to variable '{identifier}'. Attribute: {value} is not defined")
+                else:
+                    if var.datatype != value.infer_type(var.datatype, value):
+                        print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
+                        print(f"\tIncompatible types: {var.datatype.upper()} and {value.infer_type(var.datatype, value).upper()}")
+                        print(f"\tVariables Affected: {identifier}")
         p[0] = ("assignment", p[1], p[2], p[4])
+
 
     def p_declaration(self, p):
         """
@@ -213,15 +231,25 @@ class ViperParser:
         datatype = p[1]
         variables = p[2]
 
-        for var in variables:
-            name, init = var
-            new = Variable(name, datatype)
-            self.symbol_table.add_variable(new)
-            if init is not None:
-                # Si hay inicialización, comprobamos que el tipo sea correct
-                tipo = init.infer_type(self.symbol_table, self.record_table)
-                if tipo != datatype:
-                    raise SemanticError(f"Tipo de inicialización no coincide con el tipo de variable: {name}")
+        #DE HABER VALOR, SE GUARDA EN EL ÚLTIMO ELEMENTO DE VARIABLES
+        if variables[-1].value != None:
+            type = variables[-1].value.infer_type(datatype, variables[-1].value)
+            if type != datatype and type!= SemanticError:
+                print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:")
+                print(f"\tIncompatible types: {datatype.upper()} and {variables[-1].value.infer_type(datatype, variables[-1].value).upper()}")
+                print(f"\tVariables Affected: {', '.join(var.name for var in variables)}")
+            for var in variables:
+                var.datatype = datatype
+                var.value = type
+                self.symbol_table.add_variable(var)
+        else:
+            print("SIN ASIGNACION")
+            for var in variables:
+                var.datatype = datatype
+                self.symbol_table.add_variable(var)
+
+
+
 
         p[0] = ("declaration", datatype, variables) # Esto es para acumular algo
 
@@ -257,6 +285,7 @@ class ViperParser:
             name = p[1]
             init = p[2]
             p[0] = (name, init)
+            p[0] = Variable(name, None, init)
         else:
             size = p[2]
             name = p[4]

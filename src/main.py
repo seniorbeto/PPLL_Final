@@ -20,7 +20,7 @@ class Main:
         self.__lexer.run()
         self.__parser = ViperParser(self.__lexer)
         result = self.__parser.parse()
-
+        print(self.__parser.symbol_table)
         # Únicamente exporamos el árbol si se ha importado graphviz
         if not export_tree:
             pp(result)

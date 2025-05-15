@@ -1,7 +1,19 @@
-bool t = 3
 
 
-int a, b, c,d, e, f, g, h, i, j, k = 'p'       # esto está mal
-int d, e, f             # esto está bien
+'''
+type Sexo: {
+    int a
+    char[10] b
+}
+'''
+
+
+int a, b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
+
+
+a = 5/3.15
+
+
+int de, ee, efe            # esto está bien
 
 

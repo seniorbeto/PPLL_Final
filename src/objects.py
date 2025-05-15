@@ -1,5 +1,6 @@
 # objects.py
-# Modelo de los nodos AST para Viper
+# Modelo de los nodos
+from tkinter.messagebox import RETRY
 
 from exception import SemanticError
 
@@ -27,6 +28,12 @@ class Literal(Expression):
         if isinstance(self.value, str):
             return 'char'
         raise SemanticError("Tipo de literal desconocido: %r" % self.value)
+
+    def __str__(self):
+        return f"Literal({self.value})"
+
+    def __repr__(self):
+        return f"Literal({self.value})"
 
 class VariableRef(Expression):
     def __init__(self, name):
@@ -131,6 +138,13 @@ class BinaryExpr(Expression):
         if self.op in ('+', '-', '*', '/'):
             if lt in ('int','float') and rt in ('int','float'):
                 return 'float' if 'float' in (lt,rt) else 'int'
+            #Hay que tener en cuenta los chars tmb. Char se puede convertir a int o float
+            if lt == 'char' and rt in ('int','float'):
+                return 'float' if 'float' in rt else 'int'
+            if lt in ('int','float') and rt == 'char':
+                return 'float' if 'float' in lt else 'int'
+
+
         # Relacionales
         if self.op in ('==','!=','>','<','>=','<='):
             if lt == rt:
@@ -139,7 +153,14 @@ class BinaryExpr(Expression):
         if self.op in ('and','or'):
             if lt == 'bool' and rt == 'bool':
                 return 'bool'
-        raise SemanticError(f"Operador '{self.op}' no válido para tipos {lt} y {rt}")
+        #raise SemanticError(f"Operador '{self.op}' no válido para tipos {lt} y {rt}")
+        return SemanticError
+
+    def __str__(self):
+        return f"BinaryExpr({self.left}, {self.op}, {self.right})"
+
+    def __repr__(self):
+        return f"BinaryExpr({self.left}, {self.op}, {self.right})"
 
 class UnaryExpr(Expression):
     def __init__(self, op, expr):
@@ -156,6 +177,9 @@ class UnaryExpr(Expression):
                 return 'bool'
         raise SemanticError(f"Operador unario '{self.op}' no válido para tipo {t}")
 
+    def __str__(self):
+        return f"UnaryExpr({self.op},{self.expr})"
+
 class Record:
     def __init__(self, name, fields):
         # fields: dict nombre_campo -> tipo (string)
@@ -163,9 +187,15 @@ class Record:
         self.fields = fields
 
 class Variable:
-    def __init__(self, name, datatype):
+    def __init__(self, name, datatype, value):
         self.name = name          # identificador
         self.datatype = datatype  # 'int', 'float', 'bool', 'char', 'Pair', 'int[]', etc.
+        self.value = value
+
+    def __str__(self):
+        return f"Variable({self.name},{self.datatype},{self.value})"
+    def __repr__(self):
+        return f"Variable({self.name},{self.datatype},{self.value})"
 
 # Definición de función (metadatos en tabla de símbolos)
 class Function:

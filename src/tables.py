@@ -67,3 +67,6 @@ class SymbolTable:
         """Vací­a ambas tablas"""
         self._variables.clear()
         self._functions.clear()
+
+    def __str__(self):
+        return f"SymbolTable({self._variables}, {self._functions})"
