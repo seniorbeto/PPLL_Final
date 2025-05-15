@@ -4,7 +4,7 @@ class Recordtable:
     def __init__(self):
         # mapea nombre de record -> Record
         self._table = {}
-        self._basic_symbols = ("int", "float", "char",)
+        self._basic_symbols = ("int", "float", "char", "bool")
 
     def add_record(self, type_name, fields):
         """Añade una definición de Record.
