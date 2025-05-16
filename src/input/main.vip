@@ -3,14 +3,18 @@ type Sexo: {
     char r
     }
 
-Sexo tetico
+type Puta: {
+    Sexo v
+    char b
+}
+
+int a
 
 bool paco = true
 
 bool pacito = false
 
 int b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
-
 
 
 int de, ee, efe            # esto está bien

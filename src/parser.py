@@ -240,6 +240,12 @@ class ViperParser:
         #DE HABER VALOR, SE GUARDA EN EL ÚLTIMO ELEMENTO DE VARIABLES
         if variables[-1].value != None:
             type = variables[-1].value.infer_type(datatype, variables[-1].value)
+
+            if self.symbol_table._scope == "Type Definition":
+                #SI ESTAS EN UNA DECLARACION
+                print("SEMANTIC ERROR DETECTED IN TYPE DECLARATION:")
+                print(f"\tYou cannot assign a value to a record type.")
+                print(f"\tRecords Affected: {', '.join(var.name for var in variables)}")
             if type != datatype and type!= SemanticError:
                 print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:")
                 print(f"\tIncompatible types: {datatype.upper()} and {variables[-1].value.infer_type(datatype, variables[-1].value).upper()}")
@@ -340,7 +346,6 @@ class ViperParser:
         """
         type_name = p[1]
         fields_declared = p[2]
-
         fields = []
         for field in fields_declared:
             #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0]
