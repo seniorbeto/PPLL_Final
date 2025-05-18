@@ -17,7 +17,9 @@ class Recordtable:
 
     def lookup(self, name):
         """Devuelve el Record con ese nombre o None si no existe"""
-        return self._table.get(name)
+        if self._table.get(name):
+            return self._table[name]
+        return None
 
     def exists(self, name):
         """Comprueba si un Record está definido"""
@@ -66,7 +68,9 @@ class SymbolTable:
 
     def lookup_function(self, name):
         """Devuelve la Function con ese nombre o None si no existe"""
-        return self._functions.get(name)
+        if self._functions.get(name) is not None:
+            return self._functions[name]
+        return None
 
     def exists_function(self, name):
         """Comprueba si una función está definida"""

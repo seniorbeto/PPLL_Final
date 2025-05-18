@@ -43,6 +43,7 @@ class VariableRef(Expression):
         self.name = name
         # ref_chain para futuros accesos a campos o índices
         self.ref_chain = []
+        self.value = None
 
     def add_field(self, field_name, symbols, records):
         # 1. Inferimos el tipo actual de esta referencia
@@ -75,7 +76,9 @@ class VariableRef(Expression):
         # buscar variable
         var = symbols.lookup_variable(self.name)
         if not var:
-            raise SemanticError("Variable no declarada: %s" % self.name)
+            var = records.lookup(self.name)
+            if not var:
+                return None
         t = var.datatype
         # resolver cada acceso secuencialmente
         for kind, payload in self.ref_chain:
@@ -136,9 +139,15 @@ class BinaryExpr(Expression):
         self.value = None
 
     def infer_type(self, symbols, records):
+        print(f"left es {self.left} y right es {self.right} y op es {self.op}")
+
         lt = self.left.infer_type(symbols, records)
+        print(f"lt es {lt}")
         rt = self.right.infer_type(symbols, records)
         # Aritméticas
+        if lt == None or rt == None:
+            return None
+
         if self.op in ('+', '-', '*', '/'):
             if lt in ('int','float') and rt in ('int','float'):
                 return 'float' if 'float' in (lt,rt) else 'int'
@@ -157,7 +166,8 @@ class BinaryExpr(Expression):
             if lt == 'bool' and rt == 'bool':
                 return 'bool'
         #raise SemanticError(f"Operador '{self.op}' no válido para tipos {lt} y {rt}")
-        return SemanticError.print_sem_error("Incompatible Operands", [self.op, self.left, self.right])
+        SemanticError.print_sem_error("Incompatible Operands", [self.op, self.left, self.right])
+        return None
 
     def __str__(self):
         return f"BinaryExpr({self.left}, {self.op}, {self.right})"
@@ -214,6 +224,7 @@ class Vector:
         return f"Vector({self.name},{self.datatype},{self.length},{self.value})"
     def __repr__(self):
         return f"Vector({self.name},{self.datatype},{self.length},{self.value})"
+
 
 
 # Definición de función (metadatos en tabla de símbolos)
