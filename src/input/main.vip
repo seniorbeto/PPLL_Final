@@ -1,14 +1,36 @@
-type Sexo: {
-    int a,b,c
-    char r
-    }
 
-type Puta: {
-    Sexo v
-    char b
+type Word: {
+    char[10] s
+}
+
+type Human: {
+    int age
+    Word name, surname, surname_2
+}
+
+
+char[25 * 4] tetaa
+
+
+def Human perro(int a,b,c = 5; char r) : {
+    int b
+    return 0
 }
 
 int a
+
+a = 5 * 4 + (4*7)
+
+def Human Perro(int a,b,c ; char r) : {
+    int b
+    return 0
+
+}
+
+def Tipo_No_Declarado_Funcion myfunction(Tipo_No_Declarado a,b, c) : {
+
+    return 0
+}
 
 bool paco = true
 
@@ -17,6 +39,6 @@ bool pacito = false
 int b, c,d, e, f, g, h, i, j, k = 'p' + 1*5/(3)
 
 
-int de, ee, efe            # esto está bien
+int de, ee, efe
 
 

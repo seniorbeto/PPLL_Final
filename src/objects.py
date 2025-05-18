@@ -133,6 +133,7 @@ class BinaryExpr(Expression):
         self.op = op        # '+', '-', '*', '/', '==', '>', '<=', 'and', 'or',...
         self.left = left    # Expression
         self.right = right  # Expression
+        self.value = None
 
     def infer_type(self, symbols, records):
         lt = self.left.infer_type(symbols, records)
@@ -147,7 +148,6 @@ class BinaryExpr(Expression):
             if lt in ('int','float') and rt == 'char':
                 return 'float' if 'float' in lt else 'int'
 
-
         # Relacionales
         if self.op in ('==','!=','>','<','>=','<='):
             if lt == rt:
@@ -157,7 +157,7 @@ class BinaryExpr(Expression):
             if lt == 'bool' and rt == 'bool':
                 return 'bool'
         #raise SemanticError(f"Operador '{self.op}' no válido para tipos {lt} y {rt}")
-        return SemanticError
+        return SemanticError.print_sem_error("Incompatible Operands", [self.op, self.left, self.right])
 
     def __str__(self):
         return f"BinaryExpr({self.left}, {self.op}, {self.right})"
@@ -189,6 +189,8 @@ class Record:
         self.name = name
         self.fields = fields
 
+
+
 class Variable:
     def __init__(self, name, datatype, value):
         self.name = name          # identificador
@@ -200,9 +202,30 @@ class Variable:
     def __repr__(self):
         return f"Variable({self.name},{self.datatype},{self.value})"
 
+
+class Vector:
+    def __init__(self, name, datatype, length, value):
+        self.name = name
+        self.datatype = datatype
+        self.length = length
+        self.value = value
+
+    def __str__(self):
+        return f"Vector({self.name},{self.datatype},{self.length},{self.value})"
+    def __repr__(self):
+        return f"Vector({self.name},{self.datatype},{self.length},{self.value})"
+
+
 # Definición de función (metadatos en tabla de símbolos)
 class Function:
-    def __init__(self, name, parameters, return_type):
+    def __init__(self, name, datatype, parameters, return_type):
         self.name = name                 # identificador
+        self.datatype = datatype
         self.parameters = parameters     # lista de tipos de parámetros, e.g. ['int','float']
         self.return_type = return_type   # tipo de retorno, e.g. 'bool'
+        self.body = []
+
+    def __str__(self):
+        return f"Function({self.name},{self.datatype},{self.parameters},{self.return_type},{self.body})"
+    def __repr__(self):
+        return f"Function({self.name},{self.datatype},{self.parameters},{self.return_type},{self.body})"

@@ -31,7 +31,7 @@ class ViperParser:
         self.lexer = lexer
         self.route = self.lexer.parser_input_file
         self.parser = None
-
+        self.semantic_errors = SemanticError()
         self.record_table = Recordtable()
         self.symbol_table = SymbolTable()
 
@@ -70,7 +70,7 @@ class ViperParser:
                   | function_definition NEWLINE
                   | NEWLINE
         """
-        self.symbol_table._scope = "statement"
+        self.symbol_table._scope = "statement" if not self.symbol_table._scope.__contains__("FUNCTION") else self.symbol_table._scope
         if len(p) == 3:
             p[0] = p[1]
         else:
@@ -94,7 +94,6 @@ class ViperParser:
                  | if_statement
                  | while_statement
         """
-        self.symbol_table._scope = "sentence"
         p[0] = p[1]
 
     def p_expression_binary(self, p):
@@ -210,19 +209,20 @@ class ViperParser:
         if reference == []:
             var = self.symbol_table.lookup_variable(identifier)
             if var is None:
-                print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
-                print(f"\tVariable {identifier} not found.")
+                self.semantic_errors.print_sem_error( "Variable not found", identifier)
+
             else:
                 if isinstance(value, VariableRef) and self.record_table.exists(value) == False:
                     # SI ES UNA REFERENCIA QUE NO ESTA EN LA TABLA DE REGISTROS NO ES NADA, ERROR SEMANTICO
-                    print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
-                    print(f"\tInvalid assignment to variable '{identifier}'. Attribute: {value} is not defined")
+                    self.semantic_errors.print_sem_error( "Type Error Not defined", [identifier, value])
                 else:
                     #COMPROBACION DE DATATYPE == VALOR ASIGNADO
-                    if var.datatype != value.infer_type(var.datatype, value):
-                        print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
-                        print(f"\tIncompatible types: {var.datatype.upper()} and {value.infer_type(var.datatype, value).upper()}")
-                        print(f"\tVariables Affected: {identifier}")
+                    actual_type = value.infer_type(self.symbol_table, self.record_table)
+                    if var.datatype != actual_type:
+                        self.semantic_errors.print_sem_error(
+                            "Incompatible Types Assignment",
+                            [var.datatype, actual_type if actual_type != SemanticError else None, identifier]
+                        )
         p[0] = ("assignment", p[1], p[2], p[4])
 
 
@@ -239,37 +239,40 @@ class ViperParser:
 
         #DE HABER VALOR, SE GUARDA EN EL ÚLTIMO ELEMENTO DE VARIABLES
         if variables[-1].value != None:
+
             type = variables[-1].value.infer_type(datatype, variables[-1].value)
 
             if self.symbol_table._scope == "Type Definition":
                 #SI ESTAS EN UNA DECLARACION
-                print("SEMANTIC ERROR DETECTED IN TYPE DECLARATION:")
-                print(f"\tYou cannot assign a value to a record type.")
-                print(f"\tRecords Affected: {', '.join(var.name for var in variables)}")
+                self.semantic_errors.print_sem_error( "Type Declaration Error", variables)
+
+            if self.symbol_table._scope.__contains__("FUNCTIONDECL"):
+                self.semantic_errors.print_sem_error( "Function Declaration Error",
+                                                [self.symbol_table._scope.split("-")[1], variables])
+
             if type != datatype and type!= SemanticError:
-                print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:")
-                print(f"\tIncompatible types: {datatype.upper()} and {variables[-1].value.infer_type(datatype, variables[-1].value).upper()}")
-                print(f"\tVariables Affected: {', '.join(var.name for var in variables)}")
+                self.semantic_errors.print_sem_error( "Incompatible Types", [datatype,variables])
+
             else:
                 for var in variables:
                     var.datatype = datatype
                     var.value = type
                     self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
         else:
+
             #Hay que verificar que el tipo declarado sea correcto, pese a que el valor sea nulo
             if datatype not in self.record_table._basic_symbols and self.record_table.exists(datatype) == False:
-                print("SEMANTIC ERROR DETECTED IN DECLARATION:")
-                print(f"\tRecord {datatype} not found.")
-                print(f"\tVariables Affected: {', '.join(var.name for var in variables)}")
+                if self.symbol_table._scope.__contains__("FUNCTIONDECL"):
+                    self.semantic_errors.print_sem_error("Function Declaration Type Atribute Error",
+                                        [self.symbol_table._scope.split("-")[1],datatype, variables])
+                else:
+                    self.semantic_errors.print_sem_error( "Declaration Error", [datatype,variables])
             else:
                 for var in variables:
                     var.datatype = datatype
                     self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
 
-
-
-
-        p[0] = ("declaration", datatype, variables) # Esto es para acumular algo
+        p[0] = variables
 
     def p_declaration_list(self, p):
         """
@@ -302,13 +305,14 @@ class ViperParser:
         if len(p) == 3:
             name = p[1]
             init = p[2]
-            p[0] = (name, init)
+            #p[0] = (name, init)
             p[0] = Variable(name, None, init)
         else:
             size = p[2]
             name = p[4]
             init = p[5]
-            p[0] = ((name, size), init)
+            #p[0] = ((name, size), init)
+            p[0] = Vector(name, None, size, init)
 
 
     def p_assignment_declaration(self, p):
@@ -344,16 +348,31 @@ class ViperParser:
         """
         type_definition : type_definition_header type_definition_body
         """
+
         type_name = p[1]
+
         fields_declared = p[2]
+
+        #Lista contenedora de los atributos del tipo declarado. Solo se guardaran si cada atributo tiene un tipo correcto
         fields = []
+
+        #Contador para luego comprobar que todos los atributos que se han pasado se hayan guardado.
+        #En caso de no coincidir con la longitud de FIELDS no se guardará el tipo en la tabla de registros
+        number_of_attr = 0
         for field in fields_declared:
-            #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0]
-            for elems in field[2]:
-                fields.append(elems)
-        self.record_table.add_record(type_name, tuple(fields))
+            #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0] TODO BORRAR COMENTAARIO
+            for elems in field:
+                number_of_attr += 1
+                fields.append(elems) if elems.datatype != None else None
+
+        #Solo se guarda si todos los elementos de fields declared se han guardado en fields, esto quiere decir
+        # QUE TODOS LOS ATRIBUTOS DECLARADOS SON CORRECTOS
+        self.record_table.add_record(type_name, tuple(fields)) if len(fields) == number_of_attr else None
         p[0] = ("type_definition", p[2])
 
+
+
+    #FUNCION QUE PERMITE CAMBIAR EL SCOPE A TYPE_DEFINITION
     def p_type_definition_header(self, p):
         """
         type_definition_header : TYPE ID COLON LBRACE NEWLINE
@@ -368,11 +387,62 @@ class ViperParser:
         """
         p[0] = p[1]
 
+
+
+    def p_function_header(self, p):
+        """
+        function_header : DEF function_type ID
+        """
+        self.symbol_table._scope = f"FUNCTIONDECL-{p[3]}"
+        p[0] = ("function_header", p[2], p[3])
+
+
+    def p_function_header_and_parameters(self,p):
+        """
+        function_header_and_parameters : function_header LPAREN argument_list RPAREN
+        """
+        p[0] = ("header_and_p",p[1], p[3])
+
+    def p_function_before_body(self, p):
+        """
+        function_before_body : function_header_and_parameters COLON LBRACE NEWLINE
+        """
+        type_funct = p[1][1][1]
+        name_funct = p[1][1][2]
+        arg_list = p[1][2]
+        if type_funct not in self.record_table._basic_symbols and self.record_table.exists(type_funct) == False:
+            self.semantic_errors.print_sem_error( "Function Type Declaration Error", [name_funct, type_funct])
+            new_function = Function(name_funct,None, arg_list, None)
+        else:
+            new_function = Function(name_funct, type_funct, arg_list, None)
+        self.symbol_table.add_function(new_function)
+        self.symbol_table._scope = f"FUNCTION-{name_funct}"
+
+
     def p_function_definition(self, p):
         """
-        function_definition : DEF function_type ID LPAREN argument_list RPAREN COLON LBRACE NEWLINE sentence_list RETURN sentence RBRACE
+        function_definition : function_before_body sentence_function RETURN expression newlines RBRACE
         """
-        p[0] = ("function_definition", p[2], p[3], p[5], p[10], p[12])
+        """function_type = p[1][1]
+        function_name = p[1][2]
+        argument_list = p[1][3]
+        print(f"argument list es {argument_list}")
+        """
+        self.symbol_table._scope = ""
+        #p[0] = ("function_definition", function_type, function_name,argument_list, p[5], p[7])"""
+
+    def p_newlines(self, p):
+        """
+        newlines : NEWLINE
+                |
+        """
+
+    def p_sentence_function(self,p):
+        """
+        sentence_function : sentence_list
+                          |
+        """
+        p[0] = p[1] if len(p) > 1 else []
 
     def p_function_type(self, p):
         """
@@ -391,9 +461,9 @@ class ViperParser:
                       |
         """
         if len(p) == 4:
-            p[0] = p[1] + [p[3]]
+            p[0] = [var for var in p[1]] + p[3]
         elif len(p) == 2:
-            p[0] = [p[1]]
+            p[0] = p[1]
         else:
             p[0] = []
 

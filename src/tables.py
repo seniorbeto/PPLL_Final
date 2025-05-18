@@ -32,7 +32,7 @@ class SymbolTable:
         # tablas separadas para variables y funciones
         self._variables = {}
         self._functions = {}
-        self._scope = None
+        self._scope = ""
 
     # ——— Variables ———————————————————————————————————————————
     def add_variable(self, variable):
@@ -51,14 +51,18 @@ class SymbolTable:
         """Comprueba si una variable está definida"""
         return name in self._variables
 
+
     # ——— Funciones ———————————————————————————————————————————
     def add_function(self, function):
         """Añade una Function.
         function: instancia de objects.Function"""
         name = function.name
         if name in self._functions:
-            raise SemanticError(f"Función '{name}' ya definida")
-        self._functions[name] = function
+            print("SEMANTIC ERROR DETECTED")
+            print(SemanticError(f"\tFUNCTION '{name}' IS ALREADY DEFINED"))
+            print("")
+        else:
+            self._functions[name] = function
 
     def lookup_function(self, name):
         """Devuelve la Function con ese nombre o None si no existe"""
