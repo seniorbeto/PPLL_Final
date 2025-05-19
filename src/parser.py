@@ -69,7 +69,8 @@ class ViperParser:
                   | function_definition NEWLINE
                   | NEWLINE
         """
-        self.symbol_table._scope = "statement" if not self.symbol_table._scope.__contains__("FUNCTION") else self.symbol_table._scope
+        self.symbol_table._scope = "statement" if not self.symbol_table._scope.__contains__(
+            "FUNCTION") else self.symbol_table._scope
         if len(p) == 3:
             p[0] = p[1]
         else:
@@ -135,7 +136,6 @@ class ViperParser:
         """
         p[0] = FunctionCall(p[1], p[3])
 
-
     def p_function_call_argument_list(self, p):
         """
         function_call_argument_list : expression COMMA function_call_argument_list
@@ -160,8 +160,9 @@ class ViperParser:
         expression : ID reference
         """
         var = VariableRef(p[1])
-
+        print(f"Mi referencia es {p[2]} y mi identificador es {p[1]} y mi var es {var}")
         # P[1] es la lista de accesos a campos o índices recursivos
+        """
         # DENTRO DE ADD_FIELD O ADD_INDEX SE VERIFICA QUE NO EXISTA ANTES
         # EN LA TABLA DE SÍMBOLOS
         for kind, payload in p[2]:
@@ -169,6 +170,7 @@ class ViperParser:
                 var.add_field(payload, self.symbol_table, self.record_table)
             else:  # 'index'
                 var.add_index(payload, self.symbol_table, self.record_table)
+        """
 
         p[0] = var
 
@@ -202,28 +204,47 @@ class ViperParser:
                    | ID reference EQUALS assignment
         """
         identifier = p[1]
-        reference = p[2]
+        reference_value = p[2]
+        print(reference_value)
         value = p[4]
         if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
-            if reference == []:
+            if reference_value == []:
                 var = self.symbol_table.lookup_variable(identifier)
                 if var is None:
-                    SemanticError.print_sem_error( "Variable not found", identifier)
+                    SemanticError.print_sem_error("Variable not found", identifier)
 
                 else:
                     if isinstance(value, VariableRef) and self.record_table.exists(value) == False:
                         # SI ES UNA REFERENCIA QUE NO ESTA EN LA TABLA DE REGISTROS NO ES NADA, ERROR SEMANTICO
-                        SemanticError.print_sem_error( "Type Error Not defined", [identifier, value])
+                        SemanticError.print_sem_error("Type Error Not defined", [identifier, value])
                     else:
                         #COMPROBACION DE DATATYPE == VALOR ASIGNADO
+                        print(f"value es {value} y var es {var} y identifier es {identifier}")
                         actual_type = value.infer_type(self.symbol_table, self.record_table)
                         if var.datatype != actual_type:
                             SemanticError.print_sem_error(
                                 "Incompatible Types Assignment",
                                 [var.datatype, actual_type, identifier, self.symbol_table, self.record_table]
                             )
+            else:
+                print(f"YEYEaf{reference_value} con id {identifier} con vaule {value}")
+                for key, attr in reference_value:
+                    print(self.record_table)
+                    if key == 'field':
+                        var = self.symbol_table.lookup_variable(identifier)
+                        if var is None:
+                            SemanticError.print_sem_error("Variable not found", identifier)
+                        if (var.datatype not in self.record_table._basic_symbols
+                            and self.record_table.exists(var.datatype) == False):
+                            print("COÑA MALA")
+                        else:
+                            if attr not in [atribute.name for atribute in  self.record_table._table[var.datatype]]:
+                                print("El atributo no funsiona")
+                            else:
+                                pass
+
         else:
-            if reference == []:
+            if reference_value == []:
                 func_name = self.symbol_table._scope.split("-")[1]
                 function = self.symbol_table.lookup_function(func_name)
                 list_variables = SymbolTable()
@@ -231,16 +252,19 @@ class ViperParser:
                     list_variables.add_variable(var2)
                 var = list_variables.lookup_variable(identifier)
                 if var is None:
-                    SemanticError.print_sem_error( "Variable not found Function",
-                                                   [identifier, func_name])
+                    SemanticError.print_sem_error("Variable not found Function",
+                                                  [identifier, func_name])
                     p[0] = ("assignment", p[1], p[2], p[4])
                     return None
 
                 actual_value = value.infer_type(list_variables, self.record_table)
                 if var.datatype != actual_value:
-                    SemanticError.print_sem_error( "Incompatible Types Assignment Function",
+                    SemanticError.print_sem_error("Incompatible Types Assignment Function",
                                                   [var.datatype, actual_value, identifier, func_name])
-
+            else:
+                print(f"YEYE{reference_value}")
+                for kind, payload in reference_value:
+                    print(f" {kind }, {payload}")
 
         p[0] = ("assignment", p[1], p[2], p[4])
 
@@ -261,11 +285,11 @@ class ViperParser:
 
             if self.symbol_table._scope == "Type Definition":
                 #SI ESTAS EN UNA DECLARACION DE TIPO
-                SemanticError.print_sem_error( "Type Declaration Error", variables)
+                SemanticError.print_sem_error("Type Declaration Error", variables)
 
             if self.symbol_table._scope.__contains__("FUNCTIONDECL"):
-                SemanticError.print_sem_error( "Function Declaration Error",
-                                                [self.symbol_table._scope.split("-")[1], variables])
+                SemanticError.print_sem_error("Function Declaration Error",
+                                              [self.symbol_table._scope.split("-")[1], variables])
 
             if self.symbol_table._scope.__contains__("FUNCTIONBODY"):
                 #DENTRO DEL CUERPO DE UNA FUNCION
@@ -275,17 +299,17 @@ class ViperParser:
                 for var in variables:
                     if var.name in [f.name for f in function.parameters] or var.name in [f.name for f in function.body]:
                         SemanticError.print_sem_error("Redefinition of Variable",
-                                                             [var.name, func_name])
+                                                      [var.name, func_name])
                     else:
                         # COMO ES SIN ASIGNACION, SIMPLEMENTE SE AÑADE A LA LISTA DEL BODY SI COINCIDEN EN TIPO
                         local_var_table = SymbolTable()
-                        for var2 in function.parameters + function.body :
+                        for var2 in function.parameters + function.body:
                             local_var_table.add_variable(var2)
                         type = variables[-1].value.infer_type(local_var_table, self.record_table)
 
-                        if datatype!= type:
-                            SemanticError.print_sem_error( "Incompatible Types Func",
-                                      [datatype, type, variables, func_name])
+                        if datatype != type:
+                            SemanticError.print_sem_error("Incompatible Types Func",
+                                                          [datatype, type, variables, func_name])
                         else:
                             var.datatype = datatype
                             var.value = type
@@ -297,17 +321,17 @@ class ViperParser:
 
             type = variables[-1].value.infer_type(self.symbol_table, self.record_table)
 
-            if type != datatype and type!= SemanticError:
-                SemanticError.print_sem_error( "Incompatible Types",
-                                      [datatype, type, variables])
+            if type != datatype and type != SemanticError:
+                SemanticError.print_sem_error("Incompatible Types",
+                                              [datatype, type, variables])
                 p[0] = variables
                 return None
-
             else:
                 for var in variables:
                     var.datatype = datatype
                     var.value = type
-                    self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
+                    self.symbol_table.add_variable(var) if (self.symbol_table._scope == "statement" and
+                                                            not self.symbol_table.exists_variable(var.name)) else None
         else:
             if self.symbol_table._scope.__contains__("FUNCTIONBODY"):
                 #DECLARACION SIN ASIGNACION DENTRO DEL CUERPO DE UNA FUNCION
@@ -316,15 +340,15 @@ class ViperParser:
                 #MIRO TODAS LAS VARIABLES
                 for var in variables:
                     if var.name in [f.name for f in function.parameters] or var.name in [f.name for f in function.body]:
-                        SemanticError.print_sem_error( "Redefinition of Variable",
-                                                            [var.name, func_name])
+                        SemanticError.print_sem_error("Redefinition of Variable",
+                                                      [var.name, func_name])
                     else:
                         #COMO ES SIN ASIGNACION, SIMPLEMENTE SE AÑADE A LA LISTA DEL BODY SI EL TIPO ES CORRECTO
                         var.datatype = datatype if (datatype in self.record_table._basic_symbols
                                                     or self.record_table.exists(datatype) != False) else None
                         if var.datatype == None:
-                            SemanticError.print_sem_error( "Type Variable Declaration Error Function",
-                                                                  [datatype, var.name, func_name])
+                            SemanticError.print_sem_error("Type Variable Declaration Error Function",
+                                                          [datatype, var.name, func_name])
                         self.symbol_table._functions[func_name].body.append(var)
 
                 p[0] = variables
@@ -334,18 +358,18 @@ class ViperParser:
 
                 if self.symbol_table._scope.__contains__("FUNCTIONDECL"):
                     SemanticError.print_sem_error("Function Declaration Type Atribute Error",
-                                        [self.symbol_table._scope.split("-")[1],datatype, variables])
+                                                  [self.symbol_table._scope.split("-")[1], datatype, variables])
                     p[0] = variables
                     return None
                 else:
-                    SemanticError.print_sem_error( "Declaration Error", [datatype,variables])
+                    SemanticError.print_sem_error("Declaration Error", [datatype, variables])
                     p[0] = variables
                     return None
             else:
                 for var in variables:
                     var.datatype = datatype
-                    self.symbol_table.add_variable(var) if self.symbol_table._scope == "statement" else None
-
+                    self.symbol_table.add_variable(var) if (self.symbol_table._scope == "statement" and
+                                                            not self.symbol_table.exists_variable(var.name)) else None
         p[0] = variables
 
 
@@ -375,7 +399,7 @@ class ViperParser:
     def p_variable_declaration(self, p):
         """
         variable_declaration : ID assignment_declaration
-                             | LBRACKET expression RBRACKET ID assignment_declaration
+                             | LBRACKET expression RBRACKET ID
         """
         if len(p) == 3:
             name = p[1]
@@ -385,10 +409,7 @@ class ViperParser:
         else:
             size = p[2]
             name = p[4]
-            init = p[5]
-            #p[0] = ((name, size), init)
-            p[0] = Vector(name, None, size, init)
-
+            p[0] = Vector(name, None, size, None)
 
     def p_assignment_declaration(self, p):
         """
@@ -419,7 +440,7 @@ class ViperParser:
         """
         p[0] = ("while", p[2], p[6])
 
-    def p_type_definition(self,p):
+    def p_type_definition(self, p):
         """
         type_definition : type_definition_header type_definition_body
         """
@@ -438,14 +459,15 @@ class ViperParser:
             #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0] TODO BORRAR COMENTAARIO
             for elems in field:
                 number_of_attr += 1
-                fields.append(elems) if elems.datatype != None else None
-
+                if elems.datatype != None and elems.name not in [field.name for field in fields]:
+                    fields.append(elems)
+                else:
+                    if not elems.datatype == None:
+                        SemanticError.print_sem_error("Redeclaration of Type Attr", [elems.name, type_name])
         #Solo se guarda si todos los elementos de fields declared se han guardado en fields, esto quiere decir
         # QUE TODOS LOS ATRIBUTOS DECLARADOS SON CORRECTOS
-        self.record_table.add_record(type_name, tuple(fields)) if len(fields) == number_of_attr else None
+        self.record_table.add_record(type_name, fields) if len(fields) == number_of_attr else None
         p[0] = ("type_definition", p[2])
-
-
 
     #FUNCION QUE PERMITE CAMBIAR EL SCOPE A TYPE_DEFINITION
     def p_type_definition_header(self, p):
@@ -455,14 +477,11 @@ class ViperParser:
         self.symbol_table._scope = "Type Definition"
         p[0] = p[2]
 
-
     def p_type_definition_body(self, p):
         """
         type_definition_body : declaration_list RBRACE
         """
         p[0] = p[1]
-
-
 
     def p_function_header(self, p):
         """
@@ -471,12 +490,11 @@ class ViperParser:
         self.symbol_table._scope = f"FUNCTIONDECL-{p[3]}"
         p[0] = ("function_header", p[2], p[3])
 
-
-    def p_function_header_and_parameters(self,p):
+    def p_function_header_and_parameters(self, p):
         """
         function_header_and_parameters : function_header LPAREN argument_list RPAREN
         """
-        p[0] = ("header_and_p",p[1], p[3])
+        p[0] = ("header_and_p", p[1], p[3])
 
     def p_function_before_body(self, p):
         """
@@ -486,13 +504,12 @@ class ViperParser:
         name_funct = p[1][1][2]
         arg_list = p[1][2]
         if type_funct not in self.record_table._basic_symbols and self.record_table.exists(type_funct) == False:
-            SemanticError.print_sem_error( "Function Type Declaration Error", [name_funct, type_funct])
-            new_function = Function(name_funct,None, arg_list, "NoneType")
+            SemanticError.print_sem_error("Function Type Declaration Error", [name_funct, type_funct])
+            new_function = Function(name_funct, None, arg_list, "NoneType")
         else:
             new_function = Function(name_funct, type_funct, arg_list, type_funct)
         self.symbol_table.add_function(new_function)
         self.symbol_table._scope = f"FUNCTIONBODY-{name_funct}"
-
 
     def p_function_definition(self, p):
         """
@@ -510,8 +527,8 @@ class ViperParser:
         if result == None:
             result = "NoneType"
         if result.upper() != function.return_type.upper():
-            SemanticError.print_sem_error( "Incompatible Types Func Ret",
-                        [function.return_type , result, funct_name])
+            SemanticError.print_sem_error("Incompatible Types Func Ret",
+                                          [function.return_type, result, funct_name])
 
         self.symbol_table._scope = ""
         #p[0] = ("function_definition", function_type, function_name,argument_list, p[5], p[7])"""
@@ -522,7 +539,7 @@ class ViperParser:
                 |
         """
 
-    def p_sentence_function(self,p):
+    def p_sentence_function(self, p):
         """
         sentence_function : sentence_list
                           |

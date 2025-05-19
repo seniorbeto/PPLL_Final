@@ -98,3 +98,12 @@ class SemanticError(Exception):
             print(f"\tVariable {args[0]} is already declared in this scope")
             print(f"\tFunction Affected: {args[1]}")
             print("")
+
+        if type_error == "Type Redefinition Error":
+            print("SEMANTIC ERROR DETECTED IN TYPE DECLARATION:")
+            print(f"\ttype '{args[0]}' is already defined")
+            print("")
+        if type_error == "Redeclaration of Type Attr":
+            print("SEMANTIC ERROR DETECTED IN TYPE DECLARATION:")
+            print(f"\ttype '{args[0]}' already has an attribute '{args[1]}'")
+            print("")

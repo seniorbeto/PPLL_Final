@@ -74,6 +74,7 @@ class VariableRef(Expression):
 
     def infer_type(self, symbols, records):
         # buscar variable
+        """
         var = symbols.lookup_variable(self.name)
         if not var:
             var = records.lookup(self.name)
@@ -100,6 +101,8 @@ class VariableRef(Expression):
                     raise SemanticError("Tipo %s no es vector" % t)
                 t = t[:-2]  # sacamos el tipo del elemento
         return t
+        """
+
 
     def __repr__(self):
         result = f"{self.name}"
@@ -139,16 +142,13 @@ class BinaryExpr(Expression):
         self.value = None
 
     def infer_type(self, symbols, records):
-        print(f"left es {self.left} y right es {self.right} y op es {self.op}")
-
         lt = self.left.infer_type(symbols, records)
-        print(f"lt es {lt}")
         rt = self.right.infer_type(symbols, records)
         # Aritméticas
         if lt == None or rt == None:
             return None
 
-        if self.op in ('+', '-', '*', '/'):
+        if self.op in ('+', '-'):
             if lt in ('int','float') and rt in ('int','float'):
                 return 'float' if 'float' in (lt,rt) else 'int'
             #Hay que tener en cuenta los chars tmb. Char se puede convertir a int o float
@@ -156,6 +156,14 @@ class BinaryExpr(Expression):
                 return 'float' if 'float' in rt else 'int'
             if lt in ('int','float') and rt == 'char':
                 return 'float' if 'float' in lt else 'int'
+
+        if self.op in ('*', '/'):
+            if lt in ('int','float') and rt in ('int','float'):
+                return 'float'
+            if lt == 'char' and rt in ('int','float'):
+                return 'float'
+            if lt in ('int','float') and rt == 'char':
+                return 'float'
 
         # Relacionales
         if self.op in ('==','!=','>','<','>=','<='):

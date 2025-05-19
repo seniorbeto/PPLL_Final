@@ -11,7 +11,7 @@ class Recordtable:
         record: instancia de objects.Record"""
 
         if type_name in self._table:
-            raise SemanticError(f"Record '{type_name}' ya definido")
+            return SemanticError.print_sem_error("Type Redefinition Error", [type_name])
         self._table[type_name] = fields
 
 
@@ -23,7 +23,7 @@ class Recordtable:
 
     def exists(self, name):
         """Comprueba si un Record está definido"""
-        return name in self._table
+        return True if name in self._table else False
 
     def __str__(self):
         return f"Record Table: {self._table}"
@@ -51,7 +51,7 @@ class SymbolTable:
 
     def exists_variable(self, name):
         """Comprueba si una variable está definida"""
-        return name in self._variables
+        return True if name in self._variables else False
 
 
     # ——— Funciones ———————————————————————————————————————————
