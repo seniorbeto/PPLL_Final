@@ -42,7 +42,7 @@ run_test() {
     done
 
     # Comparar los ficheros generados con los esperados
-    for ext in token symbol record; do
+    for ext in token symbol record error; do
         local expected_file="test_files/expected/${base_name}.${ext}"
         local output_file="test_files/output/${base_name}.${ext}"
         if cmp -s "$expected_file" "$output_file"; then
@@ -51,13 +51,6 @@ run_test() {
             echo -e "Test $base_name ($ext): ${RED}FAIL${RESET}"
         fi
     done
-
-    # Comprobar que el .error está vacío si no ha habido errores
-    if [ -s "$output_error" ]; then
-        echo -e "Test $base_name (error): ${RED}FAIL${RESET}"
-    else
-        echo -e "Test $base_name (error): ${GREEN}SUCCESS${RESET}"
-    fi
 
     echo ""
 }
