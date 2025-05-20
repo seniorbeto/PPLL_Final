@@ -1,140 +1,261 @@
-BASIC_FORMAT = ["int", "str", "float", "bool"] #ETC
+# objects.py
+# Modelo de los nodos
+from tkinter.messagebox import RETRY
 
+from exception import SemanticError
 
-def check_table(datatype, existing_dict ):
-    if datatype in existing_dict.keys():
-        return datatype
-    return ValueError("The datatype '{}' is not defined.".format(datatype))
+# Nodo base para todas las expresiones
+class Expression:
+    def infer_type(self, symbols, records):
+        """Inferir y devolver el tipo de la expresión usando las tablas:
+           symbols: tabla de símbolos de variables/funciones
+           records: tabla de definiciones de records."""
+        raise NotImplementedError()
 
+# ——— Expr. atómicas ——————————————————————————————————————————————
 
+class Literal(Expression):
+    def __init__(self, value):
+        self.datatype = None
+        self.value = value
 
-class Vector:
-    def __init__(self, name: str, size: int, datatype:str):
-        self.__name = name
-        self.__size = size
-        self.__datatype = datatype
+    def infer_type(self, symbols, records):
+        if isinstance(self.value, bool):
+            return 'bool'
+        if isinstance(self.value, float):
+            return 'float'
+        if isinstance(self.value, int):
+            return 'int'
+
+        if self.value == "true" or self.value == "false":
+            return 'bool'
+        if isinstance(self.value, str):
+            return 'char'
+        raise SemanticError("Tipo de literal desconocido: %r" % self.value)
 
     def __str__(self):
-        return f"Vector({self.__name}, {self.__size}, {self.__datatype})"
+        return f"Literal({self.value})"
 
+    def __repr__(self):
+        return f"Literal({self.value})"
 
+class VariableRef(Expression):
+    def __init__(self, name):
+        self.name = name
+        # ref_chain para futuros accesos a campos o índices
+        self.ref_chain = []
+        self.value = None
 
-class Register:
-    def __init__(self, name:str, **kwargs):
-        self._name = name
-        self._atributes = {}
-        for key, value in zip(kwargs.keys(), kwargs.values()):
-            self._atributes[key] = value[0] if len(value) == 1 else Vector(key,value[1], value[0])
+    def add_field(self, field_name, symbols, records):
+        # 1. Inferimos el tipo actual de esta referencia
+        base_type = self.infer_type(symbols, records)
+        # 2. Comprobamos que es un record conocido
+        record_def = records.lookup(base_type)
+        if record_def is None:
+            raise SemanticError(f"Tipo `{base_type}` no es un record")
+        # 3. Comprobamos que el campo existe
+        if field_name not in record_def.fields:
+            raise SemanticError(f"Field `{field_name}` no existe en record `{base_type}`")
+        # 4. Finalmente, registramos el acceso
+        self.ref_chain.append(('field', field_name))
+        return self
+
+    def add_index(self, index_expr, symbols, records):
+        # 1. Comprobamos el índice es un int
+        idx_type = index_expr.infer_type(symbols, records)
+        if idx_type != 'int':
+            raise SemanticError(f"Índice de vector debe ser `int` (vino `{idx_type}`)")
+        # 2. Inferimos el tipo actual y comprobamos que es vector
+        base_type = self.infer_type(symbols, records)
+        if not base_type.endswith('[]'):
+            raise SemanticError(f"Tipo `{base_type}` no es un vector")
+        # 3. Registramos el acceso
+        self.ref_chain.append(('index', index_expr))
+        return self
+
+    def infer_type(self, symbols, records):
+        # buscar variable
+        """
+        var = symbols.lookup_variable(self.name)
+        if not var:
+            var = records.lookup(self.name)
+            if not var:
+                return None
+        t = var.datatype
+        # resolver cada acceso secuencialmente
+        for kind, payload in self.ref_chain:
+            if kind == 'field':
+                rec = records.lookup(t)
+                if not rec:
+                    raise SemanticError("Tipo %s no es un record" % t)
+                fields = rec.fields
+                if payload not in fields:
+                    raise SemanticError("Field %s no existe en %s" % (payload, t))
+                t = fields[payload]
+            elif kind == 'index':
+                # payload es una Expression
+                idx_type = payload.infer_type(symbols, records)
+                if idx_type != 'int':
+                    raise SemanticError("Índice no es int sino %s" % idx_type)
+                # asumimos que el tipo vector acaba en []
+                if not t.endswith('[]'):
+                    raise SemanticError("Tipo %s no es vector" % t)
+                t = t[:-2]  # sacamos el tipo del elemento
+        return t
+        """
+    def __str__(self):
+        result = f"VariableRef({self.name}"
+        for kind, payload in self.ref_chain:
+            if kind == 'field':
+                result += f".{payload}"
+            elif kind == 'index':
+                result += f"[{payload}])"
+        return result
+
+    def __repr__(self):
+        result = f"{self.name}"
+        for kind, payload in self.ref_chain:
+            if kind == 'field':
+                result += f".{payload}"
+            elif kind == 'index':
+                result += f"[{payload}]"
+        return result
+
+class FunctionCall(Expression):
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args
+
+    def infer_type(self, symbols, records):
+        func = symbols.lookup_function(self.name)
+        if not func:
+            raise SemanticError("Función no declarada: %s" % self.name)
+        # comprobar número de argumentos
+        if len(self.args) != len(func.parameters):
+            raise SemanticError("Función %s espera %d args, tuvo %d" %
+                                (self.name, len(func.parameters), len(self.args)))
+        # comprobar tipos
+        for expr, expected in zip(self.args, func.parameters):
+            actual = expr.infer_type(symbols, records)
+            if actual != expected:
+                raise SemanticError("Param %s: esperado %s, obtenido %s" %
+                                    (self.name, expected, actual))
+        return func.return_type
+
+class BinaryExpr(Expression):
+    def __init__(self, op, left, right):
+        self.op = op        # '+', '-', '*', '/', '==', '>', '<=', 'and', 'or',...
+        self.left = left    # Expression
+        self.right = right  # Expression
+        self.value = None
+
+    def infer_type(self, symbols, records):
+        lt = self.left.infer_type(symbols, records) if self.left != None else None
+        rt = self.right.infer_type(symbols, records) if self.right != None else None
+        # Aritméticas
+        if lt == None or rt == None:
+            return None
+
+        if self.op in ('+', '-'):
+            if lt in ('int','float') and rt in ('int','float'):
+                return 'float' if 'float' in (lt,rt) else 'int'
+            #Hay que tener en cuenta los chars tmb. Char se puede convertir a int o float
+            if lt == 'char' and rt in ('int','float'):
+                return 'float' if 'float' in rt else 'int'
+            if lt in ('int','float') and rt == 'char':
+                return 'float' if 'float' in lt else 'int'
+
+        if self.op in ('*', '/'):
+            if lt in ('int','float') and rt in ('int','float'):
+                return 'float'
+            if lt == 'char' and rt in ('int','float'):
+                return 'float'
+            if lt in ('int','float') and rt == 'char':
+                return 'float'
+
+        # Relacionales
+        if self.op in ('==','!=','>','<','>=','<='):
+            if lt == rt:
+                return 'bool'
+        # Lógicas
+        if self.op in ('and','or'):
+            if lt == 'bool' and rt == 'bool':
+                return 'bool'
+        #raise SemanticError(f"Operador '{self.op}' no válido para tipos {lt} y {rt}")
+        SemanticError.print_sem_error("Incompatible Operands", [self.op, self.left, self.right])
+        return None
 
     def __str__(self):
-        str = ""
-        str += f"Register({self._name})"
-        for key, value in self._atributes.items():
-            str += f"\n\t{key}: {value}"
+        return f"BinaryExpr({self.left}, {self.op}, {self.right})"
 
-        return str
+    def __repr__(self):
+        return f"BinaryExpr({self.left}, {self.op}, {self.right})"
+
+class UnaryExpr(Expression):
+    def __init__(self, op, expr):
+        self.op = op       # '-', '+', 'not'
+        self.expr = expr   # Expression
+
+    def infer_type(self, symbols, records):
+        t = self.expr.infer_type(symbols, records)
+        if self.op in ('-','+'):
+            if t in ('int','float'):
+                return t
+        if self.op == 'not':
+            if t == 'bool':
+                return 'bool'
+        raise SemanticError(f"Operador unario '{self.op}' no válido para tipo {t}")
+
+    def __str__(self):
+        return f"UnaryExpr({self.op},{self.expr})"
+
+class Record:
+    def __init__(self, name, fields):
+        # fields: dict nombre_campo -> tipo (string)
+        self.name = name
+        self.fields = fields
+
 
 
 class Variable:
-    def __init__(self, id: str, datatype: any, value = None):
-        self._name = id
-        self._datatype = datatype
-        self._value = value
-
-    def __repr__(self):
-        return f"Variable {self._name}({self._datatype}) With value {self._value}"
-
-
-    def verify_type_value(self):
-        if self._value == None:
-            return "Pinga"
-
-
-
-
-class Expression:
-    def __init__(self, express_params:tuple):
-        self._return_type = None
-
-exp1 = (('literal', 3), '/', ('literal', 7))
-exp2 = ('function_call', 'tete', [])
-exp3 = ('vector_index', ('literal', 3), None)
-
-
-"""('program',
- [None,
-  ('declaration',
-   'int',
-   [('vector_decl',
-     'a',
-     (('literal', 3), '/', ('literal', 7)),
-     ('assignment', None))]),
-  ('declaration',
-   'int',
-   [('vector_decl', 'd', ('function_call', 'tete', []), ('assignment', None))]),
-  ('declaration',
-   'int',
-   [('vector_decl',
-     'd',
-     ('t', ('vector_index', ('literal', 3), None)),
-     ('assignment', None))])])"""
-
-
-
-
-
-
-
-class Function:
-    def __init__(self, name: str, return_type:str, arguments:dict, existing_dict:dict):
-        self._name = name
-        self._return_type = return_type if BASIC_FORMAT.__contains__(return_type) else check_table(datatype, existing_dict)
-        self._arguments = []
-        for arg in arguments.values():
-            if BASIC_FORMAT.__contains__(arg):
-                self._arguments.append(arg)
-            else :
-                if check_table(arg[0], existing_dict) != ValueError :
-                    self._arguments.append(arg)
-
+    def __init__(self, name, datatype, value):
+        self.name = name          # identificador
+        self.datatype = datatype  # 'int', 'float', 'bool', 'char', 'Pair', 'int[]', etc.
+        self.value = value
 
     def __str__(self):
-        str = f"Function({self._name}, {self._return_type})"
-        """for key, value in self._arguments.items():
-            str += f"\n\t{key}: {value}"
-"""
-        for arg in self._arguments:
-            str += f"\n\t{arg}"
-        return str
+        return f"Variable({self.name},{self.datatype},{self.value})"
+    def __repr__(self):
+        return f"Variable({self.name},{self.datatype},{self.value})"
+
+
+    def infer_type(self, symbols, records):
+        return self.datatype
+
+class Vector:
+    def __init__(self, name, datatype, length, value):
+        self.name = name
+        self.datatype = datatype
+        self.length = length
+        self.value = value
+
+    def __str__(self):
+        return f"Vector({self.name},{self.datatype},{self.length},{self.value})"
+    def __repr__(self):
+        return f"Vector({self.name},{self.datatype},{self.length},{self.value})"
 
 
 
-if __name__ == "__main__":
-    datatype = {}
+# Definición de función (metadatos en tabla de símbolos)
+class Function:
+    def __init__(self, name, datatype, parameters, return_type):
+        self.name = name                 # identificador
+        self.datatype = datatype
+        self.parameters = parameters     # lista de tipos de parámetros, e.g. ['int','float']
+        self.return_type = return_type   # tipo de retorno, e.g. 'bool'
+        self.body = []
 
-    variable1 = Variable("var1", "int" , datatype)
-    print(variable1)
-    variable2 = Variable("var2", "float", datatype)
-    print(variable2)
-
-
-    arguments = {"b": ["int"],"a": ["char"], "c": ["Register", 3]}
-    c = Register("register", **arguments)
-    datatype[c._name] = c._atributes
-
-    print(c)
-
-    variable3 = Variable("var3", "register", datatype)
-    print(variable3)
-
-    func_arg = {"a": "int", "b": "char", "c": "Register"}
-    funcionn = Function("funcion", "int", arguments, datatype)
-    print(funcionn)
-
-
-
-
-
-
-
-
+    def __str__(self):
+        return f"Function({self.name},{self.datatype},{self.parameters},{self.return_type},{self.body})"
+    def __repr__(self):
+        return f"Function({self.name},{self.datatype},{self.parameters},{self.return_type},{self.body})"

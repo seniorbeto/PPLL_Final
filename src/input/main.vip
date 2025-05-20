@@ -1,7 +1,0 @@
-bool t = 3
-
-
-int a, b, c,d, e, f, g, h, i, j, k = 'p'       # esto está mal
-int d, e, f             # esto está bien
-
-

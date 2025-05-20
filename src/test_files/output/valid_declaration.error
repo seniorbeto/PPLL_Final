@@ -1,0 +1,5 @@
+Generating LALR tables
+key field, attr b
+key field, attr a
+SymbolTable({'p': Variable(p,Point,None), 'a': Variable(a,int,None), 'b': Variable(b,int,None)}, {})
+Record Table: {'Point': [Variable(a,int,None), Variable(b,int,None)]}

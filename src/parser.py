@@ -1,8 +1,8 @@
 import ply.yacc as yacc
 from lexer import ViperLexer
 
-from tables import Recordtable, SymbolTable
 from objects import *
+from tables import Recordtable, SymbolTable
 
 
 class ViperParser:
@@ -31,7 +31,6 @@ class ViperParser:
         self.lexer = lexer
         self.route = self.lexer.parser_input_file
         self.parser = None
-
         self.record_table = Recordtable()
         self.symbol_table = SymbolTable()
 
@@ -70,6 +69,8 @@ class ViperParser:
                   | function_definition NEWLINE
                   | NEWLINE
         """
+        self.symbol_table._scope = "statement" if not self.symbol_table._scope.__contains__(
+            "FUNCTION") else self.symbol_table._scope
         if len(p) == 3:
             p[0] = p[1]
         else:
@@ -109,7 +110,7 @@ class ViperParser:
                    | expression AND expression
                    | expression OR expression
         """
-        p[0] = (p[1], p[2], p[3])
+        p[0] = BinaryExpr(p[2], p[1], p[3])
 
     def p_expression_unary(self, p):
         """
@@ -117,7 +118,7 @@ class ViperParser:
                    | MINUS expression %prec MINUS
                    | PLUS expression %prec PLUS
         """
-        p[0] = ("unary", p[1], p[2])
+        p[0] = UnaryExpr(p[1], p[2])
 
     def p_expression_literal(self, p):
         """
@@ -127,13 +128,13 @@ class ViperParser:
                    | TRUE
                    | FALSE
         """
-        p[0] = p.slice[1].type
+        p[0] = Literal(p[1])
 
     def p_expression_func_call(self, p):
         """
         expression : ID LPAREN function_call_argument_list RPAREN
         """
-        p[0] = ("function_call", p[1], p[3])
+        p[0] = FunctionCall(p[1], p[3])
 
     def p_function_call_argument_list(self, p):
         """
@@ -158,7 +159,50 @@ class ViperParser:
         """
         expression : ID reference
         """
-        p[0] = (p[1], p[2])
+        name = p[1]
+        reference = p[2]
+        if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+            if not self.symbol_table.exists_variable(name):
+                SemanticError.print_sem_error("Variable not found", name)
+                return Variable(name, None, None)
+            var = self.symbol_table.lookup_variable(name)
+            for key, attr in reference:
+                if key == 'field':
+                    if (var.datatype not in self.record_table._basic_symbols
+                            and self.record_table.exists(var.datatype) == False):
+                        print("COÑA MALA ER")
+                    else:
+                        if attr not in [atribute.name for atribute in self.record_table._table[var.datatype]]:
+                            print(f"El atributo no funsiona para {attr} con key {key} ER")
+                        else:
+                            x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                            var = Variable(name, x[0], attr)
+        else:
+            funct_name = self.symbol_table._scope.split("-")[1]
+            function = self.symbol_table.lookup_function(funct_name)
+            local_var_table = SymbolTable()
+            for var in function.body + function.parameters:
+                local_var_table.add_variable(var)
+
+            if not local_var_table.exists_variable(name):
+                SemanticError.print_sem_error("Variable not found Function", [name, funct_name])
+                return Variable(name, None, None)
+
+
+            for key, attr in reference:
+                if key == 'field':
+                    if (var.datatype not in self.record_table._basic_symbols
+                            and self.record_table.exists(var.datatype) == False):
+                        print("COÑA MALA ER")
+                    else:
+                        print(f"var es {var}")
+                        if attr not in [atribute.name for atribute in self.record_table._table[var.datatype]]:
+                            print(f"El atributo no funsiona para {attr} con key {key} ER")
+                        else:
+                            x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                            var = Variable(name, x[0], attr)
+
+        p[0] = var
 
     # Una referencia es la indexación de un vector o el acceso a un campo
     # de un registro. Ambas cosas pueden ser recursivas. Además, también
@@ -170,12 +214,18 @@ class ViperParser:
                   | DOT ID reference
                   |
         """
-        if len(p) == 5:
-            p[0] = ("vector_index", p[2], p[4])
-        elif len(p) == 4:
-            p[0] = ("field", p[2], p[3])
+        # Caso en el que no hay más accesos
+        if len(p) == 1:
+            p[0] = []
+            return
+
+        # Caso vector
+        if p[1] == '[':
+            # p[2] = expresión del índice, p[4] = resto de la cadena
+            p[0] = [('index', p[2])] + p[4]
         else:
-            p[0] = None
+            # Caso campo
+            p[0] = [('field', p[2])] + p[3]
 
     # En la siguiente regla contemplamos asignaciones simples y asignaciones en cadena
     def p_assignment(self, p):
@@ -183,7 +233,84 @@ class ViperParser:
         assignment : ID reference EQUALS expression
                    | ID reference EQUALS assignment
         """
-        p[0] = ("assignment", p[1], p[2], p[4])
+        identifier = p[1]
+        reference_value = p[2]
+        value = p[4]
+        if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+            if reference_value == []:
+                var = self.symbol_table.lookup_variable(identifier)
+                if var is None:
+                    SemanticError.print_sem_error("Variable not found", identifier)
+
+                else:
+                    if isinstance(value, VariableRef) and self.record_table.exists(value.datatype) == False:
+                        # SI ES UNA REFERENCIA QUE NO ESTA EN LA TABLA DE REGISTROS NO ES NADA, ERROR SEMANTICO
+                        SemanticError.print_sem_error("Type Error Not defined", [identifier, value])
+                    else:
+                        #COMPROBACION DE DATATYPE == VALOR ASIGNADO
+                        actual_type = value.infer_type(self.symbol_table, self.record_table) if not isinstance(value, Variable) else value.datatype
+                        if var.datatype != actual_type:
+                            SemanticError.print_sem_error(
+                                "Incompatible Types Assignment",
+                                [var.datatype, actual_type, identifier, self.symbol_table, self.record_table]
+                            )
+                            var.datatype = None
+                            p[0] = var
+                            return None
+            else:
+                var = self.symbol_table.lookup_variable(identifier)
+                for key, attr in reference_value:
+                    print(f"key {key}, attr {attr}")
+                    if key == 'field':
+                        if var is None:
+                            SemanticError.print_sem_error("Variable not found", identifier)
+                        if (var.datatype not in self.record_table._basic_symbols
+                            and self.record_table.exists(var.datatype) == False):
+                            SemanticError.print_sem_error("Type Error Not defined", [identifier, var.datatype])
+                        else:
+                            if var.datatype in self.record_table._basic_symbols or attr not in [atribute.name for atribute in  self.record_table._table[var.datatype]]:
+                                SemanticError.print_sem_error("Attribute of type", [var.datatype, attr])
+                                var = Variable(identifier, None, attr)
+                            else:
+                                x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                                var = Variable(identifier, x[0] , attr)
+                    else:
+                        #INDICE DE VECTOR
+                        print(f"SEXO {key}, {attr}")
+                actual_type = value.infer_type(self.symbol_table, self.record_table) if not isinstance(value, Variable) else value.datatype
+                if var.datatype != actual_type:
+                    SemanticError.print_sem_error("Incompatible Types Assignment",
+                                      [var.datatype, actual_type, identifier, self.symbol_table, self.record_table])
+                    var.datatype = None
+                p[0] = var
+                return None
+        else:
+            if reference_value == []:
+
+                func_name = self.symbol_table._scope.split("-")[1]
+                function = self.symbol_table.lookup_function(func_name)
+                list_variables = SymbolTable()
+                for var2 in function.body + function.parameters:
+                    list_variables.add_variable(var2)
+                var = list_variables.lookup_variable(identifier)
+
+                if var is None:
+                    SemanticError.print_sem_error("Variable not found Function",
+                                                  [identifier, func_name])
+                    p[0] = ("assignment", p[1], p[2], p[4])
+                    return None
+
+                actual_value = value.infer_type(list_variables, self.record_table) if not isinstance(value, Variable) else value.datatype
+                if var.datatype != actual_value:
+                    SemanticError.print_sem_error("Incompatible Types Assignment Function",
+                                                  [var.datatype, actual_value, identifier, func_name])
+            else:
+                print(f"YEYE aa{reference_value}")
+
+
+        #p[0] = ("assignment", p[1], p[2], p[4])
+        p[0] = var
+
 
     def p_declaration(self, p):
         """
@@ -195,30 +322,106 @@ class ViperParser:
         """
         datatype = p[1]
         variables = p[2]
-        primitive_datatypes = ["int", "float", "bool", "char", "true", "false"]
-        for new_var in variables:
-            """if new_var._value is None:
-                pass"""
-            print(f"Printeo de variables {new_var}")
-            if datatype in primitive_datatypes:
-                # Es una variable simple
-                new_var._datatype = datatype
 
-                if new_var._value not in primitive_datatypes:
-                    print("ERROR SEMÁNTICO. LOS TIPOS NO COINCIDEN")
-                else:
-                    print(f"OK para var {new_var} con value {new_var._value}")
+        #DE HABER VALOR, SE GUARDA EN EL ÚLTIMO ELEMENTO DE VARIABLES
+        if variables[-1].value != None:
+
+            if self.symbol_table._scope == "Type Definition":
+                #SI ESTAS EN UNA DECLARACION DE TIPO
+                SemanticError.print_sem_error("Type Declaration Error", variables)
+
+            if self.symbol_table._scope.__contains__("FUNCTIONDECL"):
+                SemanticError.print_sem_error("Function Declaration Error",
+                                              [self.symbol_table._scope.split("-")[1], variables])
+
+            if self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+                #DENTRO DEL CUERPO DE UNA FUNCION
+                func_name = self.symbol_table._scope.split("-")[1]
+                function = self.symbol_table.lookup_function(func_name)
+                # MIRO TODAS LAS VARIABLES
+                for var in variables:
+                    if var.name in [f.name for f in function.parameters] or var.name in [f.name for f in function.body]:
+                        SemanticError.print_sem_error("Redefinition of Variable",
+                                                      [var.name, func_name])
+                    else:
+                        # COMO ES SIN ASIGNACION, SIMPLEMENTE SE AÑADE A LA LISTA DEL BODY SI COINCIDEN EN TIPO
+                        local_var_table = SymbolTable()
+                        for var2 in function.parameters + function.body:
+                            local_var_table.add_variable(var2)
+                        type = variables[-1].value.infer_type(local_var_table, self.record_table)
+
+                        if datatype != type:
+                            SemanticError.print_sem_error("Incompatible Types Func",
+                                                          [datatype, type, variables, func_name])
+                        else:
+                            var.datatype = datatype
+                            var.value = type
+                            function.body.append(var)
+
+                self.symbol_table._functions[func_name].body = function.body
+                p[0] = variables
+                return None
+
+            type = variables[-1].value.infer_type(self.symbol_table, self.record_table)
+
+            if type != datatype and type != SemanticError:
+                SemanticError.print_sem_error("Incompatible Types",
+                                              [datatype, type, variables])
+                p[0] = variables
+                return None
             else:
-                ...
+                for var in variables:
+                    var.datatype = datatype
+                    var.value = type
+                    self.symbol_table.add_variable(var) if (self.symbol_table._scope == "statement" and
+                                                            not self.symbol_table.exists_variable(var.name)) else None
+        else:
+            if self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+                #DECLARACION SIN ASIGNACION DENTRO DEL CUERPO DE UNA FUNCION
+                func_name = self.symbol_table._scope.split("-")[1]
+                function = self.symbol_table.lookup_function(func_name)
+                #MIRO TODAS LAS VARIABLES
+                for var in variables:
+                    if var.name in [f.name for f in function.parameters] or var.name in [f.name for f in function.body]:
+                        SemanticError.print_sem_error("Redefinition of Variable",
+                                                      [var.name, func_name])
+                    else:
+                        #COMO ES SIN ASIGNACION, SIMPLEMENTE SE AÑADE A LA LISTA DEL BODY SI EL TIPO ES CORRECTO
+                        var.datatype = datatype if (datatype in self.record_table._basic_symbols
+                                                    or self.record_table.exists(datatype) != False) else None
+                        if var.datatype == None:
+                            SemanticError.print_sem_error("Type Variable Declaration Error Function",
+                                                          [datatype, var.name, func_name])
+                        self.symbol_table._functions[func_name].body.append(var)
 
-        print(p[2])
+                p[0] = variables
+                return None
+            #Hay que verificar que el tipo declarado sea correcto, pese a que el valor sea nulo
+            if datatype not in self.record_table._basic_symbols and self.record_table.exists(datatype) == False:
+
+                if self.symbol_table._scope.__contains__("FUNCTIONDECL"):
+                    SemanticError.print_sem_error("Function Declaration Type Atribute Error",
+                                                  [self.symbol_table._scope.split("-")[1], datatype, variables])
+                    p[0] = variables
+                    return None
+                else:
+                    SemanticError.print_sem_error("Declaration Error", [datatype, variables])
+                    p[0] = variables
+                    return None
+            else:
+                for var in variables:
+                    var.datatype = datatype
+                    self.symbol_table.add_variable(var) if (self.symbol_table._scope == "statement" and
+                                                            not self.symbol_table.exists_variable(var.name)) else None
+        p[0] = variables
+
 
     def p_declaration_list(self, p):
         """
-        declaration_list : declaration_list declaration
-                         | declaration
+        declaration_list : declaration_list declaration NEWLINE
+                         | declaration NEWLINE
         """
-        if len(p) == 3:
+        if len(p) == 4:
             p[0] = p[1] + [p[2]]
         else:
             p[0] = [p[1]]
@@ -239,20 +442,17 @@ class ViperParser:
     def p_variable_declaration(self, p):
         """
         variable_declaration : ID assignment_declaration
-                             | LBRACKET expression RBRACKET ID assignment_declaration
+                             | LBRACKET expression RBRACKET ID
         """
         if len(p) == 3:
-            # p[0] = ("var", p[1], ("assignment", p[2]))
-            id = p[1]
-            assignement = p[2]
-            # Aquí sabemos que es una declaración sencilla. Es posible que
-            # assignement sea None, en cuyo caso no asignamos nada.
-            new_var = Variable(id, None, assignement)
-            p[0] = new_var
+            name = p[1]
+            init = p[2]
+            #p[0] = (name, init)
+            p[0] = Variable(name, None, init)
         else:
-            p[0] = ("vector_decl", p[4], p[2], ("assignment", p[5]))
-            # id = p[4]
-            # len = p[2]
+            size = p[2]
+            name = p[4]
+            p[0] = Vector(name, None, size, None)
 
     def p_assignment_declaration(self, p):
         """
@@ -261,6 +461,8 @@ class ViperParser:
         """
         if len(p) == 3:
             p[0] = p[2]
+        else:
+            p[0] = None
 
     # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
     # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
@@ -270,6 +472,8 @@ class ViperParser:
         if_statement : IF expression COLON LBRACE NEWLINE sentence_list RBRACE
                      | IF expression COLON LBRACE NEWLINE sentence_list RBRACE ELSE COLON LBRACE NEWLINE sentence_list RBRACE
         """
+        # Tenemos que comprobar que la expresión del if sea de tipo booleano
+        p[2].infer_type()
         if len(p) == 8:
             p[0] = ("if", p[2], p[6])
         else:
@@ -283,15 +487,109 @@ class ViperParser:
 
     def p_type_definition(self, p):
         """
-        type_definition : TYPE ID COLON LBRACE NEWLINE declaration_list RBRACE
+        type_definition : type_definition_header type_definition_body
         """
-        p[0] = ("type_definition", p[2], p[6])
+
+        type_name = p[1]
+
+        fields_declared = p[2]
+
+        #Lista contenedora de los atributos del tipo declarado. Solo se guardaran si cada atributo tiene un tipo correcto
+        fields = []
+
+        #Contador para luego comprobar que todos los atributos que se han pasado se hayan guardado.
+        #En caso de no coincidir con la longitud de FIELDS no se guardará el tipo en la tabla de registros
+        number_of_attr = 0
+        for field in fields_declared:
+            #DE MOMENTO EL ELEMENTO VARIABLE O LO QUE COÑO SEA ESTÄ EN FIELD[2][0] TODO BORRAR COMENTAARIO
+            for elems in field:
+                number_of_attr += 1
+                if elems.datatype != None and elems.name not in [field.name for field in fields]:
+                    fields.append(elems)
+                else:
+                    if not elems.datatype == None:
+                        SemanticError.print_sem_error("Redeclaration of Type Attr", [elems.name, type_name])
+        #Solo se guarda si todos los elementos de fields declared se han guardado en fields, esto quiere decir
+        # QUE TODOS LOS ATRIBUTOS DECLARADOS SON CORRECTOS
+        self.record_table.add_record(type_name, fields) if len(fields) == number_of_attr else None
+        p[0] = ("type_definition", p[2])
+
+    #FUNCION QUE PERMITE CAMBIAR EL SCOPE A TYPE_DEFINITION
+    def p_type_definition_header(self, p):
+        """
+        type_definition_header : TYPE ID COLON LBRACE NEWLINE
+        """
+        self.symbol_table._scope = "Type Definition"
+        p[0] = p[2]
+
+    def p_type_definition_body(self, p):
+        """
+        type_definition_body : declaration_list RBRACE
+        """
+        p[0] = p[1]
+
+    def p_function_header(self, p):
+        """
+        function_header : DEF function_type ID
+        """
+        self.symbol_table._scope = f"FUNCTIONDECL-{p[3]}"
+        p[0] = ("function_header", p[2], p[3])
+
+    def p_function_header_and_parameters(self, p):
+        """
+        function_header_and_parameters : function_header LPAREN argument_list RPAREN
+        """
+        p[0] = ("header_and_p", p[1], p[3])
+
+    def p_function_before_body(self, p):
+        """
+        function_before_body : function_header_and_parameters COLON LBRACE NEWLINE
+        """
+        type_funct = p[1][1][1]
+        name_funct = p[1][1][2]
+        arg_list = p[1][2]
+        if type_funct not in self.record_table._basic_symbols and self.record_table.exists(type_funct) == False:
+            SemanticError.print_sem_error("Function Type Declaration Error", [name_funct, type_funct])
+            new_function = Function(name_funct, None, arg_list, "NoneType")
+        else:
+            new_function = Function(name_funct, type_funct, arg_list, type_funct)
+        self.symbol_table.add_function(new_function)
+        self.symbol_table._scope = f"FUNCTIONBODY-{name_funct}"
 
     def p_function_definition(self, p):
         """
-        function_definition : DEF function_type ID LPAREN argument_list RPAREN COLON LBRACE NEWLINE sentence_list RETURN sentence RBRACE
+        function_definition : function_before_body sentence_function RETURN expression newlines RBRACE
         """
-        p[0] = ("function_definition", p[2], p[3], p[5], p[10], p[12])
+        return_statement = p[4]
+
+        funct_name = self.symbol_table._scope.split("-")[1]
+        function = self.symbol_table.lookup_function(funct_name)
+        local_var_table = SymbolTable()
+        for var in function.body + function.parameters:
+            local_var_table.add_variable(var)
+
+        result = return_statement.infer_type(local_var_table, self.record_table) if return_statement != None else None
+        if result == None:
+            result = "NoneType"
+        if result.upper() != function.return_type.upper():
+            SemanticError.print_sem_error("Incompatible Types Func Ret",
+                                          [function.return_type, result, funct_name])
+
+        self.symbol_table._scope = ""
+        #p[0] = ("function_definition", function_type, function_name,argument_list, p[5], p[7])"""
+
+    def p_newlines(self, p):
+        """
+        newlines : NEWLINE
+                |
+        """
+
+    def p_sentence_function(self, p):
+        """
+        sentence_function : sentence_list
+                          |
+        """
+        p[0] = p[1] if len(p) > 1 else []
 
     def p_function_type(self, p):
         """
@@ -310,9 +608,9 @@ class ViperParser:
                       |
         """
         if len(p) == 4:
-            p[0] = p[1] + [p[3]]
+            p[0] = [var for var in p[1]] + p[3]
         elif len(p) == 2:
-            p[0] = [p[1]]
+            p[0] = p[1]
         else:
             p[0] = []
 
@@ -354,4 +652,15 @@ class ViperParser:
         if not input_data.endswith("\n"):
             input_data += "\n"
 
-        return self.parser.parse(input_data, lexer=self.lexer.lexer)
+        result = self.parser.parse(input_data, lexer=self.lexer.lexer)
+
+        # Exportamos las tablas
+        with open(f"{self.route.replace(".postprocessed", "")}.symbol", "w") as file:
+            for symbol in self.symbol_table._variables:
+                file.write(f"{symbol}:{self.symbol_table._variables[symbol]}\n")
+
+        with open(f"{self.route.replace(".postprocessed", "")}.record", "w") as file:
+            for symbol in self.record_table._table:
+                file.write(f"{symbol}\n")
+
+        return result

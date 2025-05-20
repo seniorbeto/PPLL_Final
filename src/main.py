@@ -20,10 +20,12 @@ class Main:
         self.__lexer.run()
         self.__parser = ViperParser(self.__lexer)
         result = self.__parser.parse()
-
+        print(self.__parser.symbol_table)
+        print(self.__parser.record_table)
         # Únicamente exporamos el árbol si se ha importado graphviz
         if not export_tree:
-            pp(result)
+            #pp(result)
+            pass    #TODO ESTOY HASTA LA POLLA  DE QUE SE VEA
         else:
             self.__output_filename = route.replace(".vip", "")
             try:

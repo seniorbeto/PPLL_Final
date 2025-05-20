@@ -1,7 +1,0 @@
-Error sintáctico en línea:
->>> int 3x                      # Declaración de variable inválida, pero el programa sigue!!!!
-        ^
-Error sintáctico en línea:
->>> float x = (10.5 + 2.3       # Falta el paréntesis de cierre
-                                                               ^
-('program', [])

@@ -1,6 +1,0 @@
-// Árbol Sintáctico
-digraph {
-	0 [label=program]
-	1 [label="[]"]
-	0 -> 1
-}

@@ -1,7 +1,0 @@
-# --- ASIGNACIONES A VECTORES Y PROPIEDADES DE REGISTRO ---
-vec[0] = 100
-vec[1] = x
-reg1.a = x
-reg1.f = valor
-reg1.c = car
-reg1._[0] = reg1._[1] = reg1._[2] = 0
