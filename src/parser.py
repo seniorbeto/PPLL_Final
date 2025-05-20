@@ -168,7 +168,6 @@ class ViperParser:
                 if parameter_to_pass.datatype != original_parameters.datatype:
                     SemanticError.print_sem_error("Function error parameter FUNC",
                                                   [parameter_to_pass, original_parameters, func_name, func_scope_name])
-            print(f"POR QUE FALLAS")
             func_call.datatype = function.return_type
             func_call.value = function.return_type
             p[0] = func_call
@@ -612,8 +611,8 @@ class ViperParser:
             else:
                 for var in variables:
                     var.datatype = datatype
-                    self.symbol_table.add_variable(var) if (self.symbol_table._scope == "statement" and
-                                                            not self.symbol_table.exists_variable(var.name)) else None
+                    if self.symbol_table._scope == "statement":
+                        self.symbol_table.add_variable(var) if not self.symbol_table.exists_variable(var.name) else SemanticError.print_sem_error("Redefinition of Variable", [var.name, self.symbol_table._scope])
         p[0] = variables
 
 
@@ -681,23 +680,74 @@ class ViperParser:
     # En el "if" hacemos distinción entre el "if" y el "if-else". Consideramos
     # obligatorio el uso de un salto de línea entre el "if" y el "else" porque
     # es lo que se especifica en el enunciado.
-    def p_if_statement(self, p):
+    def p_if_statement_header(self, p):
         """
-        if_statement : IF expression COLON LBRACE NEWLINE sentence_list RBRACE
-                     | IF expression COLON LBRACE NEWLINE sentence_list RBRACE ELSE COLON LBRACE NEWLINE sentence_list RBRACE
+        if_statement_header : IF expression COLON
         """
         # Tenemos que comprobar que la expresión del if sea de tipo booleano
-        p[2].infer_type()
-        if len(p) == 8:
-            p[0] = ("if", p[2], p[6])
+        check_cond = p[2]
+        print(f"P2 es {check_cond}")
+        if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+            print(f"{check_cond.infer_type(self.symbol_table, self.record_table)}")
+            if check_cond.infer_type(self.symbol_table, self.record_table) != "bool":
+                SemanticError.print_sem_error("IF COND ERROR", [check_cond, self.symbol_table, self.record_table])
+                return None
+            else:
+                return None
         else:
-            p[0] = ("if_else", p[2], p[6], p[12])
+            func_name = self.symbol_table._scope.split("-")[1]
+            function = self.symbol_table.lookup_function(func_name)
+            list_variables = SymbolTable()
+            for var2 in function.body + function.parameters:
+                list_variables.add_variable(var2)
+            check_cond = p[2].infer_type(list_variables, self.record_table)
+            if check_cond != "bool":
+                SemanticError.print_sem_error("IF COND ERROR FUNC", [check_cond,list_variables, self.record_table, func_name])
+                return None
+            else:
+                return None
+
+    def p_if_statement(self, p):
+        """
+        if_statement : if_statement_header LBRACE NEWLINE sentence_list RBRACE
+                     | if_statement_header LBRACE NEWLINE sentence_list RBRACE ELSE COLON LBRACE NEWLINE sentence_list RBRACE
+        """
+
+
+    def p_while_header(self, p):
+        """
+        while_header : WHILE expression COLON
+        """
+        check_cond = p[2]
+
+        if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+            print(f"{check_cond.infer_type(self.symbol_table, self.record_table)}")
+            if check_cond.infer_type(self.symbol_table, self.record_table) != "bool":
+                SemanticError.print_sem_error("WHILE COND ERROR", [check_cond, self.symbol_table, self.record_table])
+                return None
+            else:
+                return None
+        else:
+            func_name = self.symbol_table._scope.split("-")[1]
+            function = self.symbol_table.lookup_function(func_name)
+            list_variables = SymbolTable()
+            for var2 in function.body + function.parameters:
+                list_variables.add_variable(var2)
+            check_cond = p[2].infer_type(list_variables, self.record_table)
+            if check_cond != "bool":
+                SemanticError.print_sem_error("WHILE COND ERROR FUNC",
+                                              [check_cond, list_variables, self.record_table, func_name])
+                return None
+            else:
+                return None
+
 
     def p_while_statement(self, p):
         """
-        while_statement : WHILE expression COLON LBRACE NEWLINE sentence_list RBRACE
+        while_statement : while_header LBRACE NEWLINE sentence_list RBRACE
         """
-        p[0] = ("while", p[2], p[6])
+
+
 
     def p_type_definition(self, p):
         """

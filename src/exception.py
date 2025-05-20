@@ -168,3 +168,25 @@ class SemanticError(Exception):
             print(f"\tFunction Call affected: {args[2]}")
             print(f"\tFunction Scope referece: {args[3]}")
             print("")
+
+        if type_error == "IF COND ERROR":
+            print("SEMANTIC ERROR DETECTED IN IF STATEMENT:")
+            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])} instead")
+            print("")
+
+        if type_error == "IF COND ERROR FUNC":
+            print("SEMANTIC ERROR DETECTED IN IF STATEMENT:")
+            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])}")
+            print(f"\tFunction Scope referece: {args[3]}")
+            print("")
+
+        if type_error == "WHILE COND ERROR":
+            print("SEMANTIC ERROR DETECTED IN WHILE STATEMENT:")
+            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])} instead")
+            print("")
+
+        if type_error == "WHILE COND ERROR FUNC":
+            print("SEMANTIC ERROR DETECTED IN WHILE STATEMENT:")
+            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])}")
+            print(f"\tFunction Scope referece: {args[3]}")
+            print("")
