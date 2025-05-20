@@ -112,3 +112,8 @@ class SemanticError(Exception):
             print("SEMANTIC ERROR DETECTED IN TYPE REFERENCE:")
             print(f"\ttype '{args[0]}' OBJECT has no attribute '{args[1]}'")
             print("")
+
+        if type_error == "Vector length error":
+            print("SEMANTIC ERROR DETECTED IN VECTOR LENGTH:")
+            print(f"\tCannot assign type {args[1]} to vector length")
+            print(f"\tVariable affected: {args[0]}")

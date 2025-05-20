@@ -453,6 +453,10 @@ class ViperParser:
             size = p[2]
             name = p[4]
             p[0] = Vector(name, None, size, None)
+            if p[0].length == None:
+                SemanticError.print_sem_error("Vector length error", [name, size])
+            p[0].datatype = None
+            return p[0]
 
     def p_assignment_declaration(self, p):
         """
