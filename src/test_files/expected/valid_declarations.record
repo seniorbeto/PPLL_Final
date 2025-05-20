@@ -1,0 +1,2 @@
+Point => [Variable(x,float,None), Variable(y,float,None)]
+Circle => [Variable(center,Point,None), Variable(radius,float,None)]

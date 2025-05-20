@@ -1,0 +1,7 @@
+
+int a, b = 10
+
+float a         # Error: redeclaración de variable
+
+# ERROR SEMÁNTICO: no se puede asignar un caracter a un booleano
+bool b = 'c'

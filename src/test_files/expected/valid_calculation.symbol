@@ -1,0 +1,3 @@
+f1:Variable(f1,float,None)
+f2:Variable(f2,float,None)
+b1:Variable(b1,bool,None)

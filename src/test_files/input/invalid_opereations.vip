@@ -1,0 +1,7 @@
+''' Fichero para comprobar errores semánticos en operaciones aritméticas '''
+
+int a = 5
+bool b = true
+
+# ERROR SEMÁNTICO: no se puede sumar un entero y un booleano
+int c = a + b
