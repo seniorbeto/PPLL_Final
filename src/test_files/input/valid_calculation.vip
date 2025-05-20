@@ -1,0 +1,7 @@
+''' Comparaciones aritméticas y booleanas'''
+
+float f1, f2
+bool b1
+
+f1 = 5 * 3 - 80 / 10
+f2 = 10 / 5 * f1

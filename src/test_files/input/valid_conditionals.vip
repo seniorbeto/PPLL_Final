@@ -1,0 +1,11 @@
+''' Fichero para comprobar el correcto funcionamiento de los condicionales'''
+
+bool positive
+float num
+
+if num >= 0: {
+    positive = true
+}
+else {
+    positive = false
+}

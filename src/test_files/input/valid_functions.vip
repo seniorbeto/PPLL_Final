@@ -18,3 +18,14 @@ float result = square(2.0)
 
 float result_2 = power(result, 3)
 
+# también se puede devolver un registro en una función
+
+type user {
+    int age
+}
+
+def user create_user(int age): {
+    user u
+    u.age = age
+    return u
+}

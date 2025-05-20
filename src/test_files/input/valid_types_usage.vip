@@ -1,0 +1,15 @@
+type Word : {
+    char[16] string
+}
+
+type Human : {
+    Word name, last_name1, last_name2
+    int age
+}
+
+Human person
+
+person.name.string[0] = 'J'
+person.name.string[1] = 'o'
+person.name.string[2] = 'h'
+person.name.string[3] = 'n'
