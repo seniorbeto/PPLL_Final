@@ -1,0 +1,7 @@
+Generating LALR tables
+para vector foo de tipo None y longitud Literal(20) se asigna el valor: None
+None
+key index, attr Variable(a,int,int)
+SEXO index, Variable(a,int,int)
+SymbolTable({'a': Variable(a,int,int), 'b': Variable(b,int,int), 'c': Variable(c,int,int), 'd': Variable(d,int,int), 'foo': Vector(foo,int,Literal(20),None)}, {})
+Record Table: {}

@@ -1,0 +1,13 @@
+Generating LALR tables
+para vector circle_vector de tipo None y longitud Literal(5) se asigna el valor: None
+None
+key index, attr Literal(0)
+SEXO index, Literal(0)
+key field, attr center
+key field, attr y
+key index, attr Literal(0)
+SEXO index, Literal(0)
+key field, attr center
+key field, attr x
+SymbolTable({'circle_vector': Vector(circle_vector,Circle,Literal(5),None)}, {})
+Record Table: {'Point': [Variable(x,float,None), Variable(y,float,None)], 'Circle': [Variable(center,Point,None), Variable(radius,float,None)]}

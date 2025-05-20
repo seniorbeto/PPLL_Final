@@ -1,0 +1,5 @@
+a:Variable(a,int,int)
+b:Variable(b,int,int)
+c:Variable(c,int,int)
+d:Variable(d,int,int)
+foo:Vector(foo,int,Literal(20),None)

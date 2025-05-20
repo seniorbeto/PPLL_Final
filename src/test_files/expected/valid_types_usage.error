@@ -1,0 +1,21 @@
+Generating LALR tables
+para vector string de tipo None y longitud Literal(16) se asigna el valor: None
+None
+key field, attr name
+key field, attr string
+key index, attr Literal(0)
+SEXO index, Literal(0)
+key field, attr name
+key field, attr string
+key index, attr Literal(1)
+SEXO index, Literal(1)
+key field, attr name
+key field, attr string
+key index, attr Literal(2)
+SEXO index, Literal(2)
+key field, attr name
+key field, attr string
+key index, attr Literal(3)
+SEXO index, Literal(3)
+SymbolTable({'person': Variable(person,Human,None)}, {})
+Record Table: {'Word': [Vector(string,char,Literal(16),None)], 'Human': [Variable(name,Word,None), Variable(last_name1,Word,None), Variable(last_name2,Word,None), Variable(age,int,None)]}
