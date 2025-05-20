@@ -113,7 +113,20 @@ class SemanticError(Exception):
             print(f"\ttype '{args[0]}' OBJECT has no attribute '{args[1]}'")
             print("")
 
+        if type_error == "No Vector Error":
+            print("SEMANTIC ERROR DETECTED IN VECTOR REFERENCE:")
+            print(f"\tAttribute '{args[0]}' is not a vector")
+            print(f"\tVariable affected: {args[1]}")
+            print("")
+
         if type_error == "Vector length error":
             print("SEMANTIC ERROR DETECTED IN VECTOR LENGTH:")
             print(f"\tCannot assign type {args[1]} to vector length")
             print(f"\tVariable affected: {args[0]}")
+            print("")
+
+        if type_error == "No Vector DEC Error":
+            print("SEMANTIC ERROR DETECTED IN VECTOR DEC:")
+            print(f"\tMissing index for vector {args[0]}")
+            print(f"\tVariable affected: {args[1]}")
+            print("")

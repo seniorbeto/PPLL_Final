@@ -236,10 +236,8 @@ class Vector:
     def __init__(self, name, datatype, length, value):
         self.name = name
         self.datatype = datatype
-        self.length = length if length.infer_type(None, None) == "int" else None
-        print(f"para vector {self.name} de tipo {self.datatype} y longitud {self.length} se asigna el valor: {value}")
+        self.length = length if length.infer_type(None, None) == "int" or length.infer_type(None, None) == "char" else None
         self.value = value
-        print(self.value)
 
     def infer_type(self, symbols, records):
         return self.datatype
