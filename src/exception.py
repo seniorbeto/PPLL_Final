@@ -130,3 +130,41 @@ class SemanticError(Exception):
             print(f"\tMissing index for vector {args[0]}")
             print(f"\tVariable affected: {args[1]}")
             print("")
+
+        if type_error == "Function not found":
+            print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
+            print(f"\tFunction '{args[0]}' not found")
+            print("")
+
+        if type_error == "Function not found FUNC":
+            print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
+            print(f"\tFunction '{args[0]}' not found")
+            print(f"\tFunction Scope referece: {args[1]}")
+            print("")
+
+
+        if type_error == "Function parameters mismatch":
+            print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
+            print(f"\tFunction '{args[0]}' takes {len(args[2])} parameters, but {len(args[1])} were provided")
+            print(f"\tVariables affected: {args[1]}")
+            print("")
+
+        if type_error == "Function parameters mismatch FUNC":
+            print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
+            print(f"\tFunction '{args[0]}' takes {len(args[2])} parameters, but {len(args[1])} were provided")
+            print(f"\tVariables affected: {args[1]}")
+            print(f"\tFunction Scope referece: {args[3]}")
+            print("")
+
+        if type_error == "Function error parameter":
+            print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
+            print(f"\tIncompatible Datatypes. Expected: {args[1].datatype if args[1].datatype != None else 'NONETYPE'} and provided: {args[2].datatype if args[2].datatype != None else 'NONETYPE'}")
+            print(f"\tFunction Call affected: {args[2]}")
+            print("")
+
+        if type_error == "Function error parameter FUNC":
+            print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
+            print(f"\tIncompatible Datatypes. Expected: {args[1].datatype if args[1].datatype != None else 'NONETYPE'} and provided: {args[2].datatype if args[2].datatype != None else 'NONETYPE'}")
+            print(f"\tFunction Call affected: {args[2]}")
+            print(f"\tFunction Scope referece: {args[3]}")
+            print("")

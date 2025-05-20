@@ -134,7 +134,73 @@ class ViperParser:
         """
         expression : ID LPAREN function_call_argument_list RPAREN
         """
-        p[0] = FunctionCall(p[1], p[3])
+        func_name = p[1]
+        func_params = p[3]
+        func_call = FunctionCall(func_name, func_params)
+
+
+        if self.symbol_table._scope.startswith("FUNCTIONBODY"):
+            func_scope_name = self.symbol_table._scope.split("-")[1]
+            function_scope = self.symbol_table.lookup_function(func_scope_name)
+            list_variables = SymbolTable()
+            for var2 in function_scope.body + function_scope.parameters:
+                list_variables.add_variable(var2)
+
+            if func_name not in self.symbol_table._functions.keys():
+                SemanticError.print_sem_error("Function not found FUNC", [func_name, func_scope_name])
+                func_call.datatype = None
+                p[0] = func_call
+                return None
+
+            function = self.symbol_table._functions[func_name]
+            if len(func_params) != len(function.parameters):
+                SemanticError.print_sem_error("Function parameters mismatch FUNC", [func_name, func_params, function.parameters, func_scope_name])
+                func_call.datatype = None
+                p[0] = func_call
+                return None
+
+            for parameter_to_pass, original_parameters in zip(func_params, function.parameters):
+                if not list_variables.exists_variable(parameter_to_pass.name):
+                    SemanticError.print_sem_error("Variable not found Function", [parameter_to_pass.name, func_scope_name])
+                    func_call.datatype = None
+                    p[0] = func_call
+                    return None
+                if parameter_to_pass.datatype != original_parameters.datatype:
+                    SemanticError.print_sem_error("Function error parameter FUNC",
+                                                  [parameter_to_pass, original_parameters, func_name, func_scope_name])
+            print(f"POR QUE FALLAS")
+            func_call.datatype = function.return_type
+            func_call.value = function.return_type
+            p[0] = func_call
+            return None
+
+        else:
+            if func_name not in self.symbol_table._functions.keys():
+                SemanticError.print_sem_error("Function not found", [func_name])
+                func_call.datatype = None
+                p[0] = func_call
+                return None
+
+            function = self.symbol_table._functions[func_name]
+            if len(func_params) != len(function.parameters):
+                SemanticError.print_sem_error("Function parameters mismatch", [func_name, func_params, function.parameters])
+                func_call.datatype = None
+                p[0] = func_call
+                return None
+
+            for parameter_to_pass, original_parameters in zip(func_params, function.parameters):
+                if not self.symbol_table.exists_variable(parameter_to_pass.name):
+                    SemanticError.print_sem_error("Variable not found", parameter_to_pass.name)
+                    func_call.datatype = None
+                    p[0] = func_call
+                    return None
+                if parameter_to_pass.datatype != original_parameters.datatype:
+                    SemanticError.print_sem_error("Function error parameter",
+                                                  [parameter_to_pass, original_parameters, func_name])
+
+            func_call.datatype = function.return_type
+            p[0] = func_call
+            return None
 
     def p_function_call_argument_list(self, p):
         """
@@ -143,7 +209,7 @@ class ViperParser:
                                     |
         """
         if len(p) == 4:
-            p[0] = p[1] + [p[3]]
+            p[0] = [p[1]] + [p[3]]
         elif len(p) == 2:
             p[0] = [p[1]]
         else:
@@ -444,29 +510,6 @@ class ViperParser:
                     var.datatype = None
                 p[0] = var
                 return None
-            """if reference_value == []:
-                func_name = self.symbol_table._scope.split("-")[1]
-                function = self.symbol_table.lookup_function(func_name)
-                list_variables = SymbolTable()
-                for var2 in function.body + function.parameters:
-                    list_variables.add_variable(var2)
-                var = list_variables.lookup_variable(identifier)
-
-                if var is None:
-                    SemanticError.print_sem_error("Variable not found Function",
-                                                  [identifier, func_name])
-                    p[0] = ("assignment", p[1], p[2], p[4])
-                    return None
-
-                actual_value = value.infer_type(list_variables, self.record_table) if not isinstance(value, Variable) else value.datatype
-                if var.datatype != actual_value:
-                    SemanticError.print_sem_error("Incompatible Types Assignment Function",
-                                                  [var.datatype, actual_value, identifier, func_name])
-            else:
-                print(f"YEYE aa{reference_value}")"""
-
-
-        #p[0] = ("assignment", p[1], p[2], p[4])
         p[0] = var
 
 

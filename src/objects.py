@@ -124,23 +124,17 @@ class VariableRef(Expression):
 class FunctionCall(Expression):
     def __init__(self, name, args):
         self.name = name
+        self.datatype = None
         self.args = args
+        self.value = None
 
     def infer_type(self, symbols, records):
-        func = symbols.lookup_function(self.name)
-        if not func:
-            raise SemanticError("Función no declarada: %s" % self.name)
-        # comprobar número de argumentos
-        if len(self.args) != len(func.parameters):
-            raise SemanticError("Función %s espera %d args, tuvo %d" %
-                                (self.name, len(func.parameters), len(self.args)))
-        # comprobar tipos
-        for expr, expected in zip(self.args, func.parameters):
-            actual = expr.infer_type(symbols, records)
-            if actual != expected:
-                raise SemanticError("Param %s: esperado %s, obtenido %s" %
-                                    (self.name, expected, actual))
-        return func.return_type
+        return self.datatype
+
+    def __str__(self):
+        return f"FunctionCall({self.name},{self.args})"
+    def __repr__(self):
+        return f"FunctionCall({self.name},{self.args})"
 
 class BinaryExpr(Expression):
     def __init__(self, op, left, right):
