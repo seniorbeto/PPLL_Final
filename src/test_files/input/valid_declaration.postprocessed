@@ -1,0 +1,8 @@
+type Point : {
+    int a, b
+}
+
+Point p
+int a,b
+
+p.a = p.b = 1

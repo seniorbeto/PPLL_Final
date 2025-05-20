@@ -1,3 +1,0 @@
-type Point: {
-    int x,y
-}

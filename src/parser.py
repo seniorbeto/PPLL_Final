@@ -161,24 +161,46 @@ class ViperParser:
         """
         name = p[1]
         reference = p[2]
-        var = "Tete"
-        if not self.symbol_table.exists_variable(name):
-            SemanticError.print_sem_error("Variable not found", name)
-            return Variable(name, None, None)
-        var = self.symbol_table.lookup_variable(name)
-        for key, attr in reference:
-            if key == 'field':
-                if (var.datatype not in self.record_table._basic_symbols
-                        and self.record_table.exists(var.datatype) == False):
-                    print("COÑA MALA ER")
-                else:
-                    print(f"var es {var}")
-                    if attr not in [atribute.name for atribute in self.record_table._table[var.datatype]]:
-                        print(f"El atributo no funsiona para {attr} con key {key} ER")
+        if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
+            if not self.symbol_table.exists_variable(name):
+                SemanticError.print_sem_error("Variable not found", name)
+                return Variable(name, None, None)
+            var = self.symbol_table.lookup_variable(name)
+            for key, attr in reference:
+                if key == 'field':
+                    if (var.datatype not in self.record_table._basic_symbols
+                            and self.record_table.exists(var.datatype) == False):
+                        print("COÑA MALA ER")
                     else:
-                        x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
-                        var = Variable(name, x[0], attr)
+                        if attr not in [atribute.name for atribute in self.record_table._table[var.datatype]]:
+                            print(f"El atributo no funsiona para {attr} con key {key} ER")
+                        else:
+                            x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                            var = Variable(name, x[0], attr)
+        else:
+            funct_name = self.symbol_table._scope.split("-")[1]
+            function = self.symbol_table.lookup_function(funct_name)
+            local_var_table = SymbolTable()
+            for var in function.body + function.parameters:
+                local_var_table.add_variable(var)
 
+            if not local_var_table.exists_variable(name):
+                SemanticError.print_sem_error("Variable not found Function", [name, funct_name])
+                return Variable(name, None, None)
+
+
+            for key, attr in reference:
+                if key == 'field':
+                    if (var.datatype not in self.record_table._basic_symbols
+                            and self.record_table.exists(var.datatype) == False):
+                        print("COÑA MALA ER")
+                    else:
+                        print(f"var es {var}")
+                        if attr not in [atribute.name for atribute in self.record_table._table[var.datatype]]:
+                            print(f"El atributo no funsiona para {attr} con key {key} ER")
+                        else:
+                            x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                            var = Variable(name, x[0], attr)
 
         p[0] = var
 
@@ -238,12 +260,13 @@ class ViperParser:
             else:
                 var = self.symbol_table.lookup_variable(identifier)
                 for key, attr in reference_value:
+                    print(f"key {key}, attr {attr}")
                     if key == 'field':
                         if var is None:
                             SemanticError.print_sem_error("Variable not found", identifier)
                         if (var.datatype not in self.record_table._basic_symbols
                             and self.record_table.exists(var.datatype) == False):
-                            print("COÑA MALA")
+                            SemanticError.print_sem_error("Type Error Not defined", [identifier, var.datatype])
                         else:
                             if var.datatype in self.record_table._basic_symbols or attr not in [atribute.name for atribute in  self.record_table._table[var.datatype]]:
                                 SemanticError.print_sem_error("Attribute of type", [var.datatype, attr])
@@ -251,7 +274,9 @@ class ViperParser:
                             else:
                                 x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
                                 var = Variable(identifier, x[0] , attr)
-
+                    else:
+                        #INDICE DE VECTOR
+                        print(f"SEXO {key}, {attr}")
                 actual_type = value.infer_type(self.symbol_table, self.record_table) if not isinstance(value, Variable) else value.datatype
                 if var.datatype != actual_type:
                     SemanticError.print_sem_error("Incompatible Types Assignment",
@@ -261,19 +286,21 @@ class ViperParser:
                 return None
         else:
             if reference_value == []:
+
                 func_name = self.symbol_table._scope.split("-")[1]
                 function = self.symbol_table.lookup_function(func_name)
                 list_variables = SymbolTable()
                 for var2 in function.body + function.parameters:
                     list_variables.add_variable(var2)
                 var = list_variables.lookup_variable(identifier)
+
                 if var is None:
                     SemanticError.print_sem_error("Variable not found Function",
                                                   [identifier, func_name])
                     p[0] = ("assignment", p[1], p[2], p[4])
                     return None
 
-                actual_value = value.infer_type(list_variables, self.record_table)
+                actual_value = value.infer_type(list_variables, self.record_table) if not isinstance(value, Variable) else value.datatype
                 if var.datatype != actual_value:
                     SemanticError.print_sem_error("Incompatible Types Assignment Function",
                                                   [var.datatype, actual_value, identifier, func_name])
@@ -541,7 +568,7 @@ class ViperParser:
         for var in function.body + function.parameters:
             local_var_table.add_variable(var)
 
-        result = return_statement.infer_type(local_var_table, self.record_table)
+        result = return_statement.infer_type(local_var_table, self.record_table) if return_statement != None else None
         if result == None:
             result = "NoneType"
         if result.upper() != function.return_type.upper():
@@ -625,4 +652,15 @@ class ViperParser:
         if not input_data.endswith("\n"):
             input_data += "\n"
 
-        return self.parser.parse(input_data, lexer=self.lexer.lexer)
+        result = self.parser.parse(input_data, lexer=self.lexer.lexer)
+
+        # Exportamos las tablas
+        with open(f"{self.route.replace(".postprocessed", "")}.symbol", "w") as file:
+            for symbol in self.symbol_table._variables:
+                file.write(f"{symbol}:{self.symbol_table._variables[symbol]}\n")
+
+        with open(f"{self.route.replace(".postprocessed", "")}.record", "w") as file:
+            for symbol in self.record_table._table:
+                file.write(f"{symbol}\n")
+
+        return result

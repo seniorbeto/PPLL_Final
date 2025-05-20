@@ -1,8 +1,0 @@
-// Árbol Sintáctico
-digraph {
-	0 [label=program]
-	1 [label=nl]
-	0 -> 1
-	2 [label=nl]
-	1 -> 2
-}

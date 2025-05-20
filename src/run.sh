@@ -2,55 +2,67 @@
 RED="\033[31m"
 GREEN="\033[32m"
 RESET="\033[0m"
-mkdir -p temp
+BLUE="\033[34m"
+
+mkdir -p output
 
 echo ""
-echo -e "\033[34m
-BATERÍA DE PRUEBAS PROCESADORES DE LENGUAJE\033[0m"
-echo -e "\033[31m
-        PRÁCTICA FINAL 'VIPER'\033[0m"
+echo -e "${BLUE}BATERÍA DE PRUEBAS PROCESADORES DE LENGUAJE${RESET}"
+echo -e "${RED}        PRÁCTICA FINAL 'VIPER'${RESET}"
 echo ""
 echo "Alberto Penas Díaz | Hector Álvarez Marcos"
 echo ""
 
 run_test() {
     local input_file="$1"
-    local expected_file="$2"
-    local output_file
-    output_file="temp/$(basename "$input_file" .vip)_test"
+    local base_name
+    base_name=$(basename "$input_file" .vip)
 
-    python3 main.py "$input_file" > "$output_file" 2> /dev/null
-    if cmp "$expected_file" "$output_file"; then
-        echo -e "Test $(basename "$input_file"): ${GREEN} SUCCESS ${RESET}"
+    # Ficheros de salida
+    local output_token="test_files/output/${base_name}.token"
+    local output_symbol="test_files/output/${base_name}.symbol"
+    local output_record="test_files/output/${base_name}.record"
+    local output_error="test_files/output/${base_name}.error"
+
+    # Ficheros esperados
+    local expected_token="test_files/expected/${base_name}.token"
+    local expected_symbol="test_files/expected/${base_name}.symbol"
+    local expected_record="test_files/expected/${base_name}.record"
+
+    # Ejecutar el compilador y redirigir la salida estándar de error
+    python3 main.py "$input_file" > "$output_error" 2>&1
+
+    for ext in token symbol record; do
+        src="test_files/input/${base_name}.${ext}"
+        dst="test_files/output/${base_name}.${ext}"
+        [ -f "$src" ] && mv "$src" "$dst"
+    done
+
+    # Comparar los ficheros generados con los esperados
+    for ext in token symbol record; do
+        local expected_file="test_files/expected/${base_name}.${ext}"
+        local output_file="test_files/output/${base_name}.${ext}"
+        if cmp -s "$expected_file" "$output_file"; then
+            echo -e "Test $base_name ($ext): ${GREEN}SUCCESS${RESET}"
+        else
+            echo -e "Test $base_name ($ext): ${RED}FAIL${RESET}"
+        fi
+    done
+
+    # Comprobar que el .error está vacío si no ha habido errores
+    if [ -s "$output_error" ]; then
+        echo -e "Test $base_name (error): ${RED}FAIL${RESET}"
     else
-        echo -e "Test $(basename "$input_file"): ${RED} FAIL ${RESET}"
+        echo -e "Test $base_name (error): ${GREEN}SUCCESS${RESET}"
     fi
+
+    echo ""
 }
 
 echo ""
-echo "TEST VÁLIDOS"
+echo "EJECUTANDO TESTS"
 echo ""
 
-run_test ./test_files/valid/v0_empty.vip ./test_files/valid/v0_empty_expected                                           # Fichero vacío
-run_test ./test_files/valid/v1_comment.vip ./test_files/valid/v1_comment_expected                                       # Fichero con comentarios
-run_test ./test_files/valid/v2_declarations.vip ./test_files/valid/v2_declarations_expected                             # Fichero con declaraciones
-run_test ./test_files/valid/v3_assignements.vip ./test_files/valid/v3_assignements_expected                             # Fichero con asignaciones
-run_test ./test_files/valid/v4_op_and_assign.vip ./test_files/valid/v4_op_and_assign_expected                           # Fichero con operadores y asignaciones múltiples
-run_test ./test_files/valid/v5_vec_assign.vip ./test_files/valid/v5_vec_assign_expected                                 # Fichero con asignaciones a vectores y operadores de registro
-run_test ./test_files/valid/v6_flux_control.vip ./test_files/valid/v6_flux_control_expected                             # Fichero con ifs, bucles y registros
-run_test ./test_files/valid/v7_functions.vip ./test_files/valid/v7_functions_expected                                   # Fichero con funciones y llamadas a funciones
-run_test ./test_files/valid/v8_all.vip ./test_files/valid/v8_all_expected
-
-
-echo ""
-echo "TEST INVÁLIDOS"
-echo ""
-
-# Comprobaremos únicamente errores de sintaxis, no léxicos (puesto que son triviales) ni semánticos
-run_test ./test_files/invalid/i0_multiple_assignment.vip ./test_files/invalid/i0_multiple_assignment_expected
-run_test ./test_files/invalid/i1_decl_and_parenthesis.vip ./test_files/invalid/i1_decl_and_parenthesis_expected
-run_test ./test_files/invalid/i2_flux_if.vip ./test_files/invalid/i2_flux_if_expected
-run_test ./test_files/invalid/i3_reassign.vip ./test_files/invalid/i3_reassign_expected
-run_test ./test_files/invalid/i4_blocks.vip ./test_files/invalid/i4_blocks_expected
-
-#rm -rf temp
+for input_file in test_files/input/*.vip; do
+    run_test "$input_file"
+done

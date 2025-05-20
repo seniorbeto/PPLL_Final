@@ -22,10 +22,10 @@ class Literal(Expression):
     def infer_type(self, symbols, records):
         if isinstance(self.value, bool):
             return 'bool'
-        if isinstance(self.value, int):
-            return 'int'
         if isinstance(self.value, float):
             return 'float'
+        if isinstance(self.value, int):
+            return 'int'
 
         if self.value == "true" or self.value == "false":
             return 'bool'
@@ -150,8 +150,8 @@ class BinaryExpr(Expression):
         self.value = None
 
     def infer_type(self, symbols, records):
-        lt = self.left.infer_type(symbols, records)
-        rt = self.right.infer_type(symbols, records)
+        lt = self.left.infer_type(symbols, records) if self.left != None else None
+        rt = self.right.infer_type(symbols, records) if self.right != None else None
         # Aritméticas
         if lt == None or rt == None:
             return None
@@ -228,6 +228,9 @@ class Variable:
     def __repr__(self):
         return f"Variable({self.name},{self.datatype},{self.value})"
 
+
+    def infer_type(self, symbols, records):
+        return self.datatype
 
 class Vector:
     def __init__(self, name, datatype, length, value):
