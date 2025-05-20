@@ -59,7 +59,7 @@ class SemanticError(Exception):
                 print("")
             else:
                 print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
-                print(f"\tIncompatible types: {args[0].upper()} and {args[1].upper()}")
+                print(f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}")
                 print(f"\tVariable affected: {args[2]}")
                 print("")
         if type_error == "Incompatible Types Assignment Function":
@@ -105,5 +105,10 @@ class SemanticError(Exception):
             print("")
         if type_error == "Redeclaration of Type Attr":
             print("SEMANTIC ERROR DETECTED IN TYPE DECLARATION:")
-            print(f"\ttype '{args[0]}' already has an attribute '{args[1]}'")
+            print(f"\ttype '{args[1]}' already has an attribute '{args[0]}'")
+            print("")
+
+        if type_error == "Attribute of type":
+            print("SEMANTIC ERROR DETECTED IN TYPE REFERENCE:")
+            print(f"\ttype '{args[0]}' OBJECT has no attribute '{args[1]}'")
             print("")

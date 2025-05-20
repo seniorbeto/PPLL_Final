@@ -16,6 +16,7 @@ class Expression:
 
 class Literal(Expression):
     def __init__(self, value):
+        self.datatype = None
         self.value = value
 
     def infer_type(self, symbols, records):
@@ -102,7 +103,14 @@ class VariableRef(Expression):
                 t = t[:-2]  # sacamos el tipo del elemento
         return t
         """
-
+    def __str__(self):
+        result = f"VariableRef({self.name}"
+        for kind, payload in self.ref_chain:
+            if kind == 'field':
+                result += f".{payload}"
+            elif kind == 'index':
+                result += f"[{payload}])"
+        return result
 
     def __repr__(self):
         result = f"{self.name}"

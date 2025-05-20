@@ -159,18 +159,26 @@ class ViperParser:
         """
         expression : ID reference
         """
-        var = VariableRef(p[1])
-        print(f"Mi referencia es {p[2]} y mi identificador es {p[1]} y mi var es {var}")
-        # P[1] es la lista de accesos a campos o índices recursivos
-        """
-        # DENTRO DE ADD_FIELD O ADD_INDEX SE VERIFICA QUE NO EXISTA ANTES
-        # EN LA TABLA DE SÍMBOLOS
-        for kind, payload in p[2]:
-            if kind == 'field':
-                var.add_field(payload, self.symbol_table, self.record_table)
-            else:  # 'index'
-                var.add_index(payload, self.symbol_table, self.record_table)
-        """
+        name = p[1]
+        reference = p[2]
+        var = "Tete"
+        if not self.symbol_table.exists_variable(name):
+            SemanticError.print_sem_error("Variable not found", name)
+            return Variable(name, None, None)
+        var = self.symbol_table.lookup_variable(name)
+        for key, attr in reference:
+            if key == 'field':
+                if (var.datatype not in self.record_table._basic_symbols
+                        and self.record_table.exists(var.datatype) == False):
+                    print("COÑA MALA ER")
+                else:
+                    print(f"var es {var}")
+                    if attr not in [atribute.name for atribute in self.record_table._table[var.datatype]]:
+                        print(f"El atributo no funsiona para {attr} con key {key} ER")
+                    else:
+                        x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                        var = Variable(name, x[0], attr)
+
 
         p[0] = var
 
@@ -205,7 +213,6 @@ class ViperParser:
         """
         identifier = p[1]
         reference_value = p[2]
-        print(reference_value)
         value = p[4]
         if not self.symbol_table._scope.__contains__("FUNCTIONBODY"):
             if reference_value == []:
@@ -214,35 +221,44 @@ class ViperParser:
                     SemanticError.print_sem_error("Variable not found", identifier)
 
                 else:
-                    if isinstance(value, VariableRef) and self.record_table.exists(value) == False:
+                    if isinstance(value, VariableRef) and self.record_table.exists(value.datatype) == False:
                         # SI ES UNA REFERENCIA QUE NO ESTA EN LA TABLA DE REGISTROS NO ES NADA, ERROR SEMANTICO
                         SemanticError.print_sem_error("Type Error Not defined", [identifier, value])
                     else:
                         #COMPROBACION DE DATATYPE == VALOR ASIGNADO
-                        print(f"value es {value} y var es {var} y identifier es {identifier}")
-                        actual_type = value.infer_type(self.symbol_table, self.record_table)
+                        actual_type = value.infer_type(self.symbol_table, self.record_table) if not isinstance(value, Variable) else value.datatype
                         if var.datatype != actual_type:
                             SemanticError.print_sem_error(
                                 "Incompatible Types Assignment",
                                 [var.datatype, actual_type, identifier, self.symbol_table, self.record_table]
                             )
+                            var.datatype = None
+                            p[0] = var
+                            return None
             else:
-                print(f"YEYEaf{reference_value} con id {identifier} con vaule {value}")
+                var = self.symbol_table.lookup_variable(identifier)
                 for key, attr in reference_value:
-                    print(self.record_table)
                     if key == 'field':
-                        var = self.symbol_table.lookup_variable(identifier)
                         if var is None:
                             SemanticError.print_sem_error("Variable not found", identifier)
                         if (var.datatype not in self.record_table._basic_symbols
                             and self.record_table.exists(var.datatype) == False):
                             print("COÑA MALA")
                         else:
-                            if attr not in [atribute.name for atribute in  self.record_table._table[var.datatype]]:
-                                print("El atributo no funsiona")
+                            if var.datatype in self.record_table._basic_symbols or attr not in [atribute.name for atribute in  self.record_table._table[var.datatype]]:
+                                SemanticError.print_sem_error("Attribute of type", [var.datatype, attr])
+                                var = Variable(identifier, None, attr)
                             else:
-                                pass
+                                x = [atribute.datatype for atribute in self.record_table._table[var.datatype]]
+                                var = Variable(identifier, x[0] , attr)
 
+                actual_type = value.infer_type(self.symbol_table, self.record_table) if not isinstance(value, Variable) else value.datatype
+                if var.datatype != actual_type:
+                    SemanticError.print_sem_error("Incompatible Types Assignment",
+                                      [var.datatype, actual_type, identifier, self.symbol_table, self.record_table])
+                    var.datatype = None
+                p[0] = var
+                return None
         else:
             if reference_value == []:
                 func_name = self.symbol_table._scope.split("-")[1]
@@ -262,11 +278,11 @@ class ViperParser:
                     SemanticError.print_sem_error("Incompatible Types Assignment Function",
                                                   [var.datatype, actual_value, identifier, func_name])
             else:
-                print(f"YEYE{reference_value}")
-                for kind, payload in reference_value:
-                    print(f" {kind }, {payload}")
+                print(f"YEYE aa{reference_value}")
 
-        p[0] = ("assignment", p[1], p[2], p[4])
+
+        #p[0] = ("assignment", p[1], p[2], p[4])
+        p[0] = var
 
 
     def p_declaration(self, p):
@@ -429,6 +445,8 @@ class ViperParser:
         if_statement : IF expression COLON LBRACE NEWLINE sentence_list RBRACE
                      | IF expression COLON LBRACE NEWLINE sentence_list RBRACE ELSE COLON LBRACE NEWLINE sentence_list RBRACE
         """
+        # Tenemos que comprobar que la expresión del if sea de tipo booleano
+        p[2].infer_type()
         if len(p) == 8:
             p[0] = ("if", p[2], p[6])
         else:

@@ -4,8 +4,6 @@ type Tuper: {
     int param
 }
 
-
-
 def Tuper Perro(int final):{
 
     int putero
@@ -14,7 +12,6 @@ def Tuper Perro(int final):{
 
     return retorno
 }
-
 
 int a, b, c, d, e, f, g, h, i, j = 3
 
@@ -25,7 +22,10 @@ def Perro square(int i,b,c = 5):{
     while i < j: {
     i = i + 1
     }
-    return i * i
+
+    Perro retorno
+
+    return retorno
 }
 
 
@@ -34,8 +34,14 @@ float c
 
 '''
 
+
+type reaux: {
+    int b
+}
+
+
 type aux: {
-    int a
+    reaux a
 }
 
 type Point: {
@@ -46,29 +52,24 @@ type Human: {
     char[20] name
 }
 
+
+
 Point coord
 
 Human salao
 
 
-salao = coord.x.a = 3
 
-int a = ppolla[300000]
-
-coord.x
-
+int tuabuela
+int pepe
+int sala = 5
 
 
-
-def int suma(Human salao; float b):{
-
-    salao.nombre[0] = 'S'
-    salao.nombre[1] = 'a'
-    salao.nombre[2] = 'l'
-    salao.nombre[3] = 'a'
-    salao.nombre[4] = 'o'
+tuabuela = pepe = 5
 
 
-    return c
-}
+
+pepe = coord.x.a.d.r = tuabuela = 4 + 5
+
+
 
