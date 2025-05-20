@@ -1,0 +1,6 @@
+int a, b, c, d = 10
+c = 20
+
+int[20] foo
+
+foo[a] = c

@@ -656,15 +656,18 @@ class ViperParser:
         if not input_data.endswith("\n"):
             input_data += "\n"
 
+        if not input_data.startswith("\n"):
+            input_data = "\n" + input_data
+
         result = self.parser.parse(input_data, lexer=self.lexer.lexer)
 
         # Exportamos las tablas
-        with open(f"{self.route.replace(".postprocessed", "")}.symbol", "w") as file:
+        with open(f"{self.route.replace(".postprocessed", "").replace(".vip", "")}.symbol", "w") as file:
             for symbol in self.symbol_table._variables:
                 file.write(f"{symbol}:{self.symbol_table._variables[symbol]}\n")
 
-        with open(f"{self.route.replace(".postprocessed", "")}.record", "w") as file:
+        with open(f"{self.route.replace(".postprocessed", "").replace(".vip", "")}.record", "w") as file:
             for symbol in self.record_table._table:
-                file.write(f"{symbol}\n")
+                file.write(f"{symbol} => {self.record_table._table[symbol]}\n")
 
         return result

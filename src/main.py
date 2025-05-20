@@ -15,7 +15,7 @@ from pprint import pprint as pp
 class Main:
     def __init__(self, route, export_tree):
         self.__route = os.path.join(os.path.dirname(__file__), route)
-        self.__lexer = ViperLexer(self.__route, allow_preprocess=True)
+        self.__lexer = ViperLexer(self.__route, allow_preprocess=False)
         self.__lexer.build()
         self.__lexer.run()
         self.__parser = ViperParser(self.__lexer)

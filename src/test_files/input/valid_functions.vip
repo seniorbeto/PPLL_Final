@@ -1,0 +1,20 @@
+'''Declaración y uso de Funciones'''
+
+def float square(float x): {
+    return x * x
+}
+
+def float power(float f; int i): {
+    float r = 1
+    int s = 1
+    while s < i: {
+        r = r * f
+        s = s + 1
+    }
+    return r
+}
+
+float result = square(2.0)
+
+float result_2 = power(result, 3)
+

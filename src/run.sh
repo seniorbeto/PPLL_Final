@@ -6,9 +6,12 @@ BLUE="\033[34m"
 
 mkdir -p output
 
+# Borramos todos los ficheros de output
+rm -f test_files/output/*
+
 echo ""
 echo -e "${BLUE}BATERÍA DE PRUEBAS PROCESADORES DE LENGUAJE${RESET}"
-echo -e "${RED}        PRÁCTICA FINAL 'VIPER'${RESET}"
+echo -e "${GREEN}        PRÁCTICA FINAL 'VIPER'${RESET}"
 echo ""
 echo "Alberto Penas Díaz | Hector Álvarez Marcos"
 echo ""

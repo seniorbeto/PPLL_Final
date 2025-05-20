@@ -1,0 +1,12 @@
+type Point : {
+    float x, y
+}
+
+type Circle : {
+    Point center
+    float radius
+}
+
+Circle[5] circle_vector
+
+circle_vector[0].center.x = circle_vector[0].center.y = 0.5

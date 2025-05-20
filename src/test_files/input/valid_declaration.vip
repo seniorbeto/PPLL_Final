@@ -1,7 +1,0 @@
-type Point : {
-    float a, b
-}
-
-Point p
-
-p.a = p.b = 1
