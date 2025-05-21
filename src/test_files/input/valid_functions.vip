@@ -14,11 +14,18 @@ def float power(float f; int i): {
     return r
 }
 
-float result_2 = power(2, 3)
+
 
 # también se puede devolver un registro en una función
 
-type user {
+float result_2 = power(2.0, 30)
+
+float[5] float_vector
+
+float result_3 = power(float_vector[1], 3)
+
+
+type user: {
     int age
 }
 

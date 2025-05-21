@@ -1,0 +1,12 @@
+SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:
+	Incompatible types: INT and BOOL
+	Variables Affected: a
+
+SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:
+	Incompatible types: BOOL and INT
+	Variables Affected: c
+
+SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:
+	Incompatible types: CHAR and FLOAT
+	Variables Affected: d
+

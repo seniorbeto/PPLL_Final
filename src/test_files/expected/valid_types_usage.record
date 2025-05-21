@@ -1,2 +1,2 @@
-Word => [Vector(string,char,Literal(16),None)]
-Human => [Variable(name,Word,None), Variable(last_name1,Word,None), Variable(last_name2,Word,None), Variable(age,int,None)]
+Word => [Vector[char] string]
+Human => [Word name, Word last_name1, Word last_name2, int age]

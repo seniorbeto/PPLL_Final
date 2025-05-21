@@ -1,0 +1,12 @@
+SEMANTIC ERROR DETECTED IN IF STATEMENT:
+	Expected a boolean value for the condition, got int instead
+
+SEMANTIC ERROR DETECTED IN FUNCTION CALL:
+	Function 'print' not found
+
+SEMANTIC ERROR DETECTED IN IF STATEMENT:
+	Expected a boolean value for the condition, got char instead
+
+SEMANTIC ERROR DETECTED IN FUNCTION CALL:
+	Function 'print' not found
+

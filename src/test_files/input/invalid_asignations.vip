@@ -1,4 +1,4 @@
-int a = true      # Asignar bool a int
-float b = 'c'     # Asignar char a float, permitido solo si hay conversión, pero la especificación la limita
-bool c = 7        # Asignar int a bool (no permitido)
-char d = 2.5      # Asignar float a char
+int a = true           # Asignar bool a int
+float b = 'c'    # Asignar char a float, permitido solo si hay conversión, pero la especificación la limita
+bool c = 7             # Asignar int a bool (no permitido)
+char d = 2.5           # Asignar float a char

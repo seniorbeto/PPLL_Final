@@ -1,0 +1,18 @@
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Variable 'x' not found or out of scope
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Variable 'a' not found or out of scope
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Variable 'b' not found or out of scope
+
+SEMANTIC ERROR DETECTED IN IF STATEMENT:
+	Expected a boolean value for the condition, got None instead
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Variable 'a' not found or out of scope
+
+SEMANTIC ERROR DETECTED IN FUNCTION CALL:
+	Function 'print' not found
+

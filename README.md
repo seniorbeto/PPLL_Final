@@ -1,149 +1,264 @@
-# Entrega Parcial Práctica Final 'Viper'
-**Procesadores del Lenguaje**
+# Entrega Final – Procesadores del Lenguaje
 
-**Alberto Penas Díaz**:
+## Autores
 
-NIA: 100471939 
+| Nombre                    | NIA       | Correo                                                        | Titulación             |
+| ------------------------- | --------- | ------------------------------------------------------------- | ---------------------- |
+| **Alberto Penas Díaz**    | 100471939 | [100471939@alumnos.uc3m.es](mailto:100471939@alumnos.uc3m.es) | Ingeniería Informática |
+| **Héctor Álvarez Marcos** | 100495794 | [100495794@alumnos.uc3m.es](mailto:100495794@alumnos.uc3m.es) | Ingeniería Informática |
 
-Correo: 100471939@alumnos.uc3m.es Titulación: Ingeniería informática 
-
-**Héctor Álvarez Marcos**:
-
-NIA: 100495794 
-
-Correo: 100495794@alumnos.uc3m.es Titulación: Ingeniería informática 
-
-Alberto Penas Díaz | Héctor Álvarez Marcos 
-
-Entrega Parcial Ejercicio Final  
+---
 
 ## Índice
 
-1. [Analizador Léxico](#Analizador-Léxico)
-2. [Analizador Sintáctico](#Analizador-Sintáctico)  
-   - [Definición formal de la gramática](#Definición-formal-de-la-gramática)  
-   - [Decisiones principales de diseño de la gramática](#Decisiones-principales-de-diseño-de-la-gramática)
-3. [Batería de Pruebas](#Batería-de-Pruebas)  
-   - [Aclaraciones Importantes](#Aclaraciones-Importantes)
-4. [Contenido Extra: Visualización del Árbol Sintáctico](#Contenido-Extra-Visualización-del-Árbol-Sintáctico)
+1. [Introducción](#introducción)
+2. [Corrección de Errores](#corrección-de-errores)
 
-# <a name="_page2_x72.00_y104.53"></a>Analizador Léxico
-Para el analizador léxico, hemos definido la secuencia de tokens que se han especificado en el enunciado,  teniendo  en  cuenta  como  tokens  los  comentarios  simples  y  los  comentarios multilínea, para llevar un conteo de la línea del código actual, usada para llevar a cabo una forma trazable de recuperación de errores. Se han definido, además, una serie de palabras reservadas, de nuevo, las especificadas en el enunciado. 
+   1. [Análisis Léxico](#análisis-léxico)
+   2. [Análisis Sintáctico](#análisis-sintáctico)
+3. [Gramática Final](#gramática-final)
+4. [Decisiones de Diseño](#decisiones-de-diseño)
+5. [Pruebas](#pruebas)
+6. [Contenido Extra](#contenido-extra)
 
-A tener en cuenta, esta vez se exporta un fichero .token con los tokens hallados en el fichero de entrada. Cabe mencionar que se espera que el fichero de entrada tenga extensión .vip, ya que de no ser así, el fichero de tokens reescribirá el fichero de entrada. 
-# <a name="_page2_x72.00_y286.34"></a>Analizador Sintáctico
-Para el desarrollo de la gramática, se ha seguido cuidadosamente los requisitos y limitaciones del  enunciado,  habiendo  optado  (por  simplicidad  y  limpieza  de  código)  no  usar  las indentaciones propuestas, si no los *brackets* de apertura y cierre.    
+   1. [Scope de funciones (variables locales)](#scope-de-funciones-variables-locales)
+   2. [Recuperación de errores](#recuperación-de-errores)
+   3. [Preprocesado del fichero](#preprocesado-del-fichero)
+7. [Conclusiones](#conclusiones)
 
-# <a name="_page2_x72.00_y372.95"></a>Definición formal de la gramática 
+---
 
-De manera formal, nuestro diseño de gramática es el siguiente: 
+## Introducción
 
-G = {NT, T, P, S} 
+Esta memoria describe el desarrollo completo del **ejercicio final** de la asignatura *Procesadores del Lenguaje*. Se exponen las fases de implementación y las mejoras realizadas sobre entregas anteriores. El objetivo principal ha sido construir un compilador funcional que integre correctamente el análisis léxico, sintáctico y semántico, cumpliendo con los requisitos del enunciado.
 
-∑NT={ S,program, statement\_list, statement, declaration, assignment, if\_statement, while\_statement, register,  var\_list,  var\_decl,  decl\_assign,  reference,  rest\_ref, funct\_decl, funct\_call, arg\_funct\_call, type\_funct,  arg\_funct,  arg\_funct2,  arg\_funct\_rec,  extra, another, block\_funct, funct\_ret, newlines, else, block, expression}
+Además, se incorporan mejoras destinadas a aumentar la robustez y el mantenimiento del sistema, entre ellas:
 
-∑T={  INT\_TYPE,  FLOAT\_TYPE,  CHAR\_TYPE,  BOOL\_TYPE,  ID,  TYPE,  TRUE,  FALSE, COMMENT, MLCOMMENT, DEF, RETURN, IF, ELSE, WHILE, DOT, LBRACKET, RBRACKET, LBRACE,  RBRACE,  LPAREN,  RPAREN,  COMMA,  COLON,  SEMICOLON,  PLUS,  MINUS, TIMES, DIVIDE, GT, LT, GE, LE, EQ, EQUALS,  AND, OR, NOT, DECIMAL, BINARY, OCTAL, HEXADECIMAL, FLOAT\_CONST, CHAR\_CONST,NEWLINE } 
+* detección y recuperación de errores más exhaustiva,
+* reducción sustancial de la complejidad gramatical,
+* sistema de **preprocesado** previo al análisis léxico.
 
-P = { 
+En los apartados siguientes se detallan las decisiones tomadas, la gramática final, el enfoque semántico y los mecanismos de gestión de ámbito y errores. También se recogen funcionalidades adicionales que, sin ser obligatorias, añaden valor al proyecto.
 
-S ::= program 
+---
 
-program ::= statement\_list 
-| λ 
+## Corrección de Errores
 
-statement\_list ::= statement\_list statement   | statement 
+Hemos solucionado numerosos problemas detectados en la segunda entrega para evitar arrastrarlos a la versión final.
 
-statement ::= declaration NEWLINE | assignment NEWLINE | if\_statement | TYPE register | while\_statement | COMMENT NEWLINE | MLCOMMENT NEWLINE 
-| funct\_decl  | funct\_call NEWLINE | NEWLINE 
+### Análisis Léxico
 
-declaration ::= INT\_TYPE var\_list | FLOAT\_TYPE var\_list   | CHAR\_TYPE var\_list | BOOL\_TYPE var\_list 
- | ID var\_list 
+* La extensión original `.vip` ya **no se reemplaza** por `.token`; ahora se anexa al nombre del fichero.
+* Se reconocen números en **notación científica**.
+* Los ceros no significativos se tokenizan individualmente; por ejemplo, `00001,3` genera cuatro tokens `INT(0)` y un token `FLOAT(1,3)`.
+* Se unifica la categoría de enteros (`INT`) para valores en base 2, 8, 10 y 16.
+* Corrección del reconocimiento de **caracteres individuales**: sólo se permiten valores ASCII extendidos.
 
-register ::= ID COLON block 
+### Análisis Sintáctico
 
-var\_decl ::= ID decl\_assign | LBRACKET expression RBRACKET ID decl\_assign decl\_assign ::= EQUALS expression  | λ 
+* Se ha simplificado la gramática (ver apartado [Gramática Final](#gramática-final)).
+* Se impide la declaración de **funciones dentro de funciones** y de **tipos dentro de tipos**.
 
-var\_list ::= var\_list COMMA var\_decl | var\_decl 
+---
 
-assignment ::= reference EQUALS assignment  | reference EQUALS expression reference ::= ID rest\_ref 
+## Gramática Final
 
-rest\_ref ::= λ  | DOT ID rest\_ref | LBRACKET expression RBRACKET rest\_ref funct\_decl ::= DEF type\_funct ID LPAREN arg\_funct RPAREN COLON block\_funct funct\_call ::= ID LPAREN arg\_funct\_call RPAREN 
+La gramática se basa en las directrices mostradas en las prácticas, con las correcciones y simplificaciones oportunas. A continuación se presenta la definición formal (BNF abreviada):
 
-arg\_funct\_call ::= expression COMMA arg\_funct\_call | expression | λ 
+```bnf
+<program> ::= <statement_list>
+           		 | ε
 
-type\_funct ::= INT\_TYPE  | FLOAT\_TYPE | BOOL\_TYPE  | CHAR\_TYPE  | ID arg\_funct ::= type\_funct arg\_funct2 | λ 
+<statement_list> ::= <statement_list> <statement>
+                   | <statement>
 
-arg\_funct2 ::= ID extra another 
+<statement> ::= <sentence> NEWLINE
+              | <type_definition> NEWLINE
+              | <function_definition> NEWLINE
+              | NEWLINE
 
-arg\_funct\_rec ::= type\_funct ID extra another 
+<sentence_list> ::= <sentence_list> <sentence> NEWLINE
+                 | <sentence> NEWLINE
 
-extra ::= COMMA ID extra | λ 
+<sentence> ::= <expression>
+             | <assignment>
+             | <declaration>
+             | <if_statement>
+             | <while_statement>
 
-another ::= SEMICOLON arg\_funct\_rec | λ 
+<expression> ::= <expression> PLUS <expression>
+               | <expression> MINUS <expression>
+               | <expression> TIMES <expression>
+               | <expression> DIVIDE <expression>
+               | <expression> EQ <expression>
+               | <expression> GT <expression>
+               | <expression> LT <expression>
+               | <expression> GE <expression>
+               | <expression> LE <expression>
+               | <expression> AND <expression>
+               | <expression> OR <expression>
+               | NOT <expression>
+               | MINUS <expression>
+               | PLUS <expression>
+               | INT
+               | FLOAT
+               | CHAR
+               | TRUE
+               | FALSE
+               | ID LPAREN <function_call_argument_list> RPAREN
+               | LPAREN <expression> RPAREN
+               | ID <reference>
 
-block\_funct ::= newlines LBRACE statement\_list funct\_ret RBRACE NEWLINE funct\_ret ::= RETURN expression newlines 
+<function_call_argument_list> ::= <expression> COMMA <function_call_argument_list>
+                               | <expression>
+                               | ε
 
-newlines ::= NEWLINE | λ 
+<reference> ::= LBRACKET <expression> RBRACKET <reference>
+             | DOT ID <reference>
+             | ε
 
-if\_statement ::= IF expression COLON block else\_ else\_ ::= newlines ELSE COLON block  | NEWLINE while\_statement ::= WHILE expression COLON block block ::= newlines LBRACE statement\_list RBRACE 
+<assignment> ::= ID <reference> EQUALS <expression>
+               | ID <reference> EQUALS <assignment>
 
-expression ::= expression PLUS expression | expression MINUS expression 
-| expression TIMES expression | expression DIVIDE expression | expression EQ expression   | expression GT expression  | expression LT expression  | expression GE expression 
-| expression LE expression | expression AND expression | expression OR expression 
-| NOT expression | MINUS expression | PLUS expression | LPAREN expression RPAREN   | DECIMAL | BINARY | OCTAL | HEXADECIMAL | FLOAT\_CONST | TRUE  | FALSE   | CHAR\_CONST | funct\_call | reference 
+<declaration> ::= INT_TYPE <variable_list>
+                | FLOAT_TYPE <variable_list>
+                | BOOL_TYPE <variable_list>
+                | CHAR_TYPE <variable_list>
+                | ID <variable_list>
 
-} 
-## <a name="_page4_x72.00_y374.29"></a>Decisiones principales de diseño de la gramática 
-Las decisiones de diseño principales de la gramática han sido el cómo consideramos nosotros el  tratamiento  de  los  “newlines”.  Básicamente consideramos tanto uno como n newlines seguidos un único token newline, por lo que por ejemplo, en los casos de control de flujo if/else, entre el cierre de llaves del if y del else puede haber tantos \n como guste, como ocurre en otros lenguajes, no hemos querido hacer limitación en eso. Otro punto es el tema ya mencionado de la elección de brackets, ya que para mantener una estructura limpia, todos los tokens  de  llave  derecha  “}”,  que  implican  el  cierre  de  una  serie  de  sentencias,  de  un controlador de flujo o de un bloque de función van a ir seguidos de un salto de linea, con el fin de evitar nuevas declaraciones o sentencias en la misma línea del cierre de llaves. El único caso en el que esto no funciona así es en el bucle if/else, ya que se permite que justo después del cierre del bloque if, sí y sólo si va un “else”, se permita ponerlo a la misma altura. De esta forma: 
+<declaration_list> ::= <declaration_list> <declaration> NEWLINE
+                     | <declaration> NEWLINE
 
-if b: {
+<variable_list> ::= <variable_list> COMMA <variable_declaration>
+                  | <variable_declaration>
 
-x = x + 1
+<variable_declaration> ::= ID <assignment_declaration>
+                        | LBRACKET <expression> RBRACKET ID
 
-} else : {   
+<assignment_declaration> ::= EQUALS <expression>
+                          | ε
 
-x = x - 1       
+<if_statement_header> ::= IF <expression> COLON
 
-}  
-Este es el único caso en el que se puede escribir algo que
-no  sea  después de un cierre de llaves
-Tampoco  se  podrá  realizar  el  cierre  de  múltiples  bloques  de  llaves  de  forma consecutiva(“}}}...”) ya que como se ha dicho, después de cada llave tiene que existir un salto de línea. 
+<if_statement> ::= <if_statement_header> LBRACE NEWLINE <sentence_list> RBRACE
+                 | <if_statement_header> LBRACE NEWLINE <sentence_list> RBRACE ELSE COLON LBRACE NEWLINE <sentence_list> RBRACE
 
-Otro tema a considerar es que nosotros dentro de los índices de un vector permitimos al lenguaje  encapsular  todo  tipo  de  expresiones,  incluidas  por  ejemplo  las  de  tipo  float  y booleano,  pese  a  que  sabemos que luego en el semántico va a producir error porque se necesita una expresión de tipo entero, pero entendemos que eso es un punto a tratar en la próxima parte de la práctica. Por ende, el resto \*de momento\* son válidos. Así pues, se puede asignar al índice de un vector la llamada a una función. Luego será cosa del sintáctico el verificar por ejemplo que esa función tenga una sentencia de retorno que sea de tipo entero, pero a ese punto no tenemos que llegar todavía, simplemente se han descartado las opciones que son sintácticamente incorrectas. 
+<while_header> ::= WHILE <expression> COLON
 
-Cabe mencionar, además, que cuando existe algún error sintáctico en el fichero de entrada, se imprime la línea en la que se encuentra, de forma en la que se señala exactamente dónde se encuentra el error y se recupera del mismo pasando directamente a la siguiente línea. 
-# <a name="_page5_x72.00_y394.43"></a> Batería de Pruebas
-Para la batería de pruebas, hemos generado un *shell script* con distintos casos de prueba. Estos casos siguen la estructura “v[n]\_[referencia\_a\_funcionalidad\_test]” ∀ n ∈ ℕ y se basan en  la  generación  de  un  archivo  temporal en el directorio /temp (el cual es eliminado al finalizar la ejecución de las pruebas) y la comparación de este fichero con la salida esperada almacenada en los ficheros con estructura “v[n]\_[referencia\_a\_funcionalidad\_test]\_expected” ∀ n ∈ ℕ. 
+<while_statement> ::= <while_header> LBRACE NEWLINE <sentence_list> RBRACE
 
-Si se quisiera visualizar la salida de cada uno de los ficheros de entrada del programa, basta con  comentar  o eliminar la última sentencia del fichero de test *run.sh*, que es la que se encarga  de  eliminar  el  directorio  temporal  que  se  ha creado. Esto se puede hacer de la siguiente manera:  
+<type_definition> ::= <type_definition_header> <type_definition_body>
 
-\# rm -rf temp 
+<type_definition_header> ::= TYPE ID COLON LBRACE NEWLINE
 
-Por  otra  parte,  los  casos  inválidos  tratan  de  explorar  los  “casos  límite”  de  nuestra implementación, revisando la gestión de errores tanto en la apertura del archivo de entrada, como errores reconocidos en el ámbito del léxico, del sintáctico, como errores puramente matemáticos, como la no división por 0. Estos casos de error siguen la misma estructura que los válidos, pero con nombre “i[n]\_[referencia\_a\_funcionalidad\_test].vip” ∀ n ∈ ℕ. 
+<type_definition_body> ::= <declaration_list> RBRACE
 
-En cada uno de los ficheros de los casos de prueba se explica más en detalle qué se está tratando de comprobar específicamente, todos ellos situados en el directorio test\_files. 
-## <a name="_page6_x72.00_y104.53"></a>Aclaraciones Importantes 
-**IMPORTANTE**: esta práctica se ha desarrollado en equipos linux. Para ejecutar un fichero de  Python  en  equipos  con  arquitectura  linux,  basta  con  poner  en  terminal  python3 <nombre del archivo>.Sin  embargo  esto  puede  cambiar en equipos con MacOS o Windows, ya que es posible que para ejecutar un fichero de python en estos equipos haya que introducir por terminal python <nombre del archivo>.Si este fuera el caso, solo hace falta cambiar la linea 22 del fichero run.sh de la siguiente manera:  
+<function_header> ::= DEF <function_type> ID
 
-Cambiar:  
+<function_header_and_parameters> ::= <function_header> LPAREN <argument_list> RPAREN
 
-python3 main.py "$input\_file" > "$output\_file" por:
+<function_before_body> ::= <function_header_and_parameters> COLON LBRACE NEWLINE
 
-python main.py "$input\_file" > "$output\_file" 
+<function_definition> ::= <function_before_body> <sentence_function> RETURN <expression> <newlines> RBRACE
 
-Además, es importante mencionar que si no se puede ejecutar el fichero run.sh, es posible que haya que darle permisos de administrador con el comando chmod +x run.sh 
-# <a name="_page6_x72.00_y426.29"></a>Contenido Extra: Visualización del Árbol Sintáctico
-Para facilitar el desarrollo del árbol sintáctico, se ha utilizado una herramienta para poder visualizar de forma gráfica el árbol resultante de la siguiente manera:  
+<newlines> ::= NEWLINE
+             | ε
 
-![](./doc/foto_arbol_readme_md.jpeg)
+<sentence_function> ::= <sentence_list>
+                     | ε
 
-Este árbol nos sirve como base para ver cómo se está formando la gramática **pero no es explícitamente el árbol que genera un analizador sintáctico LALR**. Se ha generado para ayudarnos a ver gráficamente cómo se producen las derivaciones de las reglas de producción. Para la ejecución del mismo, se ha modificado levemente el protocolo de lanzamiento del programa, de forma que si se quiere exportar dicho árbol, se ha de introducir por terminal la siguiente sentencia:  
+<function_type> ::= INT_TYPE
+                 | FLOAT_TYPE
+                 | BOOL_TYPE
+                 | CHAR_TYPE
+                 | ID
 
-python3 main.py true
+<argument_list> ::= <declaration> SEMICOLON <argument_list>
+                 | <declaration>
+                 | ε
 
-Es necesario que el tercer parámetro de la sentencia sea la palabra “true”. En caso de no serlo, se imprimirá por terminal un mensaje de error, explicando cómo se tiene que ejecutar. Es muy importante mencionar, además, que esta visualización depende del paquete “graphviz”, por lo que para usarlo se deberá tener instalado. Lo que no quiere decir que el programa no pueda usarse en caso de no tenerlo: es puramente opcional. 
+```
 
-Los resultados obtenidos se guardarán en el directorio /tree\_gen/ en formato pdf 
-7 
+*Para evitar conflictos shift/reduce en la construcción `if/else`, el token `ELSE` debe aparecer en la **misma línea** que el corchete de cierre del bloque `if`.*
 
+Con el fin de mantener la gramática limpia y reutilizable, empleamos reglas comunes —por ejemplo, `declaration`— tanto en atributos de registros como en listas de argumentos. Las restricciones que esto introduce (p.ej., prohibir asignaciones en dichos contextos) se delegan al **análisis semántico**.
 
+---
+
+## Decisiones de Diseño
+
+* **Arquitectura orientada a objetos**: clases para Literales, Llamadas a función, Expresiones binarias/unarias, etc. Todas heredan de `Expression` y comparten el método clave `infer_type`.
+* **Promoción implícita de tipos**: valores `char` se convierten a `int` o `float` cuando lo requiere el contexto. Por ejemplo:
+
+  ```vip
+  char a = 'A'
+  int  b = a + 4   # a → 65
+  ```
+* Verificación del **tipo de retorno** en funciones. Solo se admite una sentencia `return` por función, cumpliendo la especificación.
+* Prohibición de **asignaciones** en declaraciones dentro de registros y firmas de funciones; dichas infracciones se notifican pero no interrumpen el análisis.
+
+---
+
+## Pruebas
+
+Se suministra un script *bash* (`run.sh`) que ejecuta todas las pruebas contenidas en `test_files/input/`. Para cada .vip se generan cuatro artefactos en `test_files/output/`:
+
+| Extensión | Descripción                                          |
+| --------- | ---------------------------------------------------- |
+| `.token`  | Tokens producidos por el lexer                       |
+| `.symbol` | Tabla de símbolos generada por el análisis semántico |
+| `.record` | Registros definidos en el programa                   |
+| `.error`  | Salida estándar (vacía si no hay errores)            |
+
+El script compara cada salida con la referencia correspondiente en `test_files/expected/`. Se recomienda ejecutar las pruebas en un entorno **Linux** (son las VMs oficiales de la UC3M) para evitar discrepancias.
+
+> **Nota:** la primera ejecución puede fallar si `parsetab.py` y `parser.out` aún no existen, pues su creación emite mensajes en stdout.
+
+---
+
+## Contenido Extra
+
+### Scope de funciones (variables locales)
+
+Se implementó un control de **ámbito** que permite declarar variables locales dentro de una función. Estas variables quedan inaccesibles tras el retorno:
+
+```vip
+def int foo(int a):{
+    int i
+    return 0
+}
+
+i = 10  # Error: 'i' fue declarada en un ámbito distinto
+```
+
+### Recuperación de errores
+
+El compilador continúa el análisis tras detectar un error léxico, sintáctico o semántico, minimizando el número de abortos prematuros. Los errores léxicos suelen propagar más fallos derivados que los semánticos, al situarse en las primeras fases del pipeline.
+
+### Preprocesado del fichero
+
+Se añadió un **preprocesador** inspirado en C con dos directivas:
+
+* `%append <path>`  – Inserta el contenido de *path*.
+* `%supplant <old> <new>` – Reemplaza todas las ocurrencias de `<old>` por `<new>`.
+
+Ejemplo:
+
+```vip
+%append foo.vip
+%supplant PI 3.141592
+
+Circle c
+c.radius = 1
+float perimeter = 2 * c.radius * PI
+```
+
+Activable con el argumento opcional `allow_preprocess` de `ViperLexer`, genera un archivo `.postprocessed` que se entrega al lexer.
+
+---
+
+## Conclusiones
+
+La práctica ha consolidado los conceptos de compiladores: análisis léxico, sintáctico y semántico, así como el diseño modular y la gestión robusta de errores. Aunque el periodo de entrega coincidió con otras evaluaciones, el resultado es **funcional y coherente** con los objetivos.
+
+Esta experiencia nos ha permitido reforzar tanto la habilidad técnica como la organización en proyectos de software.

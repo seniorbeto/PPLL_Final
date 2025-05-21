@@ -4,7 +4,7 @@ int c = a + b     # Error: suma entre int y bool
 
 float x = 2.3
 char y = 'a'
-float z = x * y   # Error: multiplicar float por char
+float z = x * y   #Esto Ok
 
 bool t = true or 5  # Error: operación lógica con tipo no booleano
 

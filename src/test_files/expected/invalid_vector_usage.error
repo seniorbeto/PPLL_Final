@@ -1,0 +1,27 @@
+SEMANTIC ERROR DETECTED IN VECTOR LENGTH:
+	Cannot assign type Literal(5.5, float) to vector length
+	Variable affected: arr
+
+SEMANTIC ERROR DETECTED IN VECTOR LENGTH:
+	Cannot assign type float to vector length
+	Variable affected: v
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: NONETYPE and FLOAT
+	Variable affected: v
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: NONETYPE and BOOL
+	Variable affected: v
+
+SEMANTIC ERROR DETECTED. REDECLARATION OF VARIABLE:
+	Variable arr is already declared in this scope
+
+SEMANTIC ERROR DETECTED IN VECTOR LENGTH:
+	Cannot assign type bool to vector length
+	Variable affected: arr
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: NONETYPE and INT
+	Variable affected: arr
+

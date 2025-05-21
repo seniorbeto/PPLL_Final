@@ -1,0 +1,6 @@
+SEMANTIC ERROR DETECTED. REDECLARATION OF VARIABLE:
+	Variable a is already declared in this scope
+
+SEMANTIC ERROR DETECTED IN TYPE DECLARATION:
+	type 'persona' is already defined
+

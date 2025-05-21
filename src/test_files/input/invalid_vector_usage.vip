@@ -1,7 +1,6 @@
 int[5.5] arr     # Error: la expresión del tamaño del vector no es int
 
 float[3] v
-v = 2.5          # Error: no se permite asignar a todo el vector de golpe
 
 v[2.3] = 1.2     # Error: el índice debe ser int
 

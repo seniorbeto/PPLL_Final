@@ -1,1 +1,1 @@
-circle_vector:Vector(circle_vector,Circle,Literal(5),None)
+Vector[Circle] circle_vector

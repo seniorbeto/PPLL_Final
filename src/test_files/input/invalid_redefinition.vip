@@ -1,9 +1,11 @@
 int a = 3
 float a = 2.5    # Error: a ya declarada
 
-type persona {
+
+type persona: {
     int edad
 }
-type persona {   # Error: tipo persona ya definido
+
+type persona: {   # Error: tipo persona ya definido
     float altura
 }

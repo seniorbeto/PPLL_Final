@@ -1,4 +1,4 @@
-type user {
+type user: {
     int age
 }
 user u
@@ -8,10 +8,10 @@ u.age = true     # Error: tipo incompatible, espera int
 
 u.edad = 8       # Error: el campo 'edad' no existe (es 'age')
 
-type inner {
+type inner: {
     int v
 }
-type outer {
+type outer: {
     inner in
 }
 outer o

@@ -37,7 +37,7 @@ class Literal(Expression):
         raise SemanticError("Tipo de literal desconocido: %r" % self.value)
 
     def __repr__(self):
-        return f"Literal({self.value})"
+        return f"Literal({self.value}, {self.datatype})"
 
 
 class VariableRef(Expression):
@@ -77,35 +77,7 @@ class VariableRef(Expression):
         return self
 
     def infer_type(self, symbols, records):
-        # buscar variable
-        """
-        var = symbols.lookup_variable(self.name)
-        if not var:
-            var = records.lookup(self.name)
-            if not var:
-                return None
-        t = var.datatype
-        # resolver cada acceso secuencialmente
-        for kind, payload in self.ref_chain:
-            if kind == 'field':
-                rec = records.lookup(t)
-                if not rec:
-                    raise SemanticError("Tipo %s no es un record" % t)
-                fields = rec.fields
-                if payload not in fields:
-                    raise SemanticError("Field %s no existe en %s" % (payload, t))
-                t = fields[payload]
-            elif kind == 'index':
-                # payload es una Expression
-                idx_type = payload.infer_type(symbols, records)
-                if idx_type != 'int':
-                    raise SemanticError("Índice no es int sino %s" % idx_type)
-                # asumimos que el tipo vector acaba en []
-                if not t.endswith('[]'):
-                    raise SemanticError("Tipo %s no es vector" % t)
-                t = t[:-2]  # sacamos el tipo del elemento
-        return t
-        """
+        pass
 
     def __str__(self):
         result = f"VariableRef({self.name}"

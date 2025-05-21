@@ -1,0 +1,20 @@
+SEMANTIC ERROR DETECTED IN OPERATOR EXPRESSION:
+	Incompatible operands: int and bool for operator +. (Are they assigned?)
+
+SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:
+	Incompatible types: INT and NONETYPE
+	Variables Affected: c
+
+SEMANTIC ERROR DETECTED IN OPERATOR EXPRESSION:
+	Incompatible operands: true and 5 for operator or. (Are they assigned?)
+
+SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:
+	Incompatible types: BOOL and NONETYPE
+	Variables Affected: t
+
+SEMANTIC ERROR DETECTED IN OPERATOR EXPRESSION:
+	Incompatible operands: char and false for operator *. (Are they assigned?)
+
+	DETECTED IN ASSIGNMENT
+	Variable affected: w
+

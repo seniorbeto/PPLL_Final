@@ -109,6 +109,12 @@ class SemanticError(Exception):
             print("")
         if type_error == "Redefinition of Variable":
             print(
+                "SEMANTIC ERROR DETECTED. REDECLARATION OF VARIABLE:")
+            print(f"\tVariable {args[0]} is already declared in this scope")
+            print("")
+
+        if type_error == "Redefinition of Variable FUNC":
+            print(
                 "SEMANTIC ERROR DETECTED IN FUNCTION BODY->REDECLARATION OF VARIABLE:"
             )
             print(f"\tVariable {args[0]} is already declared in this scope")
@@ -142,7 +148,7 @@ class SemanticError(Exception):
             print("")
 
         if type_error == "No Vector DEC Error":
-            print("SEMANTIC ERROR DETECTED IN VECTOR DEC:")
+            print("SEMANTIC ERROR DETECTED IN VECTOR:")
             print(f"\tMissing index for vector {args[0]}")
             print(f"\tVariable affected: {args[1]}")
             print("")
