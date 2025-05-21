@@ -1,7 +1,7 @@
 class SemanticError(Exception):
 
     @staticmethod
-    def print_sem_error( type_error, args):
+    def print_sem_error(type_error, args):
         if type_error == "Function Declaration Error":
             print("SEMANTIC ERROR DETECTED IN FUNCTION ATRIBUTES DEFINITION:")
             print(f"\tYou cannot assign a value to a function atribute type.")
@@ -35,13 +35,19 @@ class SemanticError(Exception):
 
         if type_error == "Incompatible Types":
             print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:")
-            print(f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}")
+            print(
+                f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}"
+            )
             print(f"\tVariables Affected: {', '.join(var.name for var in args[2])}")
             print("")
 
         if type_error == "Incompatible Types Func":
-            print("SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT INSIDE FUNCTION:")
-            print(f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}")
+            print(
+                "SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT INSIDE FUNCTION:"
+            )
+            print(
+                f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}"
+            )
             print(f"\tVariables Affected: {', '.join(var.name for var in args[2])}")
             print(f"\tFunction Affected: {args[3]}")
             print("")
@@ -59,12 +65,16 @@ class SemanticError(Exception):
                 print("")
             else:
                 print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
-                print(f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}")
+                print(
+                    f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}"
+                )
                 print(f"\tVariable affected: {args[2]}")
                 print("")
         if type_error == "Incompatible Types Assignment Function":
             print("SEMANTIC ERROR DETECTED IN ASSIGNMENT INSIDE FUNCTION:")
-            print(f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}")
+            print(
+                f"\tIncompatible types: {args[0].upper() if args[0] != None else "NONETYPE"} and {args[1].upper() if args[1] != None else "NONETYPE"}"
+            )
             print(f"\tVariable affected: {args[2]}")
             print(f"\tFunction Affected: {args[3]}")
             print("")
@@ -87,14 +97,20 @@ class SemanticError(Exception):
 
         if type_error == "Type Error Not defined":
             print("SEMANTIC ERROR DETECTED IN ASSIGNMENT:")
-            print(f"\tInvalid assignment to variable '{args[0]}'. Attribute: {args[1]} is not defined")
+            print(
+                f"\tInvalid assignment to variable '{args[0]}'. Attribute: {args[1]} is not defined"
+            )
             print("")
-        if type_error =="Incompatible Operands":
+        if type_error == "Incompatible Operands":
             print("SEMANTIC ERROR DETECTED IN OPERATOR EXPRESSION:")
-            print(f"\tIncompatible operands: {args[1].value} and {args[2].value} for operator {args[0]}")
+            print(
+                f"\tIncompatible operands: {args[1].value} and {args[2].value} for operator {args[0]}. (Are they assigned?)"
+            )
             print("")
         if type_error == "Redefinition of Variable":
-            print("SEMANTIC ERROR DETECTED IN FUNCTION BODY->REDECLARATION OF VARIABLE:")
+            print(
+                "SEMANTIC ERROR DETECTED IN FUNCTION BODY->REDECLARATION OF VARIABLE:"
+            )
             print(f"\tVariable {args[0]} is already declared in this scope")
             print(f"\tFunction Affected: {args[1]}")
             print("")
@@ -142,51 +158,66 @@ class SemanticError(Exception):
             print(f"\tFunction Scope referece: {args[1]}")
             print("")
 
-
         if type_error == "Function parameters mismatch":
             print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
-            print(f"\tFunction '{args[0]}' takes {len(args[2])} parameters, but {len(args[1])} were provided")
+            print(
+                f"\tFunction '{args[0]}' takes {len(args[2])} parameters, but {len(args[1])} were provided"
+            )
             print(f"\tVariables affected: {args[1]}")
             print("")
 
         if type_error == "Function parameters mismatch FUNC":
             print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
-            print(f"\tFunction '{args[0]}' takes {len(args[2])} parameters, but {len(args[1])} were provided")
+            print(
+                f"\tFunction '{args[0]}' takes {len(args[2])} parameters, but {len(args[1])} were provided"
+            )
             print(f"\tVariables affected: {args[1]}")
             print(f"\tFunction Scope referece: {args[3]}")
             print("")
 
         if type_error == "Function error parameter":
             print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
-            print(f"\tIncompatible Datatypes. Expected: {args[1].datatype if args[1].datatype != None else 'NONETYPE'} and provided: {args[2].datatype if args[2].datatype != None else 'NONETYPE'}")
+            print(
+                f"\tIncompatible Datatypes. Expected: {args[1].datatype if args[1].datatype != None else 'NONETYPE'} and provided: {args[2].datatype if args[2].datatype != None else 'NONETYPE'}"
+            )
             print(f"\tFunction Call affected: {args[2]}")
             print("")
 
         if type_error == "Function error parameter FUNC":
             print("SEMANTIC ERROR DETECTED IN FUNCTION CALL:")
-            print(f"\tIncompatible Datatypes. Expected: {args[1].datatype if args[1].datatype != None else 'NONETYPE'} and provided: {args[2].datatype if args[2].datatype != None else 'NONETYPE'}")
+            print(
+                f"\tIncompatible Datatypes. Expected: {args[1].datatype if args[1].datatype != None else 'NONETYPE'} and provided: {args[2].datatype if args[2].datatype != None else 'NONETYPE'}"
+            )
             print(f"\tFunction Call affected: {args[2]}")
             print(f"\tFunction Scope referece: {args[3]}")
             print("")
 
         if type_error == "IF COND ERROR":
             print("SEMANTIC ERROR DETECTED IN IF STATEMENT:")
-            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])} instead")
+            print(
+                f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])} instead"
+            )
             print("")
 
         if type_error == "IF COND ERROR FUNC":
             print("SEMANTIC ERROR DETECTED IN IF STATEMENT:")
-            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])}")
+            print(
+                f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])}"
+            )
             print(f"\tFunction Scope referece: {args[3]}")
             print("")
 
         if type_error == "WHILE COND ERROR":
             print("SEMANTIC ERROR DETECTED IN WHILE STATEMENT:")
-            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])} instead")
+            print(
+                f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])} instead"
+            )
             print("")
 
         if type_error == "WHILE COND ERROR FUNC":
             print("SEMANTIC ERROR DETECTED IN WHILE STATEMENT:")
-            print(f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])}")
+            print(
+                f"\tExpected a boolean value for the condition, got {args[0].infer_type(args[1], args[2])}"
+            )
             print(f"\tFunction Scope referece: {args[3]}")
             print("")

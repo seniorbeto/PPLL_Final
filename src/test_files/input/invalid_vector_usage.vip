@@ -1,0 +1,14 @@
+int[5.5] arr     # Error: la expresión del tamaño del vector no es int
+
+float[3] v
+v = 2.5          # Error: no se permite asignar a todo el vector de golpe
+
+v[2.3] = 1.2     # Error: el índice debe ser int
+
+v[1] = true      # Error: tipo incompatible, float vs bool
+
+int[4] nums
+nums[4] = 2      # OJO: fuera de rango, pero esto es de ejecución, no semántico en compilación
+
+int[2] arr
+arr[true] = 2    # Error: índice debe ser int

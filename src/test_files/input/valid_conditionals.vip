@@ -1,11 +1,12 @@
 ''' Fichero para comprobar el correcto funcionamiento de los condicionales'''
 
 bool positive
-float num
+float num = 3.0
+float other = 2.0
 
-if num >= 0: {
+# Si pones 0 directamente falla TODO
+if num >= other: {
     positive = true
-}
-else {
+} else : {
     positive = false
 }

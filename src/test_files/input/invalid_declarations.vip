@@ -1,0 +1,5 @@
+x = 7            # Error: x no declarada previamente
+
+if a < b: {      # Error: a y b no declaradas
+    print(a)
+}

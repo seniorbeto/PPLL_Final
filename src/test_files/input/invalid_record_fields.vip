@@ -1,0 +1,20 @@
+type user {
+    int age
+}
+user u
+u.nombre = 7     # Error: el campo 'nombre' no existe en 'user'
+
+u.age = true     # Error: tipo incompatible, espera int
+
+u.edad = 8       # Error: el campo 'edad' no existe (es 'age')
+
+type inner {
+    int v
+}
+type outer {
+    inner in
+}
+outer o
+o.in = 2          # Error: se espera inner, no int
+
+o.in.v = true     # Error: tipo incompatible, espera int

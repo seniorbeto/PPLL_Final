@@ -107,7 +107,7 @@ class ViperLexer:
 
     # Definición para números en coma flotante (incluye notación científica)
     def t_FLOAT(self, t):
-        r'(?:[1-9]\d*|0)\.\d+(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+'
+        r"(?:[1-9]\d*|0)\.\d+(?:[eE][+-]?\d+)?|\d+[eE][+-]?\d+"
         t.value = float(t.value)
         return t
 
@@ -188,10 +188,14 @@ class ViperLexer:
                 content = self.preprocess(self.input_file)
 
                 # Actualizamos la ruta del fichero de entrada para el parser
-                self.parser_input_file = self.output_file.replace(".token", ".postprocessed")
+                self.parser_input_file = self.output_file.replace(
+                    ".token", ".postprocessed"
+                )
 
                 # Exportamos un fichero con el contenido preprocesado
-                with open(self.output_file.replace(".token", ".postprocessed"), "w") as pre_file:
+                with open(
+                    self.output_file.replace(".token", ".postprocessed"), "w"
+                ) as pre_file:
                     pre_file.write(content)
 
             self.lexer.input(content)
@@ -221,7 +225,7 @@ class ViperLexer:
         visited.add(file_path)
 
         # Lectura de líneas originales
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
         replacements = []
@@ -229,23 +233,25 @@ class ViperLexer:
 
         for line in lines:
             stripped = line.strip()
-            if stripped.startswith('%'):
+            if stripped.startswith("%"):
                 parts = shlex.split(stripped)
                 cmd = parts[0]
 
                 # %append <ruta>
-                if cmd == '%append' and len(parts) == 2:
+                if cmd == "%append" and len(parts) == 2:
                     include_path = parts[1]
                     # ruta relativa → absoluta (respecto al directorio del fichero padre)
                     if not os.path.isabs(include_path):
-                        include_path = os.path.join(os.path.dirname(file_path), include_path)
+                        include_path = os.path.join(
+                            os.path.dirname(file_path), include_path
+                        )
                     # recursividad para el fichero incluido, por si hay %appends dentro de %appends
                     included = self.preprocess(include_path, visited)
                     output_lines.append(included)
                     continue
 
                 # %supplant A B
-                elif cmd == '%supplant' and len(parts) == 3:
+                elif cmd == "%supplant" and len(parts) == 3:
                     old, new = parts[1], parts[2]
                     replacements.append((old, new))
                     continue
@@ -254,7 +260,7 @@ class ViperLexer:
             output_lines.append(line)
 
         # Ensamblamos el fichero resultante
-        content = ''.join(output_lines)
+        content = "".join(output_lines)
         for old, new in replacements:
             content = content.replace(old, new)
 

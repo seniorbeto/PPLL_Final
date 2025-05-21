@@ -1,0 +1,9 @@
+int a = 4
+if a: {
+    print(a)      # Error: condición no booleana
+}
+
+char c = 'c'
+if c: {
+    print(c)      # Error: condición no booleana
+}

@@ -1,7 +1,12 @@
-''' Fichero para comprobar errores semánticos en operaciones aritméticas '''
+int a = 3
+bool b = false
+int c = a + b     # Error: suma entre int y bool
 
-int a = 5
-bool b = true
+float x = 2.3
+char y = 'a'
+float z = x * y   # Error: multiplicar float por char
 
-# ERROR SEMÁNTICO: no se puede sumar un entero y un booleano
-int c = a + b
+bool t = true or 5  # Error: operación lógica con tipo no booleano
+
+char w = 'b'
+w = w * false     # Error: multiplicar char por bool

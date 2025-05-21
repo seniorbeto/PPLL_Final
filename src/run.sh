@@ -4,7 +4,7 @@ GREEN="\033[32m"
 RESET="\033[0m"
 BLUE="\033[34m"
 
-mkdir -p output
+mkdir -p test_files/output
 
 # Borramos todos los ficheros de output
 rm -f test_files/output/*

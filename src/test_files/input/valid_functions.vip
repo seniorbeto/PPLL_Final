@@ -5,7 +5,7 @@ def float square(float x): {
 }
 
 def float power(float f; int i): {
-    float r = 1
+    float r = 1.0
     int s = 1
     while s < i: {
         r = r * f
@@ -14,9 +14,7 @@ def float power(float f; int i): {
     return r
 }
 
-float result = square(2.0)
-
-float result_2 = power(result, 3)
+float result_2 = power(2, 3)
 
 # también se puede devolver un registro en una función
 
