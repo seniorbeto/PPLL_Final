@@ -1,0 +1,2 @@
+Point => [float x, float y]
+Circle => [Point center, float radius]

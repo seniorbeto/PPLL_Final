@@ -1,0 +1,2 @@
+Word => [Vector[char] string]
+Human => [Word name, Word last_name1, Word last_name2, int age]

@@ -1,0 +1,26 @@
+SEMANTIC ERROR DETECTED IN TYPE REFERENCE:
+	type 'user' OBJECT has no attribute 'nombre'
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: NONETYPE and INT
+	Variable affected: u
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: INT and BOOL
+	Variable affected: u
+
+SEMANTIC ERROR DETECTED IN TYPE REFERENCE:
+	type 'user' OBJECT has no attribute 'edad'
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: NONETYPE and INT
+	Variable affected: u
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: INNER and INT
+	Variable affected: o
+
+SEMANTIC ERROR DETECTED IN ASSIGNMENT:
+	Incompatible types: INT and BOOL
+	Variable affected: o
+

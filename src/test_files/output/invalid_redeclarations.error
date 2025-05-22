@@ -1,0 +1,7 @@
+SEMANTIC ERROR DETECTED. REDECLARATION OF VARIABLE:
+	Variable a is already declared in this scope
+
+SEMANTIC ERROR DETECTED IN DECLARATION AND ASSIGNEMENT:
+	Incompatible types: BOOL and CHAR
+	Variables Affected: b
+
